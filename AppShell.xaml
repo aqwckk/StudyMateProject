@@ -1,15 +1,38 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <Shell
     x:Class="StudyMateProject.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:StudyMateProject"
-    Shell.FlyoutBehavior="Disabled"
-    Title="StudyMateProject">
+    xmlns:views="clr-namespace:StudyMateProject.Views"
+    Shell.FlyoutBehavior="Flyout"
+    Title="StudyMate">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <Shell.FlyoutHeader>
+        <Grid BackgroundColor="{DynamicResource Primary}" HeightRequest="100">
+            <Image Source="app_icon.png" HeightRequest="80" HorizontalOptions="Center" VerticalOptions="Center"/>
+            <Label Text="StudyMate" TextColor="White" FontSize="24" FontAttributes="Bold" 
+                   HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,10"/>
+        </Grid>
+    </Shell.FlyoutHeader>
+
+    <!-- Main Tab Menu -->
+    <FlyoutItem Title="Заметки" Icon="icon_notes.png">
+        <ShellContent ContentTemplate="{DataTemplate views:NotesPage}" Route="notes" />
+    </FlyoutItem>
+    <FlyoutItem Title="Напоминания" Icon="icon_reminder.png">
+        <ShellContent ContentTemplate="{DataTemplate views:RemindersPage}" Route="reminders" />
+    </FlyoutItem>
+    <FlyoutItem Title="Калькулятор" Icon="icon_calculator.png">
+        <ShellContent ContentTemplate="{DataTemplate views:CalculatorPage}" Route="calculator" />
+    </FlyoutItem>
+    <FlyoutItem Title="Настройки" Icon="icon_settings.png">
+        <ShellContent ContentTemplate="{DataTemplate views:SettingsPage}" Route="settings" />
+    </FlyoutItem>
+
+    <!-- Registration of routes for other pages that are not in the tab menu -->
+    <ShellContent ContentTemplate="{DataTemplate views:TextNotePage}" Route="textNote" />
+    <ShellContent ContentTemplate="{DataTemplate views:GraphicNotePage}" Route="graphicNote" />
+    <ShellContent ContentTemplate="{DataTemplate views:EditReminderPage}" Route="editReminder" />
 
 </Shell>
