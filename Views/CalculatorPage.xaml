@@ -7,9 +7,7 @@
     x:DataType="viewmodels:CalculatorViewModel"
     Title="{Binding Title}">
 
-    <ContentPage.BindingContext>
-        <viewmodels:CalculatorViewModel />
-    </ContentPage.BindingContext>
+    <!-- Удалена дублирующаяся инициализация ViewModel -->
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Очистить историю" Command="{Binding ClearHistoryCommand}" IconImageSource="icon_clear.png" />

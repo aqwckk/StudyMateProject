@@ -463,6 +463,18 @@ namespace StudyMateProject.ViewModels
                 {
                     foreach (var stroke in loadedStrokes)
                     {
+                        // Проверка валидности цвета
+                        if (string.IsNullOrEmpty(stroke.Color) || !stroke.Color.StartsWith("#"))
+                        {
+                            stroke.Color = "#000000"; // По умолчанию черный
+                        }
+
+                        // Проверка валидности StrokeType
+                        if (string.IsNullOrEmpty(stroke.StrokeType))
+                        {
+                            stroke.StrokeType = "Pen"; // По умолчанию ручка
+                        }
+
                         Strokes.Add(stroke);
                     }
                 }
@@ -470,6 +482,8 @@ namespace StudyMateProject.ViewModels
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error loading strokes: {ex.Message}");
+                // В случае ошибки десериализации, очищаем строки
+                Strokes.Clear();
             }
         }
 

@@ -1,34 +1,59 @@
-﻿using Plugin.LocalNotification;
-using StudyMateProject.Models;
-
-namespace StudyMateProject.Services
+﻿namespace StudyMateProject.Services
 {
     public static class NotificationService
     {
+        private static bool _isSupported = false;
+
         public static async void Initialize()
         {
             try
             {
-                // Request permission with await, т.к. метод возвращает Task<bool>
-                bool permissionGranted = await LocalNotificationCenter.Current.RequestNotificationPermission();
+                // Сначала проверяем доступность плагина для текущей платформы
+                if (DeviceInfo.Platform == DevicePlatform.WinUI)
+                {
+                    System.Diagnostics.Debug.WriteLine("Local notifications are not fully supported on Windows platform");
+                    _isSupported = false;
+                    return; // Ранний выход для Windows
+                }
+
+                // Проверяем существование LocalNotificationCenter.Current
+                // используя null-условный оператор
+                var center = LocalNotificationCenter.Current;
+                if (center == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("LocalNotificationCenter.Current is null");
+                    _isSupported = false;
+                    return;
+                }
+
+                _isSupported = true;
+
+                // Безопасная подписка на событие
+                center.NotificationActionTapped += OnNotificationTapped;
+
+                // Запрос разрешения
+                bool permissionGranted = await center.RequestNotificationPermission();
                 if (!permissionGranted)
                 {
                     System.Diagnostics.Debug.WriteLine("Notification permission not granted");
                 }
             }
+            catch (NotImplementedException ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Local notifications are not implemented for this platform: {ex.Message}");
+                _isSupported = false;
+            }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error requesting notification permission: {ex}");
+                System.Diagnostics.Debug.WriteLine($"Error initializing notification service: {ex.Message}");
+                _isSupported = false;
             }
-
-            // Set notification tap handling
-            LocalNotificationCenter.Current.NotificationActionTapped += OnNotificationTapped;
         }
 
         public static void ScheduleReminderNotification(Reminder reminder)
         {
-            // Skip scheduling if the reminder is completed or in the past
-            if (reminder.IsCompleted || reminder.DueDate <= DateTime.Now)
+            // Skip scheduling if not supported, the reminder is completed, or in the past
+            if (!_isSupported || reminder.IsCompleted || reminder.DueDate <= DateTime.Now)
                 return;
 
             try
@@ -47,8 +72,8 @@ namespace StudyMateProject.Services
                 // Add data to identify the reminder when tapped
                 notification.ReturningData = reminder.Id;
 
-                // Без await
-                LocalNotificationCenter.Current.Show(notification);
+                // Вызываем синхронно, чтобы избежать проблем с отложенным выполнением
+                LocalNotificationCenter.Current?.Show(notification);
             }
             catch (Exception ex)
             {

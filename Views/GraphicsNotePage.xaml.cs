@@ -62,7 +62,17 @@ public partial class GraphicNotePage : ContentPage
                 paint.StrokeWidth = stroke.StrokeWidth;
                 paint.StrokeJoin = SKStrokeJoin.Round;
                 paint.StrokeCap = SKStrokeCap.Round;
-                paint.Color = SKColor.Parse(stroke.Color);
+
+                // Безопасное преобразование строки цвета в SKColor
+                try
+                {
+                    paint.Color = SKColor.Parse(stroke.Color);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error parsing color: {stroke.Color}, {ex.Message}");
+                    paint.Color = SKColors.Black; // Используем черный цвет по умолчанию при ошибке
+                }
 
                 // Apply special settings for highlighter
                 if (stroke.StrokeType == "Highlighter")
@@ -86,16 +96,19 @@ public partial class GraphicNotePage : ContentPage
                 using (var path = new SKPath())
                 {
                     // Start at the first point
-                    path.MoveTo(stroke.Points[0].X, stroke.Points[0].Y);
-
-                    // Add lines to all other points
-                    for (int i = 1; i < stroke.Points.Count; i++)
+                    if (stroke.Points.Count > 0)
                     {
-                        path.LineTo(stroke.Points[i].X, stroke.Points[i].Y);
-                    }
+                        path.MoveTo(stroke.Points[0].X, stroke.Points[0].Y);
 
-                    // Draw the path
-                    canvas.DrawPath(path, paint);
+                        // Add lines to all other points
+                        for (int i = 1; i < stroke.Points.Count; i++)
+                        {
+                            path.LineTo(stroke.Points[i].X, stroke.Points[i].Y);
+                        }
+
+                        // Draw the path
+                        canvas.DrawPath(path, paint);
+                    }
                 }
             }
         }
@@ -110,7 +123,17 @@ public partial class GraphicNotePage : ContentPage
                 paint.StrokeWidth = _currentStroke.StrokeWidth;
                 paint.StrokeJoin = SKStrokeJoin.Round;
                 paint.StrokeCap = SKStrokeCap.Round;
-                paint.Color = SKColor.Parse(_currentStroke.Color);
+
+                // Безопасное преобразование строки цвета в SKColor
+                try
+                {
+                    paint.Color = SKColor.Parse(_currentStroke.Color);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error parsing current stroke color: {_currentStroke.Color}, {ex.Message}");
+                    paint.Color = SKColors.Black; // Используем черный цвет по умолчанию при ошибке
+                }
 
                 // Apply special settings for highlighter
                 if (_currentStroke.StrokeType == "Highlighter")
@@ -139,61 +162,69 @@ public partial class GraphicNotePage : ContentPage
 
     private void OnCanvasViewTouch(object sender, SKTouchEventArgs e)
     {
-        switch (e.ActionType)
+        try
         {
-            case SKTouchAction.Pressed:
-                // Start a new path
-                _currentPath = new SKPath();
-                _currentPath.MoveTo(e.Location);
+            switch (e.ActionType)
+            {
+                case SKTouchAction.Pressed:
+                    // Start a new path
+                    _currentPath = new SKPath();
+                    _currentPath.MoveTo(e.Location);
 
-                // Create a new stroke
-                _currentStroke = new DrawingStroke
-                {
-                    StrokeWidth = _viewModel.SelectedStrokeWidth,
-                    Color = _viewModel.SelectedColor,
-                    StrokeType = _viewModel.SelectedTool
-                };
-                _currentStroke.Points.Add(new SKPointWrapper { X = e.Location.X, Y = e.Location.Y });
-
-                _isDrawing = true;
-                break;
-
-            case SKTouchAction.Moved:
-                if (_isDrawing)
-                {
-                    // Add point to the path
-                    _currentPath.LineTo(e.Location);
-
-                    // Add point to the stroke
+                    // Create a new stroke
+                    _currentStroke = new DrawingStroke
+                    {
+                        StrokeWidth = _viewModel.SelectedStrokeWidth,
+                        Color = _viewModel.SelectedColor,
+                        StrokeType = _viewModel.SelectedTool
+                    };
                     _currentStroke.Points.Add(new SKPointWrapper { X = e.Location.X, Y = e.Location.Y });
 
-                    // Invalidate to redraw
-                    canvasView.InvalidateSurface();
-                }
-                break;
+                    _isDrawing = true;
+                    break;
 
-            case SKTouchAction.Released:
-                if (_isDrawing)
-                {
-                    // Finish the path
-                    _currentPath.LineTo(e.Location);
+                case SKTouchAction.Moved:
+                    if (_isDrawing)
+                    {
+                        // Add point to the path
+                        _currentPath.LineTo(e.Location);
 
-                    // Add the last point to the stroke
-                    _currentStroke.Points.Add(new SKPointWrapper { X = e.Location.X, Y = e.Location.Y });
+                        // Add point to the stroke
+                        _currentStroke.Points.Add(new SKPointWrapper { X = e.Location.X, Y = e.Location.Y });
 
-                    // Add the stroke to the collection
-                    _viewModel.AddStrokeCommand.Execute(_currentStroke);
+                        // Invalidate to redraw
+                        canvasView.InvalidateSurface();
+                    }
+                    break;
 
+                case SKTouchAction.Released:
+                    if (_isDrawing)
+                    {
+                        // Finish the path
+                        _currentPath.LineTo(e.Location);
+
+                        // Add the last point to the stroke
+                        _currentStroke.Points.Add(new SKPointWrapper { X = e.Location.X, Y = e.Location.Y });
+
+                        // Add the stroke to the collection
+                        _viewModel.AddStrokeCommand.Execute(_currentStroke);
+
+                        _isDrawing = false;
+
+                        // Invalidate to redraw
+                        canvasView.InvalidateSurface();
+                    }
+                    break;
+
+                case SKTouchAction.Cancelled:
                     _isDrawing = false;
-
-                    // Invalidate to redraw
-                    canvasView.InvalidateSurface();
-                }
-                break;
-
-            case SKTouchAction.Cancelled:
-                _isDrawing = false;
-                break;
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error in OnCanvasViewTouch: {ex.Message}");
+            _isDrawing = false;
         }
 
         e.Handled = true;

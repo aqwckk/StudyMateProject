@@ -98,7 +98,6 @@ public partial class EditReminderPage : ContentPage
             DateTime dueDate = DueDatePicker.Date;
             TimeSpan dueTime = DueTimePicker.Time;
             _reminder.DueDate = dueDate.Add(dueTime);
-
             _reminder.IsCompleted = CompletedCheckBox.IsChecked;
 
             // Set related note

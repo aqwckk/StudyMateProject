@@ -66,8 +66,42 @@ namespace StudyMateProject.Models
     {
         public List<SKPointWrapper> Points { get; set; } = new();
         public float StrokeWidth { get; set; } = 5;
-        public string Color { get; set; } = "#000000";
-        public string StrokeType { get; set; } = "Normal"; // Normal, Highlighter, Eraser и т.д.
+        private string _color = "#000000";
+        public string Color
+        {
+            get => _color;
+            set
+            {
+                // Проверяем, что значение является валидным цветом
+                if (!string.IsNullOrEmpty(value) && value.StartsWith("#"))
+                {
+                    _color = value;
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"Invalid color value: {value}, using default");
+                    _color = "#000000"; // Черный цвет по умолчанию
+                }
+            }
+        }
+        private string _strokeType = "Pen";
+        public string StrokeType
+        {
+            get => _strokeType;
+            set
+            {
+                // Проверяем, что значение является валидным типом штриха
+                if (value == "Pen" || value == "Highlighter" || value == "Eraser")
+                {
+                    _strokeType = value;
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"Invalid stroke type: {value}, using default");
+                    _strokeType = "Pen"; // Ручка по умолчанию
+                }
+            }
+        }
     }
 
     /// <summary>

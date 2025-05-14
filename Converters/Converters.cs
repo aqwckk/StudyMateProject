@@ -72,13 +72,30 @@ namespace StudyMateProject.Converters
     /// <summary>
     /// Конвертер для работы с цветами
     /// </summary>
+    /// <summary>
+    /// Конвертер для работы с цветами
+    /// </summary>
     public class ColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is string currentColor && parameter is string parameterColor)
+            try
             {
-                return currentColor.Equals(parameterColor, StringComparison.OrdinalIgnoreCase);
+                if (value is string currentColor && parameter is string parameterColor)
+                {
+                    // Проверка на валидность цветов
+                    if (!currentColor.StartsWith("#"))
+                        currentColor = "#000000"; // По умолчанию черный
+
+                    if (!parameterColor.StartsWith("#"))
+                        parameterColor = "#000000"; // По умолчанию черный
+
+                    return currentColor.Equals(parameterColor, StringComparison.OrdinalIgnoreCase);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in ColorConverter.Convert: {ex.Message}");
             }
 
             return false;
@@ -86,12 +103,23 @@ namespace StudyMateProject.Converters
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is bool isChecked && isChecked && parameter is string parameterColor)
+            try
             {
-                return parameterColor;
+                if (value is bool isChecked && isChecked && parameter is string parameterColor)
+                {
+                    // Проверка на валидность цвета
+                    if (!parameterColor.StartsWith("#"))
+                        return "#000000"; // По умолчанию черный
+
+                    return parameterColor;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in ColorConverter.ConvertBack: {ex.Message}");
             }
 
-            return string.Empty;
+            return "#000000"; // По умолчанию черный
         }
     }
 
