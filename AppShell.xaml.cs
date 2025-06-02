@@ -1,16 +1,12 @@
-﻿using StudyMateProject.Views;
-
-namespace StudyMateProject;
-
-public partial class AppShell : Shell
+﻿namespace StudyMateTest
 {
-    public AppShell()
+    public partial class AppShell : Shell
     {
-        InitializeComponent();
+        public AppShell()
+        {
+            InitializeComponent();
 
-        // Register routes for navigation
-        Routing.RegisterRoute("textNote", typeof(TextNotePage));
-        Routing.RegisterRoute("graphicNote", typeof(GraphicNotePage));
-        Routing.RegisterRoute("editReminder", typeof(EditReminderPage));
+            Routing.RegisterRoute(nameof(Views.DrawingPage), typeof(Views.DrawingPage));
+        }
     }
 }

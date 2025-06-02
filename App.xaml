@@ -1,10 +1,9 @@
-﻿<?xml version="1.0" encoding="UTF-8" ?>
-<Application
-    x:Class="StudyMateProject.App"
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:StudyMateProject"
-    xmlns:converters="clr-namespace:StudyMateProject.Converters">
+﻿<?xml version = "1.0" encoding = "UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:StudyMateTest"
+             xmlns:converters="clr-namespace:StudyMateTest.Converters"
+             x:Class="StudyMateTest.App">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -12,14 +11,9 @@
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Converters -->
-            <converters:DatePastConverter x:Key="DatePastConverter" />
-            <converters:StringNotEmptyConverter x:Key="StringNotEmptyConverter" />
-            <converters:TypeConverter x:Key="TypeConverter" />
-            <converters:ColorConverter x:Key="ColorConverter" />
-            <converters:ToolConverter x:Key="ToolConverter" />
-            <converters:ExportCommandConverter x:Key="ExportCommandConverter" />
-            <converters:CompletionStatusToBrushConverter x:Key="CompletionStatusToBrushConverter" />
+            <converters:ToolToBackgroundColorConverter x:Key="ToolToBgConverter"/>
+            <converters:BoolToBackgroundColorConverter x:Key="BoolToBgConverter"/>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>
