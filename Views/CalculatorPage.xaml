@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="StudyMateProject.Views.CalculatorPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewmodels="clr-namespace:StudyMateProject.ViewModels"
+    x:DataType="viewmodels:CalculatorViewModel"
+    Title="{Binding Title}">
+
+    <!-- Удалена дублирующаяся инициализация ViewModel -->
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Очистить историю" Command="{Binding ClearHistoryCommand}" IconImageSource="icon_clear.png" />
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto,Auto,*" ColumnDefinitions="*" Padding="10">
+        <!-- Expression Entry -->
+        <Frame Grid.Row="0" Padding="10" BorderColor="{DynamicResource Primary}" CornerRadius="8" Margin="0,0,0,10">
+            <Entry Text="{Binding Expression}" 
+                 FontSize="24" 
+                 HorizontalTextAlignment="End"
+                 IsReadOnly="True" />
+        </Frame>
+
+        <!-- Result Display -->
+        <Frame Grid.Row="1" Padding="10" BorderColor="{DynamicResource Secondary}" CornerRadius="8" Margin="0,0,0,15">
+            <Grid ColumnDefinitions="*, Auto">
+                <Label Text="{Binding Result}" 
+                     FontSize="30" 
+                     FontAttributes="Bold"
+                     HorizontalTextAlignment="End"
+                     VerticalOptions="Center" />
+
+                <Button Grid.Column="1" 
+                      Text="Использовать" 
+                      Command="{Binding UseResultCommand}"
+                      IsEnabled="{Binding Result, Converter={StaticResource StringNotEmptyConverter}}"
+                      Margin="10,0,0,0"
+                      WidthRequest="60" />
+            </Grid>
+        </Frame>
+
+        <!-- Calculator Buttons and History -->
+        <Grid Grid.Row="2" RowDefinitions="*, Auto" ColumnDefinitions="*, Auto">
+            <!-- Calculator Buttons -->
+            <Grid RowDefinitions="*,*,*,*,*" ColumnDefinitions="*,*,*,*">
+                <!-- First Row -->
+                <Button Grid.Row="0" Grid.Column="0" Text="7" Command="{Binding AppendCommand}" CommandParameter="7" />
+                <Button Grid.Row="0" Grid.Column="1" Text="8" Command="{Binding AppendCommand}" CommandParameter="8" />
+                <Button Grid.Row="0" Grid.Column="2" Text="9" Command="{Binding AppendCommand}" CommandParameter="9" />
+                <Button Grid.Row="0" Grid.Column="3" Text="÷" Command="{Binding AppendCommand}" CommandParameter="/" BackgroundColor="{DynamicResource Secondary}" />
+
+                <!-- Second Row -->
+                <Button Grid.Row="1" Grid.Column="0" Text="4" Command="{Binding AppendCommand}" CommandParameter="4" />
+                <Button Grid.Row="1" Grid.Column="1" Text="5" Command="{Binding AppendCommand}" CommandParameter="5" />
+                <Button Grid.Row="1" Grid.Column="2" Text="6" Command="{Binding AppendCommand}" CommandParameter="6" />
+                <Button Grid.Row="1" Grid.Column="3" Text="×" Command="{Binding AppendCommand}" CommandParameter="*" BackgroundColor="{DynamicResource Secondary}" />
+
+                <!-- Third Row -->
+                <Button Grid.Row="2" Grid.Column="0" Text="1" Command="{Binding AppendCommand}" CommandParameter="1" />
+                <Button Grid.Row="2" Grid.Column="1" Text="2" Command="{Binding AppendCommand}" CommandParameter="2" />
+                <Button Grid.Row="2" Grid.Column="2" Text="3" Command="{Binding AppendCommand}" CommandParameter="3" />
+                <Button Grid.Row="2" Grid.Column="3" Text="-" Command="{Binding AppendCommand}" CommandParameter="-" BackgroundColor="{DynamicResource Secondary}" />
+
+                <!-- Fourth Row -->
+                <Button Grid.Row="3" Grid.Column="0" Text="0" Command="{Binding AppendCommand}" CommandParameter="0" />
+                <Button Grid.Row="3" Grid.Column="1" Text="." Command="{Binding AppendCommand}" CommandParameter="." />
+                <Button Grid.Row="3" Grid.Column="2" Text="=" Command="{Binding CalculateCommand}" BackgroundColor="{DynamicResource Primary}" TextColor="White" />
+                <Button Grid.Row="3" Grid.Column="3" Text="+" Command="{Binding AppendCommand}" CommandParameter="+" BackgroundColor="{DynamicResource Secondary}" />
+
+                <!-- Fifth Row -->
+                <Button Grid.Row="4" Grid.Column="0" Text="(" Command="{Binding AppendCommand}" CommandParameter="(" BackgroundColor="{DynamicResource Tertiary}" />
+                <Button Grid.Row="4" Grid.Column="1" Text=")" Command="{Binding AppendCommand}" CommandParameter=")" BackgroundColor="{DynamicResource Tertiary}" />
+                <Button Grid.Row="4" Grid.Column="2" Text="C" Command="{Binding ClearCommand}" BackgroundColor="{DynamicResource Danger}" TextColor="White" />
+                <Button Grid.Row="4" Grid.Column="3" Text="⌫" Command="{Binding BackspaceCommand}" BackgroundColor="{DynamicResource Warning}" />
+            </Grid>
+
+            <!-- History Section -->
+            <Frame Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" BorderColor="{DynamicResource Tertiary}" CornerRadius="8" Padding="10" Margin="10,0,0,0" MinimumWidthRequest="150">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="История" FontAttributes="Bold" FontSize="18" HorizontalOptions="Center" />
+                    <BoxView HeightRequest="1" BackgroundColor="{DynamicResource Gray200}" Margin="0,5" />
+                    <CollectionView ItemsSource="{Binding History}" HeightRequest="400">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Frame Padding="5" Margin="0,2" BorderColor="{DynamicResource Gray300}" CornerRadius="4">
+                                    <Label Text="{Binding .}" 
+                                         FontSize="14" 
+                                         LineBreakMode="TailTruncation" />
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+        </Grid>
+    </Grid>
+</ContentPage>

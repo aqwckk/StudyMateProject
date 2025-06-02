@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="StudyMateProject.Views.NotesPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewmodels="clr-namespace:StudyMateProject.ViewModels"
+    xmlns:models="clr-namespace:StudyMateProject.Models"
+    x:DataType="viewmodels:NotesViewModel"
+    Title="{Binding Title}">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Добавить текст" Command="{Binding AddTextNoteCommand}" IconImageSource="icon_text_note.png" />
+        <ToolbarItem Text="Добавить рисунок" Command="{Binding AddGraphicNoteCommand}" IconImageSource="icon_graphic_note.png" />
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto,*" ColumnDefinitions="*" Padding="10">
+        <!-- Search Box -->
+        <Frame Grid.Row="0" Padding="5" BorderColor="{DynamicResource Primary}" CornerRadius="8">
+            <SearchBar Placeholder="Поиск заметок..." Text="{Binding SearchText}" 
+                      SearchCommand="{Binding SearchNotesCommand}" />
+        </Frame>
+
+        <!-- Notes List -->
+        <RefreshView Grid.Row="1" Command="{Binding LoadNotesCommand}" IsRefreshing="{Binding IsBusy}">
+            <CollectionView ItemsSource="{Binding Notes}" 
+                          SelectedItem="{Binding SelectedNote}" 
+                          SelectionMode="Single"
+                          SelectionChangedCommand="{Binding NoteSelectedCommand}"
+                          SelectionChangedCommandParameter="{Binding SelectedNote}">
+                <CollectionView.EmptyView>
+                    <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image Source="icon_empty_notes.png" HeightRequest="100" WidthRequest="100" />
+                        <Label Text="Заметок не найдено" FontSize="18" HorizontalOptions="Center" />
+                        <Label Text="Создайте новую заметку, чтобы начать" FontSize="14" HorizontalOptions="Center" />
+                    </StackLayout>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:NoteBase">
+                        <SwipeView>
+                            <SwipeView.RightItems>
+                                <SwipeItems>
+                                    <SwipeItem Text="Удалить"
+                                             BackgroundColor="Red"
+                                             IconImageSource="icon_delete.png"
+                                             Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:NotesViewModel}}, Path=DeleteNoteCommand}"
+                                             CommandParameter="{Binding Id}" />
+                                </SwipeItems>
+                            </SwipeView.RightItems>
+
+                            <Frame Margin="0,5,0,5" BorderColor="{DynamicResource Secondary}" CornerRadius="5" Padding="10">
+                                <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto, Auto">
+                                    <!-- Note Title -->
+                                    <Label Grid.Column="0" Grid.Row="0" 
+                                         Text="{Binding Title}" 
+                                         FontSize="18" 
+                                         FontAttributes="Bold"/>
+
+                                    <!-- Note Type Icon -->
+                                    <Image Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
+                                         HeightRequest="30" 
+                                         WidthRequest="30">
+                                        <Image.Triggers>
+                                            <DataTrigger TargetType="Image" 
+                                                      Binding="{Binding Source={RelativeSource Self}, 
+                                                               Path=BindingContext, 
+                                                               Converter={StaticResource TypeConverter}}" 
+                                                      Value="TextNote">
+                                                <Setter Property="Source" Value="icon_text_note.png" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Image" 
+                                                      Binding="{Binding Source={RelativeSource Self}, 
+                                                               Path=BindingContext, 
+                                                               Converter={StaticResource TypeConverter}}" 
+                                                      Value="GraphicNote">
+                                                <Setter Property="Source" Value="icon_graphic_note.png" />
+                                            </DataTrigger>
+                                        </Image.Triggers>
+                                    </Image>
+
+                                    <!-- Modified Date -->
+                                    <Label Grid.Column="0" Grid.Row="1" 
+                                         Text="{Binding ModifiedDate, StringFormat='Изменено: {0:g}'}" 
+                                         FontSize="12" 
+                                         TextColor="Gray"/>
+                                </Grid>
+                            </Frame>
+                        </SwipeView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

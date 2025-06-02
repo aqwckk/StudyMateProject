@@ -1,7 +1,7 @@
 ﻿using Android.App;
 using Android.Runtime;
 
-namespace StudyMateProject
+namespace StudyMateTest
 {
     [Application]
     public class MainApplication : MauiApplication

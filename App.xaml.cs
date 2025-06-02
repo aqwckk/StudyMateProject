@@ -1,4 +1,4 @@
-﻿namespace StudyMateProject
+﻿namespace StudyMateTest
 {
     public partial class App : Application
     {

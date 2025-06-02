@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="StudyMateProject.Views.EditReminderPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:StudyMateProject.Models"
+    Title="Редактирование напоминания">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Сохранить" Clicked="OnSaveClicked" IconImageSource="icon_save.png" />
+        <ToolbarItem Text="Отмена" Clicked="OnCancelClicked" IconImageSource="icon_cancel.png" />
+    </ContentPage.ToolbarItems>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+            <!-- Title -->
+            <Label Text="Заголовок" FontAttributes="Bold" />
+            <Entry x:Name="TitleEntry" Placeholder="Заголовок напоминания" />
+
+            <!-- Description -->
+            <Label Text="Описание" FontAttributes="Bold" />
+            <Editor x:Name="DescriptionEditor" Placeholder="Детали напоминания" HeightRequest="100" />
+
+            <!-- Due Date and Time -->
+            <Label Text="Срок" FontAttributes="Bold" />
+            <HorizontalStackLayout Spacing="10">
+                <DatePicker x:Name="DueDatePicker" HorizontalOptions="FillAndExpand" />
+                <TimePicker x:Name="DueTimePicker" HorizontalOptions="FillAndExpand" />
+            </HorizontalStackLayout>
+
+            <!-- Completed Status -->
+            <HorizontalStackLayout Spacing="10">
+                <CheckBox x:Name="CompletedCheckBox" />
+                <Label Text="Отметить как выполненное" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <!-- Link to Note -->
+            <Label Text="Связанная заметка (Опционально)" FontAttributes="Bold" />
+            <Picker x:Name="RelatedNotePicker" Title="Выберите заметку" ItemDisplayBinding="{Binding Title}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

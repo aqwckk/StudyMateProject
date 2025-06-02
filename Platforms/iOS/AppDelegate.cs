@@ -1,6 +1,6 @@
 ﻿using Foundation;
 
-namespace StudyMateProject
+namespace StudyMateTest
 {
     [Register("AppDelegate")]
     public class AppDelegate : MauiUIApplicationDelegate
