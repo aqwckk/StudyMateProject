@@ -28,9 +28,36 @@ namespace StudyMateTest.Services
         private float _strokeWidth = 5;
         private bool _isFilled = false;
 
+        // настройки холста и масштабирования 
+        private float _canvasWidth = 800;
+        private float _canvasHeight = 600;
+        private float _zoom = 1.0f;
+        private SKPoint _panOffset = new SKPoint(0, 0);
+        private bool _isPanning = false;
+        private SKPoint _lastPanPoint;
+
+        // якоря для изменения размера 
+        private const float HANDLE_SIZE = 10;
+        private bool _isResizing = false;
+        private ResizeHandle _activateHandle = ResizeHandle.None;
+
+        public enum ResizeHandle 
+        {
+            None,
+            TopLeft,
+            TopRight, 
+            BottomLeft,
+            BottomRight,
+            Top,
+            Bottom,
+            Left,
+            Right
+        }
+
         // события
         public event EventHandler CanUndoRedoChanged;
         public event EventHandler DrawingChanged;
+        public event EventHandler<CanvasSizeChangedEventArgs> CanvasSizeChanged;
 
         private bool _isBatchOperation = false;
         private bool _hasChangedDuringBatch = false;
@@ -38,6 +65,44 @@ namespace StudyMateTest.Services
         // свойства для проверки возможности отмены/повтора
         public bool CanUndo => _undoStack.Count > 0;
         public bool CanRedo => _redoStack.Count > 0;
+
+        public float CanvasWidth 
+        {
+            get => _canvasWidth;
+            set 
+            {
+                if (_canvasWidth != value) 
+                {
+                    _canvasWidth = Math.Max(100, value);
+                    OnCanvasSizeChanged();
+                    OnDrawingChanged();
+                }
+            }
+        }
+
+        public float CanvasHeight
+        {
+            get => _canvasHeight;
+            set
+            {
+                if (_canvasHeight != value)
+                {
+                    _canvasHeight = Math.Max(100, value);
+                    OnCanvasSizeChanged();
+                    OnDrawingChanged();
+                }
+            }
+        }
+
+        public float Zoom 
+        {
+            get => _zoom;
+            set 
+            {
+                _zoom = Math.Max(0.1f, Math.Min(5.0f, value));
+                OnDrawingChanged();
+            }
+        }
 
         public void BeginBatchOperation() 
         {
@@ -53,6 +118,70 @@ namespace StudyMateTest.Services
                 OnDrawingChanged();
                 _hasChangedDuringBatch = false;
             }
+        }
+
+        private SKPoint ScreenToCanvas(SKPoint screenPoint, SKSize viewSize) 
+        {
+            float canvasScreenWidth = _canvasWidth * _zoom;
+            float canvasScreenHeight = _canvasHeight * _zoom;
+
+            float offsetX = (viewSize.Width - canvasScreenWidth) / 2 + _panOffset.X;
+            float offsetY = (viewSize.Height - canvasScreenHeight) / 2 + _panOffset.Y;
+
+            return new SKPoint(
+                (screenPoint.X - offsetX) / _zoom,
+                (screenPoint.Y - offsetY) / _zoom
+                );
+        }
+
+        private SKPoint CanvasToScreen(SKPoint canvasPoint, SKSize viewSize)
+        {
+            float canvasScreenWidth = _canvasWidth * _zoom;
+            float canvasScreenHeight = _canvasHeight * _zoom;
+
+            float offsetX = (viewSize.Width - canvasScreenWidth) / 2 + _panOffset.X;
+            float offsetY = (viewSize.Height - canvasScreenHeight) / 2 + _panOffset.Y;
+
+            return new SKPoint(
+                canvasPoint.X * _zoom + offsetX,
+                canvasPoint.Y * _zoom + offsetY
+                );
+        }
+
+        private ResizeHandle GetResizeHandle(SKPoint screenPoint, SKSize viewSize)
+        {
+            var topLeft = CanvasToScreen(new SKPoint(0, 0), viewSize);
+            var bottomRight = CanvasToScreen(new SKPoint(_canvasWidth, _canvasHeight), viewSize);
+
+            float handleSize = HANDLE_SIZE;
+
+            // углы
+            if (IsPointInHandle(screenPoint, topLeft, handleSize))
+                return ResizeHandle.TopLeft;
+            if (IsPointInHandle(screenPoint, new SKPoint(bottomRight.X, topLeft.Y), handleSize))
+                return ResizeHandle.TopRight;
+            if (IsPointInHandle(screenPoint, new SKPoint(topLeft.X, bottomRight.Y), handleSize))
+                return ResizeHandle.BottomLeft;
+            if (IsPointInHandle(screenPoint, bottomRight, handleSize))
+                return ResizeHandle.BottomRight;
+
+            // стороны
+            if (IsPointInHandle(screenPoint, new SKPoint((topLeft.X + bottomRight.X) / 2, topLeft.Y), handleSize))
+                return ResizeHandle.Top;
+            if (IsPointInHandle(screenPoint, new SKPoint((topLeft.X + bottomRight.X) / 2, bottomRight.Y), handleSize))
+                return ResizeHandle.Bottom;
+            if (IsPointInHandle(screenPoint, new SKPoint(topLeft.X, (topLeft.Y + bottomRight.Y) / 2), handleSize))
+                return ResizeHandle.Left;
+            if (IsPointInHandle(screenPoint, new SKPoint(bottomRight.X, (topLeft.Y + bottomRight.Y) / 2), handleSize))
+                return ResizeHandle.Right;
+
+            return ResizeHandle.None;
+        }
+
+        private bool IsPointInHandle(SKPoint point, SKPoint handleCenter, float handleSize) 
+        {
+            return Math.Abs(point.X - handleCenter.X) <= handleSize &&
+                Math.Abs(point.Y - handleCenter.Y) <= handleSize;
         }
 
         // создание кисти с текущими настройками
