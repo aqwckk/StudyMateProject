@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
+using SkiaSharp.Views.Maui.Controls.Hosting;
+using StudyMateTest.Services;
 
-namespace StudyMateProject
+namespace StudyMateTest
 {
     public static class MauiProgram
     {
@@ -9,12 +11,14 @@ namespace StudyMateProject
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseSkiaSharp()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
+            builder.Services.AddSingleton<IDrawingService, DrawingService>();
 #if DEBUG
             builder.Logging.AddDebug();
 #endif

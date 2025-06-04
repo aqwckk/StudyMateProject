@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:StudyMateTest.Models.Drawing"
+             xmlns:models="clr-namespace:StudyMateTest.Models.Drawing;assembly=StudyMateTest"
+             xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
+             xmlns:vm="clr-namespace:StudyMateTest.ViewModels"
+             x:Class="StudyMateTest.Views.DrawingPage"
+             Title="Графический редактор">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <ScrollView Grid.Row="0" Orientation="Horizontal">
+            <HorizontalStackLayout Padding="10" Spacing="8">
+                <Button Text="Карандаш"
+                        Command="{Binding SetToolCommand}"
+                        CommandParameter="{x:Static models:DrawingTool.Pen}"
+                        BackgroundColor="{Binding SelectedTool, Converter={StaticResource ToolToBgConverter}, ConverterParameter={x:Static local:DrawingTool.Pen}}" />
+
+                <Button Text="Линия"
+                        Command="{Binding SetToolCommand}"
+                        CommandParameter="{x:Static models:DrawingTool.Line}"
+                        BackgroundColor="{Binding SelectedTool, Converter={StaticResource ToolToBgConverter}, ConverterParameter={x:Static local:DrawingTool.Line}}" />
+
+                <Button Text="Прямоугольник"
+                        Command="{Binding SetToolCommand}"
+                        CommandParameter="{x:Static models:DrawingTool.Rectangle}"
+                        BackgroundColor="{Binding SelectedTool, Converter={StaticResource ToolToBgConverter}, ConverterParameter={x:Static local:DrawingTool.Rectangle}}" />
+
+                <Button Text="Квадрат"
+                        Command="{Binding SetToolCommand}"
+                        CommandParameter="{x:Static models:DrawingTool.Square}"
+                        BackgroundColor="{Binding SelectedTool, Converter={StaticResource ToolToBgConverter}, ConverterParameter={x:Static local:DrawingTool.Square}}" />
+
+                <Button Text="Эллипс"
+                        Command="{Binding SetToolCommand}"
+                        CommandParameter="{x:Static models:DrawingTool.Ellipse}"
+                        BackgroundColor="{Binding SelectedTool, Converter={StaticResource ToolToBgConverter}, ConverterParameter={x:Static local:DrawingTool.Ellipse}}" />
+
+                <Button Text="Круг"
+                        Command="{Binding SetToolCommand}"
+                        CommandParameter="{x:Static models:DrawingTool.Circle}"
+                        BackgroundColor="{Binding SelectedTool, Converter={StaticResource ToolToBgConverter}, ConverterParameter={x:Static local:DrawingTool.Circle}}" />
+
+                <Button Text="Треугольник"
+                        Command="{Binding SetToolCommand}"
+                        CommandParameter="{x:Static models:DrawingTool.Triangle}"
+                        BackgroundColor="{Binding SelectedTool, Converter={StaticResource ToolToBgConverter}, ConverterParameter={x:Static local:DrawingTool.Triangle}}" />
+
+                <Button Text="Заливка"
+                        Command="{Binding ToggleFillModeCommand}"
+                        BackgroundColor="{Binding IsFilled, Converter={StaticResource BoolToBgConverter}}" />
+            </HorizontalStackLayout>
+        </ScrollView>
+
+        <Grid Grid.Row="1">
+            <skia:SKCanvasView x:Name="canvasView"
+                               PaintSurface="OnCanvasViewPaintSurface"
+                               EnableTouchEvents="True"
+                               Touch="OnCanvasViewTouch" />
+        </Grid>
+
+        <Grid Grid.Row="2" Padding="10" ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="10">
+            <Button Grid.Column="0" Text="Отменить"
+                    Command="{Binding UndoCommand}"
+                    IsEnabled="{Binding CanUndo}" />
+            <Button Grid.Column="1" Text="Повторить"
+                    Command="{Binding RedoCommand}"
+                    IsEnabled="{Binding CanRedo}" />
+            <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center">
+
+                <Label Text="{Binding StrokeWidth, StringFormat='Толщина: {0:F1}'}"
+                       HorizontalOptions="Center" />
+                <Slider Value="{Binding StrokeWidth}"
+                        Minimum="1" Maximum="20"
+                        MinimumTrackColor="Black"
+                        MaximumTrackColor="LightGray" />
+
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="8" Margin="0,8,0,0">
+                    <Button WidthRequest="32" HeightRequest="32"
+                            BackgroundColor="Black"
+                            Command="{Binding SetColorCommand}"
+                            CommandParameter="Black" />
+                    <Button WidthRequest="32" HeightRequest="32"
+                            BackgroundColor="Red"
+                            Command="{Binding SetColorCommand}"
+                            CommandParameter="Red" />
+                    <Button WidthRequest="32" HeightRequest="32"
+                            BackgroundColor="Green"
+                            Command="{Binding SetColorCommand}"
+                            CommandParameter="Green" />
+                    <Button WidthRequest="32" HeightRequest="32"
+                            BackgroundColor="Blue"
+                            Command="{Binding SetColorCommand}"
+                            CommandParameter="Blue" />
+                    <Button WidthRequest="32" HeightRequest="32"
+                            BackgroundColor="Yellow"
+                            Command="{Binding SetColorCommand}"
+                            CommandParameter="Yellow" />
+                    <Button WidthRequest="32" HeightRequest="32"
+                            BackgroundColor="Purple"
+                            Command="{Binding SetColorCommand}"
+                            CommandParameter="Purple" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
+            <Button Grid.Column="3" Text="Очистить"
+                    Command="{Binding ClearCommand}" />
+            <Button Grid.Column="4" Text="Сохранить"
+                    Command="{Binding SaveCommand}" />
+        </Grid>
+
+    </Grid>
+</ContentPage>

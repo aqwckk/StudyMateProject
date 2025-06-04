@@ -3,6 +3,10 @@
     "Windows Machine": {
       "commandName": "MsixPackage",
       "nativeDebugging": false
+    },
+    "Профиль 1": {
+      "commandName": "Project",
+      "nativeDebugging": true
     }
   }
 }
