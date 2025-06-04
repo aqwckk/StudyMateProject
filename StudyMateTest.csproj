@@ -32,7 +32,31 @@
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" Condition="'$(Configuration)' == 'Debug'" />
+		<PackageReference Include="Shiny.Hosting.Maui" Version="3.3.4" />
+		<PackageReference Include="Shiny.Notifications" Version="3.3.4" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.6" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Views\ReminderPage.xaml.cs">
+	    <DependentUpon>ReminderPage.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Views\ReminderPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Platforms\Android\Resources\drawable\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiImage Update="Resources\Images\Bell.png">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </MauiImage>
 	</ItemGroup>
 
 </Project>

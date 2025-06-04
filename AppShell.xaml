@@ -4,11 +4,18 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:StudyMateTest.Views"
+    xmlns:views="clr-namespace:StudyMateTest.Views"
     Shell.FlyoutBehavior="Disabled">
 
     <ShellContent
         Title="Графический редактор"
-        ContentTemplate="{DataTemplate local:DrawingPage}"
-        Route="DrawingPage" />
+        ContentTemplate="{DataTemplate local:ReminderPage}"
+        Route="ReminderPage" />
 
+    <FlyoutItem Title="Напоминания" Icon="bell.png">
+        <ShellContent
+        Title="Напоминания"
+        ContentTemplate="{DataTemplate views:ReminderPage}"
+        Route="ReminderPage" />
+    </FlyoutItem>
 </Shell>
