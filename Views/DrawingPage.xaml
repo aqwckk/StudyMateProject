@@ -48,7 +48,8 @@
 
                 <Button Text="Заливка"
                         Command="{Binding ToggleFillModeCommand}"
-                        BackgroundColor="{Binding IsFilled, Converter={StaticResource BoolToBgConverter}}" />
+                        BackgroundColor="{Binding IsFilled, Converter={StaticResource BoolToBgConverter}}"
+                        IsVisible="{Binding IsFillSupported}"/>
             </HorizontalStackLayout>
         </ScrollView>
 

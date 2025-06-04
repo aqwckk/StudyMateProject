@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui.Controls;
@@ -19,13 +20,13 @@ namespace StudyMateTest.ViewModels
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public ICommand SetToolCommand { get; }
-        public ICommand UndoCommand { get; }
-        public ICommand RedoCommand { get; }
-        public ICommand ClearCommand { get; }
-        public ICommand ToggleFillModeCommand { get; }
-        public ICommand SaveCommand { get; }
-        public ICommand SetColorCommand { get; }
+        public ICommand SetToolCommand { get; private set; }
+        public ICommand UndoCommand { get; private set; }
+        public ICommand RedoCommand { get; private set; }
+        public ICommand ClearCommand { get; private set; }
+        public ICommand ToggleFillModeCommand { get; private set; }
+        public ICommand SaveCommand { get; private set; }
+        public ICommand SetColorCommand { get; private set; }
 
         private DrawingTool _selectedTool = DrawingTool.Pen;
         public DrawingTool SelectedTool 
@@ -38,6 +39,7 @@ namespace StudyMateTest.ViewModels
                     _selectedTool = value;
                     _drawingService.SetCurrentTool(value);
                     OnPropertyChanged();
+                    OnPropertyChanged(nameof(IsFillSupported));
                 }
             }
         }
@@ -87,6 +89,12 @@ namespace StudyMateTest.ViewModels
             }
         }
 
+        public bool IsFillSupported => _selectedTool == DrawingTool.Rectangle ||
+                                       _selectedTool == DrawingTool.Square ||
+                                       _selectedTool == DrawingTool.Ellipse ||
+                                       _selectedTool == DrawingTool.Circle ||
+                                       _selectedTool == DrawingTool.Triangle;
+
         public bool CanUndo => _drawingService.CanUndo;
         public bool CanRedo => _drawingService.CanRedo;
 
@@ -94,27 +102,20 @@ namespace StudyMateTest.ViewModels
         {
             _drawingService = drawingService;
 
-            SetToolCommand = new Command<DrawingTool>(tool => SelectedTool = tool);
-            UndoCommand = new Command(Undo, () => CanUndo);
-            RedoCommand = new Command(Redo, () => CanRedo);
-            ClearCommand = new Command(Clear);
-            ToggleFillModeCommand = new Command(() => IsFilled = !IsFilled);
-            SaveCommand = new Command(async () => await SaveDrawingAsync());
-            SetColorCommand = new Command<string>(SetColor);
-
-            _drawingService.CanUndoRedoChanged += (s, e) =>
-            {
-                OnPropertyChanged(nameof(CanUndo));
-                OnPropertyChanged(nameof(CanRedo));
-                ((Command)UndoCommand).ChangeCanExecute();
-                ((Command)RedoCommand).ChangeCanExecute();
-            };
+            InitializeCommands();
+            SubscribeToEvents();
         }
 
         public DrawingPageViewModel()
         {
             _drawingService = App.Current.Handler.MauiContext.Services.GetService<IDrawingService>();
 
+            InitializeCommands();
+            SubscribeToEvents();
+        }
+
+        private void InitializeCommands() 
+        {
             SetToolCommand = new Command<DrawingTool>(tool => SelectedTool = tool);
             UndoCommand = new Command(Undo, () => CanUndo);
             RedoCommand = new Command(Redo, () => CanRedo);
@@ -122,14 +123,29 @@ namespace StudyMateTest.ViewModels
             ToggleFillModeCommand = new Command(() => IsFilled = !IsFilled);
             SaveCommand = new Command(async () => await SaveDrawingAsync());
             SetColorCommand = new Command<string>(SetColor);
+        }
 
-            _drawingService.CanUndoRedoChanged += (s, e) =>
-            {
-                OnPropertyChanged(nameof(CanUndo));
-                OnPropertyChanged(nameof(CanRedo));
-                ((Command)UndoCommand).ChangeCanExecute();
-                ((Command)RedoCommand).ChangeCanExecute();
-            };
+        private void SubscribeToEvents() 
+        {
+            _drawingService.CanUndoRedoChanged += OnCanUndoRedoChanged;
+            _drawingService.DrawingChanged += OnDrawingChanged;
+        }
+
+        private void OnCanUndoRedoChanged(object sender, EventArgs e) 
+        {
+            OnPropertyChanged(nameof(CanUndo));
+            OnPropertyChanged(nameof(CanRedo));
+
+            ((Command)UndoCommand).ChangeCanExecute();
+            ((Command)RedoCommand).ChangeCanExecute();
+        }
+
+        private void OnDrawingChanged(object sender, EventArgs e) 
+        {
+            OnPropertyChanged(nameof(CanUndo));
+            OnPropertyChanged(nameof(CanRedo));
+            ((Command)UndoCommand).ChangeCanExecute();
+            ((Command)RedoCommand).ChangeCanExecute();
         }
 
         public void Draw(SKCanvas canvas) 

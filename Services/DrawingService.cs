@@ -36,7 +36,7 @@ namespace StudyMateTest.Services
         private bool _hasChangedDuringBatch = false;
 
         // свойства для проверки возможности отмены/повтора
-        public bool CanUndo => _elements.Count > 0;
+        public bool CanUndo => _undoStack.Count > 0;
         public bool CanRedo => _redoStack.Count > 0;
 
         public void BeginBatchOperation() 
@@ -58,12 +58,18 @@ namespace StudyMateTest.Services
         // создание кисти с текущими настройками
         private SKPaint CreatePaint() 
         {
+            bool supportsFill = _currentTool == DrawingTool.Rectangle ||
+                                _currentTool == DrawingTool.Square ||
+                                _currentTool == DrawingTool.Ellipse ||
+                                _currentTool == DrawingTool.Circle ||
+                                _currentTool == DrawingTool.Triangle;
+
             return new SKPaint()
             {
                 Color = _strokeColor,
                 StrokeWidth = _strokeWidth,
                 IsAntialias = true,
-                Style = _isFilled ? SKPaintStyle.Fill : SKPaintStyle.Stroke,
+                Style = (supportsFill && _isFilled) ? SKPaintStyle.Fill : SKPaintStyle.Stroke,
                 StrokeCap = SKStrokeCap.Round,
                 StrokeJoin = SKStrokeJoin.Round
             };
@@ -176,12 +182,12 @@ namespace StudyMateTest.Services
             _lastPoint = point;
             _isDragging = true;
 
-            if (_currentTool == DrawingTool.Pen) 
+            if (_currentTool == DrawingTool.Pen)
             {
                 _currentPath = new SKPath();
                 _currentPath.MoveTo(point);
             }
-
+            
             OnDrawingChanged();
         }
 
@@ -204,6 +210,7 @@ namespace StudyMateTest.Services
                 return;
             _lastPoint = point;
             _isDragging = false;
+            int index = _elements.Count;
 
             IDrawingElement newElement = null;
             SKPaint paint = CreatePaint();
@@ -244,12 +251,23 @@ namespace StudyMateTest.Services
                 {
                     Type = DrawingAction.ActionType.Add,
                     Element = newElement,
+                    Index = index
                 });
                 _elements.Add(newElement);
                 _redoStack.Clear();
                 OnCanUndoRedoChanged();
             }
             OnDrawingChanged();
+        }
+
+        
+
+        private bool ColorMatch(SKColor color1, SKColor color2, int tolerance = 10) 
+        {
+            return Math.Abs(color1.Red - color2.Red) <= tolerance &&
+                   Math.Abs(color1.Green - color2.Green) <= tolerance &&
+                   Math.Abs(color1.Blue - color2.Blue) <= tolerance &&
+                   Math.Abs(color1.Alpha - color2.Alpha) <= tolerance;
         }
 
         public void SetCurrentTool(DrawingTool tool) 
@@ -275,7 +293,7 @@ namespace StudyMateTest.Services
 
         public void Undo() 
         {
-            if (!CanUndo || _undoStack.Count == 0)
+            if (!CanUndo)
                 return;
             BeginBatchOperation();
             try
@@ -285,15 +303,13 @@ namespace StudyMateTest.Services
                 switch (action.Type)
                 {
                     case DrawingAction.ActionType.Add:
-                        int lastIndex = _elements.Count - 1;
-                        IDrawingElement removedElement = _elements[lastIndex];
-                        _elements.RemoveAt(lastIndex);
+                        _elements.RemoveAt(action.Index);
 
                         _redoStack.Push(new DrawingAction
                         {
-                            Type = DrawingAction.ActionType.Remove,
-                            Element = removedElement,
-                            Index = lastIndex
+                            Type = DrawingAction.ActionType.Add,
+                            Element = action.Element,
+                            Index = action.Index
                         });
                         break;
                     case DrawingAction.ActionType.Remove:
@@ -301,8 +317,9 @@ namespace StudyMateTest.Services
 
                         _redoStack.Push(new DrawingAction
                         {
-                            Type = DrawingAction.ActionType.Add,
-                            Element = action.Element
+                            Type = DrawingAction.ActionType.Remove,
+                            Element = action.Element,
+                            Index = action.Index
                         });
                         break;
 
@@ -312,7 +329,7 @@ namespace StudyMateTest.Services
                         _redoStack.Push(new DrawingAction
                         {
                             Type = DrawingAction.ActionType.Clear,
-                            ClearedElements = new List<IDrawingElement>(_elements)
+                            ClearedElements = new List<IDrawingElement>(action.ClearedElements)
                         });
                         break;
                 }
@@ -321,12 +338,13 @@ namespace StudyMateTest.Services
             {
                 EndBatchOperation();
                 OnCanUndoRedoChanged();
+                OnDrawingChanged();
             }        
         }
 
         public void Redo() 
         {
-            if (!CanRedo || _redoStack.Count == 0) 
+            if (!CanRedo) 
                 return;
 
             BeginBatchOperation();
@@ -337,16 +355,22 @@ namespace StudyMateTest.Services
                 switch (action.Type)
                 {
                     case DrawingAction.ActionType.Add:
-                        _elements.Add(action.Element);
+                        if (action.Index >= 0 && action.Index <= _elements.Count)
+                            _elements.Insert(action.Index, action.Element);
+                        else
+                            _elements.Add(action.Element);
 
-                        _undoStack.Push(new DrawingAction
-                        {
-                            Type = DrawingAction.ActionType.Add,
-                            Element = action.Element
-                        });
+                            _undoStack.Push(new DrawingAction
+                            {
+                                Type = DrawingAction.ActionType.Add,
+                                Element = action.Element,
+                                Index = action.Index
+                            });
                         break;
+
                     case DrawingAction.ActionType.Remove:
-                        _elements.RemoveAt(action.Index);
+                        if(action.Index >= 0 && action.Index < _elements.Count)
+                            _elements.RemoveAt(action.Index);
 
                         _undoStack.Push(new DrawingAction
                         {
@@ -372,6 +396,7 @@ namespace StudyMateTest.Services
             {
                 EndBatchOperation();
                 OnCanUndoRedoChanged();
+                OnDrawingChanged();
             }
         }
 
@@ -397,6 +422,7 @@ namespace StudyMateTest.Services
             {
                 EndBatchOperation();
                 OnCanUndoRedoChanged();
+                OnDrawingChanged();
             }
         }
 

@@ -4,7 +4,6 @@ using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
 using StudyMateTest.Services;
 using StudyMateTest.ViewModels;
-using System.Xml;
 
 namespace StudyMateTest.Views;
 
@@ -20,6 +19,8 @@ public partial class DrawingPage : ContentPage
 
 		_viewModel = new DrawingPageViewModel(drawingService);
 		BindingContext = _viewModel;
+
+		drawingService.DrawingChanged += OnDrawingChanged;
 	}
 
     public DrawingPage()
@@ -29,11 +30,21 @@ public partial class DrawingPage : ContentPage
         var drawingService = App.Current.Handler.MauiContext.Services.GetService<IDrawingService>();
         _viewModel = new DrawingPageViewModel();
         BindingContext = _viewModel;
+
+		drawingService.DrawingChanged += OnDrawingChanged;
     }
 
     private void OnCanvasViewPaintSurface(object sender, SKPaintSurfaceEventArgs e) 
 	{
 		_viewModel.Draw(e.Surface.Canvas);
+	}
+
+	private void OnDrawingChanged(object sender, EventArgs e) 
+	{
+		MainThread.BeginInvokeOnMainThread(() =>
+		{
+			canvasView.InvalidateSurface();
+		});
 	}
 
 	private void OnCanvasViewTouch(object sender, SKTouchEventArgs e) 
@@ -59,4 +70,17 @@ public partial class DrawingPage : ContentPage
 		
 		e.Handled = true;
 	}
+
+    protected override void OnDisappearing()
+    {
+		if (_viewModel != null && App.Current?.Handler?.MauiContext?.Services != null) 
+		{
+			var drawingService = App.Current.Handler.MauiContext.Services.GetService<IDrawingService>();
+			if (drawingService != null) 
+			{
+				drawingService.DrawingChanged -= OnDrawingChanged;
+			}
+		}
+		base.OnDisappearing();
+    }
 }
