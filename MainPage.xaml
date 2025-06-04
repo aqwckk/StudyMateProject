@@ -27,7 +27,7 @@
             <Button
                 x:Name="CounterBtn"
                 Text="Click me" 
-                SemanticProperties.Hint="Counts chikchirikNikita number of times you click"
+                SemanticProperties.Hint="Counts the number of times you click"
                 Clicked="OnCounterClicked"
                 HorizontalOptions="Fill" />
         </VerticalStackLayout>
