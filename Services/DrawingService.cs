@@ -39,7 +39,7 @@ namespace StudyMateTest.Services
         // якоря для изменения размера 
         private const float HANDLE_SIZE = 10;
         private bool _isResizing = false;
-        private ResizeHandle _activateHandle = ResizeHandle.None;
+        private ResizeHandle _activeHandle = ResizeHandle.None;
 
         public enum ResizeHandle 
         {
@@ -205,11 +205,35 @@ namespace StudyMateTest.Services
         }
 
         // метод рисования на холсте
-        public void Draw(SKCanvas canvas) 
+        public void Draw(SKCanvas canvas, SKSize viewSize) 
         {
             canvas.Clear(SKColors.White);
 
-            int count = _elements.Count;
+            float canvasScreenWidth = _canvasWidth * _zoom;
+            float canvasScreenHeight = _canvasHeight * _zoom;
+
+            float offsetX = (viewSize.Width - canvasScreenWidth) / 2 + _panOffset.X;
+            float offsetY = (viewSize.Height - canvasScreenHeight) / 2 + _panOffset.Y;
+
+            canvas.Save();
+
+            SKRect canvasRect = new SKRect(offsetX, offsetY, offsetX + canvasScreenWidth, offsetY + canvasScreenHeight);
+            using (SKPaint bgPaint = new SKPaint { Color = SKColors.White, Style = SKPaintStyle.Fill }) 
+            {
+                canvas.DrawRect(canvasRect, bgPaint);
+            }
+
+            using (SKPaint borderPaint = new SKPaint { Color = SKColors.Black, Style = SKPaintStyle.Stroke, StrokeWidth = 1 }) 
+            {
+                canvas.DrawRect(canvasRect, borderPaint);
+            }
+
+            canvas.Translate(offsetX, offsetY);
+            canvas.Scale(_zoom);
+
+            canvas.ClipRect(new SKRect(0, 0, _canvasWidth, _canvasHeight));
+
+                int count = _elements.Count;
             for (int i = 0; i < count; i++) 
             {
                 _elements[i].Draw(canvas);
@@ -266,6 +290,35 @@ namespace StudyMateTest.Services
                         break;
                 }
             }
+            canvas.Restore();
+
+            DrawResizeHandles(canvas, viewSize);
+        }
+
+        private void DrawResizeHandles(SKCanvas canvas, SKSize viewSize)
+        {
+            var topLeft = CanvasToScreen(new SKPoint(0, 0), viewSize);
+            var bottomRight = CanvasToScreen(new SKPoint(_canvasWidth, _canvasHeight), viewSize);
+
+            using (SKPaint handlePaint = new SKPaint { Color = SKColors.Blue, Style = SKPaintStyle.Fill })
+            {
+                float handleSize = HANDLE_SIZE;
+
+                DrawHandle(canvas, topLeft, handleSize, handlePaint);
+                DrawHandle(canvas, new SKPoint(bottomRight.X, topLeft.Y), handleSize, handlePaint);
+                DrawHandle(canvas, new SKPoint(topLeft.X, bottomRight.Y), handleSize, handlePaint);
+                DrawHandle(canvas, bottomRight, handleSize, handlePaint);
+
+                DrawHandle(canvas, new SKPoint((topLeft.X + bottomRight.X) / 2, topLeft.Y), handleSize, handlePaint);
+                DrawHandle(canvas, new SKPoint((topLeft.X + bottomRight.X) / 2, bottomRight.Y), handleSize, handlePaint);
+                DrawHandle(canvas, new SKPoint(topLeft.X, (topLeft.Y + bottomRight.Y) / 2), handleSize, handlePaint);
+                DrawHandle(canvas, new SKPoint(bottomRight.X, (topLeft.Y + bottomRight.Y) / 2), handleSize, handlePaint);
+            }
+        }
+
+        private void DrawHandle(SKCanvas canvas, SKPoint center, float size, SKPaint paint) 
+        {
+            canvas.DrawRect(center.X - size / 2, center.Y - size / 2, size, size, paint);
         }
 
         private SKRect CalculateRect(SKPoint start, SKPoint end, bool isSquareorCircle) 
@@ -305,8 +358,24 @@ namespace StudyMateTest.Services
             return new SKPoint[] { top, bottomLeft, bottomRight };
         }
 
-        public void HandleTouchStart(SKPoint point) 
+        public void HandleTouchStart(SKPoint point, SKSize viewSize) 
         {
+            _activeHandle = GetResizeHandle(point, viewSize);
+            if (_activeHandle != ResizeHandle.None) 
+            {
+                _isResizing = true;
+                return;
+            }
+
+            SKPoint canvasPoint = ScreenToCanvas(point, viewSize);
+
+            if (canvasPoint.X < 0 || canvasPoint.X > _canvasWidth || canvasPoint.Y < 0 || canvasPoint.Y > _canvasHeight) 
+            {
+                _isPanning = true;
+                _lastPanPoint = point;
+                return;
+            }
+
             _startPoint = point;
             _lastPoint = point;
             _isDragging = true;
@@ -314,30 +383,60 @@ namespace StudyMateTest.Services
             if (_currentTool == DrawingTool.Pen)
             {
                 _currentPath = new SKPath();
-                _currentPath.MoveTo(point);
+                _currentPath.MoveTo(canvasPoint);
             }
             
             OnDrawingChanged();
         }
 
-        public void HandleTouchMove(SKPoint point) 
+        public void HandleTouchMove(SKPoint point, SKSize viewSize) 
         {
+            if (_isResizing) 
+            {
+                HandleResize(point, viewSize);
+                return;
+            }
+
+            if (_isPanning) 
+            {
+                float deltaX = point.X - _lastPanPoint.X;
+                float deltaY = point.Y - _lastPanPoint.Y;
+                _panOffset = new SKPoint(_panOffset.X + deltaX, _panOffset.Y + deltaY);
+                _lastPanPoint = point;
+                OnDrawingChanged();
+                return;
+            }
             if (!_isDragging)
                 return;
 
-            _lastPoint = point;
+            SKPoint canvasPoint = ScreenToCanvas(point, viewSize);
+            _lastPoint = canvasPoint;
 
             if (_currentTool == DrawingTool.Pen && _currentPath != null) 
-                _currentPath.LineTo(point);
+                _currentPath.LineTo(canvasPoint);
 
             OnDrawingChanged();
         }
 
-        public void HandleTouchEnd(SKPoint point) 
+        public void HandleTouchEnd(SKPoint point, SKSize viewSize) 
         {
+            if (_isResizing) 
+            {
+                _isResizing = false;
+                _activeHandle = ResizeHandle.None;
+                return;
+            }
+
+            if (_isPanning) 
+            {
+                _isPanning = false;
+                return;
+            }
+
             if (!_isDragging)
                 return;
-            _lastPoint = point;
+            SKPoint canvasPoint = ScreenToCanvas(point, viewSize);
+            _lastPoint = canvasPoint;
             _isDragging = false;
             int index = _elements.Count;
 
@@ -349,14 +448,14 @@ namespace StudyMateTest.Services
                 case DrawingTool.Pen:
                     if (_currentPath != null) 
                     {
-                        _currentPath.LineTo(point);
+                        _currentPath.LineTo(canvasPoint);
                         newElement = new PathElement(_currentPath, paint);
                         _currentPath = null;
                     }
                     break;
 
                 case DrawingTool.Line:
-                    newElement = new LineElement(_startPoint, point, paint);
+                    newElement = new LineElement(_startPoint, canvasPoint, paint);
                     break;
 
                 case DrawingTool.Rectangle:
@@ -366,11 +465,11 @@ namespace StudyMateTest.Services
                     break;
                 case DrawingTool.Ellipse:
                 case DrawingTool.Circle:
-                    SKRect ellipseRect = CalculateRect(_startPoint, point, _currentTool == DrawingTool.Circle);
+                    SKRect ellipseRect = CalculateRect(_startPoint, canvasPoint, _currentTool == DrawingTool.Circle);
                     newElement = new EllipseElement(ellipseRect, paint);
                     break;
                 case DrawingTool.Triangle:
-                    SKPoint[] trianglePoints = CalculateTrianglePoints(_startPoint, point);
+                    SKPoint[] trianglePoints = CalculateTrianglePoints(_startPoint, canvasPoint);
                     newElement = new TriangleElement(trianglePoints[0], trianglePoints[1], trianglePoints[2], paint);
                     break;
             }
@@ -389,15 +488,62 @@ namespace StudyMateTest.Services
             OnDrawingChanged();
         }
 
-        
-
-        private bool ColorMatch(SKColor color1, SKColor color2, int tolerance = 10) 
+        private void HandleResize(SKPoint point, SKSize viewSize) 
         {
-            return Math.Abs(color1.Red - color2.Red) <= tolerance &&
-                   Math.Abs(color1.Green - color2.Green) <= tolerance &&
-                   Math.Abs(color1.Blue - color2.Blue) <= tolerance &&
-                   Math.Abs(color1.Alpha - color2.Alpha) <= tolerance;
+            var topLeft = CanvasToScreen(new SKPoint(0, 0), viewSize);
+            var bottomRight = CanvasToScreen(new SKPoint(_canvasWidth, _canvasHeight), viewSize);
+
+            switch (_activeHandle)
+            {
+                case ResizeHandle.TopLeft:
+                    var newTopLeft = point;
+                    _canvasWidth = (bottomRight.X - newTopLeft.X) / _zoom;
+                    _canvasHeight = (bottomRight.Y - newTopLeft.Y) / _zoom;
+                    break;
+                case ResizeHandle.TopRight:
+                    _canvasWidth = (point.X - topLeft.X) / _zoom;
+                    _canvasHeight = (bottomRight.Y - point.Y) / _zoom;
+                    break;
+                case ResizeHandle.BottomLeft:
+                    _canvasWidth = (bottomRight.X - point.X) / _zoom;
+                    _canvasHeight = (point.Y - topLeft.Y) / _zoom;
+                    break;
+                case ResizeHandle.BottomRight:
+                    _canvasWidth = (point.X - topLeft.X) / _zoom;
+                    _canvasHeight = (point.Y - topLeft.Y) / _zoom;
+                    break;
+                case ResizeHandle.Top:
+                    _canvasHeight = (bottomRight.Y - point.Y) / _zoom;
+                    break;
+                case ResizeHandle.Bottom:
+                    _canvasHeight = (point.Y - topLeft.Y) / _zoom;
+                    break;
+                case ResizeHandle.Left:
+                    _canvasWidth = (bottomRight.X - point.X) / _zoom;
+                    break;
+                case ResizeHandle.Right:
+                    _canvasWidth = (point.X - topLeft.X) / _zoom;
+                    break;
+            }
+
+            _canvasWidth = Math.Max(100, _canvasWidth);
+            _canvasHeight = Math.Max(100, _canvasHeight);
+
+            OnCanvasSizeChanged();
+            OnDrawingChanged();
         }
+
+        public void SetZoom(float zoom) 
+        {
+            Zoom = zoom;
+        }
+
+        public void SetCanvasSize(float width, float height) 
+        {
+            CanvasWidth = width;
+            CanvasHeight = height;
+        }
+
 
         public void SetCurrentTool(DrawingTool tool) 
         {
@@ -557,45 +703,20 @@ namespace StudyMateTest.Services
 
         public async Task<byte[]> SaveAsPngAsync()
         {
-            int width = 800;
-            int height = 600;
-            if (_elements.Count > 0)
+            SKImageInfo info = new SKImageInfo((int)_canvasWidth, (int)_canvasHeight);
+            using (SKSurface surface = SKSurface.Create(info)) 
             {
-                SKRect bounds = SKRect.Empty;
-                foreach (IDrawingElement element in _elements)
-                {
-                    if (bounds.IsEmpty)
-                    {
-                        bounds = element.Bounds;
-                    }
-                    else
-                    {
-                        float left = Math.Min(bounds.Left, element.Bounds.Left);
-                        float top = Math.Min(bounds.Top, element.Bounds.Top);
-                        float right = Math.Max(bounds.Right, element.Bounds.Right);
-                        float bottom = Math.Max(bounds.Bottom, element.Bounds.Bottom);
+                SKCanvas canvas = surface.Canvas;
+                canvas.Clear(SKColors.White);
 
-                        bounds = new SKRect(left, top, right, bottom);
-                    }
+                int count = _elements.Count;
+                for (int i = 0; i < count; i++) 
+                {
+                    _elements[i].Draw(canvas);
                 }
 
-                bounds = new SKRect(
-                    bounds.Left - 10,
-                    bounds.Top - 10,
-                    bounds.Right + 10,
-                    bounds.Bottom + 10
-                );
-
-                width = Math.Max(width, (int)bounds.Width);
-                height = Math.Max(height, (int)bounds.Height);
-            }
-
-            SKImageInfo info = new SKImageInfo(width, height);
-            using (SKSurface surface = SKSurface.Create(info))
-            {
-                Draw(surface.Canvas);
                 using (SKImage image = surface.Snapshot())
-                using (SKData data = image.Encode(SKEncodedImageFormat.Png, 100))
+                using (SKData data = image.Encode(SKEncodedImageFormat.Png, 100)) 
                 {
                     return data.ToArray();
                 }
@@ -616,6 +737,11 @@ namespace StudyMateTest.Services
             }
 
             DrawingChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        protected virtual void OnCanvasSizeChanged() 
+        {
+            CanvasSizeChanged?.Invoke(this, new CanvasSizeChangedEventArgs(_canvasWidth, _canvasHeight));
         }
     }
 }
