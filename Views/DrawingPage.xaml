@@ -6,9 +6,11 @@
              xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
              xmlns:vm="clr-namespace:StudyMateTest.ViewModels"
              x:Class="StudyMateTest.Views.DrawingPage"
-             Title="Графический редактор">
+             Title="Графический редактор"
+             BackgroundColor="#2E2E2E">
 
-    <Grid RowDefinitions="Auto,*,Auto">
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
+
         <ScrollView Grid.Row="0" Orientation="Horizontal">
             <HorizontalStackLayout Padding="10" Spacing="8">
                 <Button Text="Карандаш"
@@ -53,14 +55,55 @@
             </HorizontalStackLayout>
         </ScrollView>
 
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Padding="10" ColumnDefinitions="Auto,*,Auto,*,Auto" ColumnSpacing="10">
+            <VerticalStackLayout Grid.Column="0">
+                <Label Text="Размер холста" FontSize="12" HorizontalOptions="Center"/>
+                <HorizontalStackLayout Spacing="5">
+                    <Label Text="Ш:" VerticalOptions="Center"/>
+                    <Entry Text="{Binding CanvasWidth}"
+                           WidthRequest="60"
+                           Keyboard="Numeric"/>
+                    <Label Text="В:" VerticalOptions="Center"/>
+                    <Entry Text="{Binding CanvasHeight}"
+                           WidthRequest="60"
+                           Keyboard="Numeric"/>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
+            <BoxView Grid.Column="1" Color="LightGray" WidthRequest="1" Margin="10,0"/>
+
+            <VerticalStackLayout Grid.Column="2">
+                <Label Text="{Binding ZoomPercentage}" FontSize="12" HorizontalOptions="Center"/>
+                <HorizontalStackLayout Spacing="5">
+                    <Button Text="-" Command="{Binding ZoomOutCommand}" WidthRequest="30" HeightRequest="30"/>
+                    <Slider Value="{Binding Zoom}"
+                            Minimum="0.1"
+                            Maximum="5"
+                            WidthRequest="100"
+                            VerticalOptions="Center"/>
+                    <Button Text="+" Command="{Binding ZoomInCommand}" WidthRequest="30" HeightRequest="30"/>
+                    <Button Text="100%" Command="{Binding ResetZoomCommand}" WidthRequest="50" HeightRequest="30"/>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
+            <BoxView Grid.Column="3" Color="LightGray" WidthRequest="1" Margin="10,0"/>
+
+            <VerticalStackLayout Grid.Column="4">
+                <Label Text="Управление" FontSize="12" HorizontalOptions="Center"/>
+                <Label Text="Ctrl+колесо - масштаб" FontSize="10" HorizontalOptions="Center"/>
+                <Label Text="ЛКМ вне холста - панорама" FontSize="10" HorizontalOptions="Center"/>
+                <Label Text="Синие квадраты - изменение размера" FontSize="10" HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+        </Grid>
+
+        <Grid Grid.Row="2" BackgroundColor="#404040" Padding="20">
             <skia:SKCanvasView x:Name="canvasView"
                                PaintSurface="OnCanvasViewPaintSurface"
                                EnableTouchEvents="True"
                                Touch="OnCanvasViewTouch" />
         </Grid>
 
-        <Grid Grid.Row="2" Padding="10" ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="10">
+        <Grid Grid.Row="3" Padding="10" ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="10">
             <Button Grid.Column="0" Text="Отменить"
                     Command="{Binding UndoCommand}"
                     IsEnabled="{Binding CanUndo}" />

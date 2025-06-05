@@ -17,6 +17,7 @@ namespace StudyMateTest.ViewModels
     public class DrawingPageViewModel : INotifyPropertyChanged 
     {
         private readonly IDrawingService _drawingService;
+        private SKSize _currentViewSize;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -27,6 +28,9 @@ namespace StudyMateTest.ViewModels
         public ICommand ToggleFillModeCommand { get; private set; }
         public ICommand SaveCommand { get; private set; }
         public ICommand SetColorCommand { get; private set; }
+        public ICommand ZoomInCommand { get; private set; }
+        public ICommand ZoomOutCommand { get; private set; }
+        public ICommand ResetZoomCommand { get; private set; }
 
         private DrawingTool _selectedTool = DrawingTool.Pen;
         public DrawingTool SelectedTool 
@@ -89,6 +93,48 @@ namespace StudyMateTest.ViewModels
             }
         }
 
+        public float CanvasWidth 
+        {
+            get => _drawingService.CanvasWidth;
+            set 
+            {
+                if (_drawingService.CanvasWidth != value) 
+                {
+                    _drawingService.CanvasWidth = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public float CanvasHeight
+        {
+            get => _drawingService.CanvasHeight;
+            set
+            {
+                if (_drawingService.CanvasHeight != value)
+                {
+                    _drawingService.CanvasHeight = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public float Zoom 
+        {
+            get => _drawingService.Zoom;
+            set 
+            {
+                if (_drawingService.Zoom != value) 
+                {
+                    _drawingService.Zoom = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(ZoomPercentage));
+                }
+            }
+        }
+
+        public string ZoomPercentage => $"{Zoom * 100:F0}%";
+
         public bool IsFillSupported => _selectedTool == DrawingTool.Rectangle ||
                                        _selectedTool == DrawingTool.Square ||
                                        _selectedTool == DrawingTool.Ellipse ||
@@ -123,12 +169,17 @@ namespace StudyMateTest.ViewModels
             ToggleFillModeCommand = new Command(() => IsFilled = !IsFilled);
             SaveCommand = new Command(async () => await SaveDrawingAsync());
             SetColorCommand = new Command<string>(SetColor);
+
+            ZoomInCommand = new Command(() => Zoom = Math.Min(5.0f, Zoom * 1.2f));
+            ZoomOutCommand = new Command(() => Zoom = Math.Max(0.1f, Zoom / 1.2f));
+            ResetZoomCommand = new Command(() => Zoom = 1.0f);
         }
 
         private void SubscribeToEvents() 
         {
             _drawingService.CanUndoRedoChanged += OnCanUndoRedoChanged;
             _drawingService.DrawingChanged += OnDrawingChanged;
+            _drawingService.CanvasSizeChanged += OnCanvasSizeChanged;
         }
 
         private void OnCanUndoRedoChanged(object sender, EventArgs e) 
@@ -148,24 +199,42 @@ namespace StudyMateTest.ViewModels
             ((Command)RedoCommand).ChangeCanExecute();
         }
 
+        private void OnCanvasSizeChanged(object sender, CanvasSizeChangedEventArgs e) 
+        {
+            OnPropertyChanged(nameof(CanvasWidth));
+            OnPropertyChanged(nameof(CanvasHeight));
+        }
+
+        public void SetViewSize(SKSize viewSize) 
+        {
+            _currentViewSize = viewSize;
+        }
+
         public void Draw(SKCanvas canvas) 
         {
-            _drawingService.Draw(canvas);
+            _drawingService.Draw(canvas, _currentViewSize);
         }
 
         public void HandleTouchStart(SKPoint point) 
         {
-            _drawingService.HandleTouchStart(point);
+            _drawingService.HandleTouchStart(point, _currentViewSize);
         }
 
         public void HandleTouchMove(SKPoint point) 
         {
-            _drawingService.HandleTouchMove(point);
+            _drawingService.HandleTouchMove(point, _currentViewSize);
         }
 
         public void HandleTouchEnd(SKPoint point) 
         {
-            _drawingService.HandleTouchEnd(point);
+            _drawingService.HandleTouchEnd(point, _currentViewSize);
+        }
+
+        public void HandleWheelZoom(float delta, SKPoint center) 
+        {
+            float zoomFactor = delta > 0 ? 1.1f : 0.9f;
+            float newZoom = Math.Max(0.1f, Math.Min(5.0f, Zoom * zoomFactor));
+            Zoom = newZoom;
         }
 
         private void Undo() 

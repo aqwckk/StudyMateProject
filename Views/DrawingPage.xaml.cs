@@ -13,6 +13,8 @@ public partial class DrawingPage : ContentPage
 	private DateTime _lastInvalidateTime = DateTime.MinValue;
 	private const int MinInvalidateIntervalMs = 16;
 	private DrawingPageViewModel _viewModel;
+	private bool _isCtrlPressed = false;
+
 	public DrawingPage(IDrawingService drawingService)
 	{
 		InitializeComponent();
@@ -36,6 +38,7 @@ public partial class DrawingPage : ContentPage
 
     private void OnCanvasViewPaintSurface(object sender, SKPaintSurfaceEventArgs e) 
 	{
+		_viewModel.SetViewSize(e.Info.Size);
 		_viewModel.Draw(e.Surface.Canvas);
 	}
 
@@ -70,6 +73,48 @@ public partial class DrawingPage : ContentPage
 		
 		e.Handled = true;
 	}
+
+    protected override void OnHandlerChanged()
+    {
+        base.OnHandlerChanged();
+
+		if (Handler?.PlatformView != null) 
+		{
+			try
+			{
+				#if WINDOWS
+				if (Handler.PlatformView is Microsoft.UI.Xaml.FrameworkElement frameworkElement)
+				{
+					frameworkElement.KeyDown += (s, e) =>
+					{
+						_isCtrlPressed = e.Key == Windows.System.VirtualKey.Control;
+					};
+
+					frameworkElement.KeyUp += (s, e) =>
+					{
+						if(e.Key == Windows.System.VirtualKey.Control)
+							_isCtrlPressed = false;
+					};
+
+					frameworkElement.PointerWheelChanged += (s, e) =>
+					{
+						if(_isCtrlPressed)
+						{
+							var delta = e.GetCurrentPoint(frameworkElement).Properties.MouseWheelDelta;
+							var location = e.GetCurrentPoint(frameworkElement).Position;
+							_viewModel.HandleWheelZoom(delta, new SKPoint((float)location.X, (float)location.Y));
+							e.Handled = true;
+						}
+					};
+				}
+				#endif	
+			}
+			catch 
+			{
+				
+			}
+		}
+    }
 
     protected override void OnDisappearing()
     {

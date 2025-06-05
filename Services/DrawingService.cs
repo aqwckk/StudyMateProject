@@ -207,7 +207,7 @@ namespace StudyMateTest.Services
         // метод рисования на холсте
         public void Draw(SKCanvas canvas, SKSize viewSize) 
         {
-            canvas.Clear(SKColors.White);
+            canvas.Clear(SKColor.Parse("#A9A9A9"));
 
             float canvasScreenWidth = _canvasWidth * _zoom;
             float canvasScreenHeight = _canvasHeight * _zoom;
@@ -418,16 +418,16 @@ namespace StudyMateTest.Services
             OnDrawingChanged();
         }
 
-        public void HandleTouchEnd(SKPoint point, SKSize viewSize) 
+        public void HandleTouchEnd(SKPoint point, SKSize viewSize)
         {
-            if (_isResizing) 
+            if (_isResizing)
             {
                 _isResizing = false;
                 _activeHandle = ResizeHandle.None;
                 return;
             }
 
-            if (_isPanning) 
+            if (_isPanning)
             {
                 _isPanning = false;
                 return;
@@ -435,6 +435,7 @@ namespace StudyMateTest.Services
 
             if (!_isDragging)
                 return;
+
             SKPoint canvasPoint = ScreenToCanvas(point, viewSize);
             _lastPoint = canvasPoint;
             _isDragging = false;
@@ -443,10 +444,10 @@ namespace StudyMateTest.Services
             IDrawingElement newElement = null;
             SKPaint paint = CreatePaint();
 
-            switch (_currentTool) 
+            switch (_currentTool)
             {
                 case DrawingTool.Pen:
-                    if (_currentPath != null) 
+                    if (_currentPath != null)
                     {
                         _currentPath.LineTo(canvasPoint);
                         newElement = new PathElement(_currentPath, paint);
@@ -460,20 +461,23 @@ namespace StudyMateTest.Services
 
                 case DrawingTool.Rectangle:
                 case DrawingTool.Square:
-                    SKRect rectRect = CalculateRect(_startPoint, point, _currentTool == DrawingTool.Square);
+                    SKRect rectRect = CalculateRect(_startPoint, canvasPoint, _currentTool == DrawingTool.Square);
                     newElement = new RectangleElement(rectRect, paint);
                     break;
+
                 case DrawingTool.Ellipse:
                 case DrawingTool.Circle:
                     SKRect ellipseRect = CalculateRect(_startPoint, canvasPoint, _currentTool == DrawingTool.Circle);
                     newElement = new EllipseElement(ellipseRect, paint);
                     break;
+
                 case DrawingTool.Triangle:
                     SKPoint[] trianglePoints = CalculateTrianglePoints(_startPoint, canvasPoint);
                     newElement = new TriangleElement(trianglePoints[0], trianglePoints[1], trianglePoints[2], paint);
                     break;
             }
-            if (newElement != null) 
+
+            if (newElement != null)
             {
                 _undoStack.Push(new DrawingAction
                 {

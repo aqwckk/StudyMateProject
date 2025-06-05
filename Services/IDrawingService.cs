@@ -26,6 +26,10 @@ namespace StudyMateTest.Services
 
         bool CanUndo { get; }
         bool CanRedo { get; }
+        float CanvasWidth { get; set; }
+        float CanvasHeight { get; set; }
+        float Zoom { get; set; }
+
         void Undo();
         void Redo();
         void Clear();
