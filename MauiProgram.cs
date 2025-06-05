@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using StudyMateTest.Services;
+using StudyMateTest.Services.NotificationServices;
 using StudyMateTest.Views;
 
 namespace StudyMateTest
@@ -17,8 +18,16 @@ namespace StudyMateTest
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-            // Регистрируем простой сервис уведомлений БЕЗ Shiny
-            builder.Services.AddSingleton<INotificationService, SimpleNotificationService>();
+            // Регистрируем наши сервисы уведомлений (без Shiny)
+#if WINDOWS
+            builder.Services.AddSingleton<INotificationService, WindowsNotificationService>();
+#elif ANDROID
+            builder.Services.AddSingleton<INotificationService, AndroidNotificationService>();
+#elif IOS
+            builder.Services.AddSingleton<INotificationService, IOSNotificationService>();
+#else
+            builder.Services.AddSingleton<INotificationService, DefaultNotificationService>();
+#endif
 
             // Регистрируем страницы
             builder.Services.AddTransient<ReminderPage>();

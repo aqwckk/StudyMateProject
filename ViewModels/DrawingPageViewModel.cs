@@ -9,7 +9,7 @@ using Microsoft.Maui.Controls;
 using Microsoft.Maui.Storage;
 using SkiaSharp;
 using StudyMateTest.Models.Drawing;
-using StudyMateTest.Services;
+using StudyMateTest.Services.DrawingServices;
 
 namespace StudyMateTest.ViewModels
 {

@@ -7,7 +7,7 @@ using SkiaSharp;
 using StudyMateTest.Models.Drawing;
 using StudyMateTest.Models.Drawing.DrawingElements;
 
-namespace StudyMateTest.Services
+namespace StudyMateTest.Services.DrawingServices
 {
     public class DrawingService : IDrawingService
     {

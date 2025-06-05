@@ -10,8 +10,14 @@
 
         public DateTime ScheduledTime { get; set; } // Дата и время, когда должно появится уведомление
 
+        public DateTime CreatedAt { get; set; } // Когда было создано напоминание
+
         public bool IsActive { get; set; } // Свойство, которое показывает активно уведомление или нет
 
         public Dictionary<string, string> Metadata { get; set; } = new(); // Словарь для хранения дополнительных данных
+
+        // Для отображения в UI
+        public string DisplayTime => ScheduledTime.ToString("HH:mm dd.MM.yyyy");
+        public string StatusText => IsActive ? "Активно" : "Неактивно";
     }
 }
