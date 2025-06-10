@@ -156,55 +156,49 @@ namespace StudyMateTest.Services
             {
                 var context = Platform.CurrentActivity ?? Android.App.Application.Context;
 
-                // Создаем intent для открытия MainActivity
-                var intent = new Intent(context, typeof(MainActivity));
-                intent.SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTask | ActivityFlags.SingleTop);
-
-                // Добавляем дополнительные данные для обработки в приложении
-                intent.PutExtra("FromNotification", true);
-                intent.PutExtra("NotificationTitle", title);
-                intent.PutExtra("NotificationMessage", message);
-
-                if (metadata != null)
-                {
-                    foreach (var item in metadata)
-                    {
-                        intent.PutExtra(item.Key, item.Value);
-                    }
-                }
-
-                var pendingIntent = PendingIntent.GetActivity(context, notificationId, intent,
-                    PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
-
-                // Создаем уведомление с улучшенным каналом
-                var builder = new NotificationCompat.Builder(context, "studymate_reminders")
+                // Используем новый ID канала
+                var builder = new NotificationCompat.Builder(context, "StudyMateReminders_v2")
                     .SetContentTitle(title)
                     .SetContentText(message)
-                    .SetSmallIcon(Android.Resource.Drawable.IcDialogInfo) // Используем системную иконку
-                    .SetContentIntent(pendingIntent)
+                    .SetSmallIcon(Android.Resource.Drawable.IcDialogAlert) // Другая иконка
                     .SetAutoCancel(true)
-                    .SetPriority(NotificationCompat.PriorityHigh)
+                    .SetPriority(NotificationCompat.PriorityMax) // МАКСИМАЛЬНЫЙ приоритет
                     .SetDefaults(NotificationCompat.DefaultAll)
-                    .SetStyle(new NotificationCompat.BigTextStyle().BigText(message)) // Поддержка длинного текста
-                    .SetCategory(NotificationCompat.CategoryReminder); // Указываем категорию
+                    .SetStyle(new NotificationCompat.BigTextStyle().BigText(message))
+                    .SetCategory(NotificationCompat.CategoryCall) // Категория ЗВОНКА - самая важная!
+                    .SetVisibility(NotificationCompat.VisibilityPublic)
+                    .SetOngoing(false)
+                    .SetWhen(Java.Lang.JavaSystem.CurrentTimeMillis())
+                    .SetShowWhen(true)
+                    .SetSound(Android.Media.RingtoneManager.GetDefaultUri(Android.Media.RingtoneType.Notification))
+                    .SetVibrate(new long[] { 0, 250, 250, 250 }); // Принудительная вибрация
 
                 var notification = builder.Build();
+                
+                // Принудительно устанавливаем флаги
+                notification.Flags |= NotificationFlags.NoClear;
+                notification.Flags |= NotificationFlags.HighPriority;
+
                 var notificationManager = NotificationManagerCompat.From(context);
         
-                // Проверяем разрешения перед показом
                 if (NotificationManagerCompat.From(context).AreNotificationsEnabled())
                 {
                     notificationManager.Notify(notificationId, notification);
-                    System.Diagnostics.Debug.WriteLine($"Showed Android notification: {title} - {message}");
+                    System.Diagnostics.Debug.WriteLine($"FORCED MAX PRIORITY notification: {title}");
+                    
+                    // Дополнительная отладка
+                    System.Diagnostics.Debug.WriteLine($"Notification ID: {notificationId}");
+                    System.Diagnostics.Debug.WriteLine($"Channel ID: StudyMateReminders_v2");
+                    System.Diagnostics.Debug.WriteLine($"Priority: MAX");
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("Notifications are disabled for this app");
+                    System.Diagnostics.Debug.WriteLine("❌ Notifications are DISABLED for this app!");
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error showing Android notification: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"❌ Error showing notification: {ex.Message}");
             }
         }
     }
