@@ -36,12 +36,21 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Views\EditReminderPage.xaml.cs">
+	    <DependentUpon>EditReminderPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\ReminderPage.xaml.cs">
 	    <DependentUpon>ReminderPage.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Views\AddReminderPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\EditReminderPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\ReminderPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

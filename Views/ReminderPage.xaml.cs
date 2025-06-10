@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using Microsoft.Maui.Controls;
 using StudyMateTest.Models;
+using StudyMateTest.Services;
 using StudyMateTest.Services.NotificationServices;
 
 namespace StudyMateTest.Views
@@ -8,28 +9,29 @@ namespace StudyMateTest.Views
     public partial class ReminderPage : ContentPage
     {
         private readonly INotificationService _notificationService;
+        private readonly ILocalStorageService _localStorageService;
         private readonly ObservableCollection<Reminder> _reminders;
         private readonly Dictionary<string, string> _notificationIds;
 
         public ReminderPage()
         {
             InitializeComponent();
-
-            // Инициализация коллекций
             _reminders = new ObservableCollection<Reminder>();
             _notificationIds = new Dictionary<string, string>();
-
-            // Получаем сервис уведомлений
             _notificationService = GetNotificationService();
-
-            // Привязываем данные
+            _localStorageService = GetLocalStorageService();
             BindingContext = this;
             RemindersCollectionView.ItemsSource = _reminders;
 
-            // Загружаем существующие напоминания
+            // Подписываемся на сообщения
+            MessagingCenter.Subscribe<AddReminderPage, Reminder>(this, "ReminderCreated", OnReminderCreated);
+            MessagingCenter.Subscribe<EditReminderPage, Reminder>(this, "ReminderEdited", OnReminderEdited);
+
             _ = Task.Run(LoadReminders);
 
-            // Обновляем счетчик
+            // Запускаем периодическое обновление статусов
+            StartStatusUpdateTimer();
+
             UpdateReminderCount();
         }
 
@@ -37,13 +39,10 @@ namespace StudyMateTest.Views
         {
             try
             {
-                // Пытаемся получить сервис из DI контейнера
                 if (Application.Current?.MainPage?.Handler?.MauiContext?.Services != null)
                 {
                     return Application.Current.MainPage.Handler.MauiContext.Services.GetService<INotificationService>();
                 }
-
-                // Если не получилось, создаем fallback сервис
                 System.Diagnostics.Debug.WriteLine("Warning: Could not get NotificationService from DI, creating fallback");
                 return new DefaultNotificationService();
             }
@@ -54,27 +53,123 @@ namespace StudyMateTest.Views
             }
         }
 
-        public ObservableCollection<Reminder> Reminders => _reminders;
+        private ILocalStorageService GetLocalStorageService()
+        {
+            try
+            {
+                if (Application.Current?.MainPage?.Handler?.MauiContext?.Services != null)
+                {
+                    return Application.Current.MainPage.Handler.MauiContext.Services.GetService<ILocalStorageService>();
+                }
+                System.Diagnostics.Debug.WriteLine("Warning: Could not get LocalStorageService from DI, creating fallback");
+                return new LocalStorageService();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting LocalStorageService: {ex.Message}");
+                return new LocalStorageService();
+            }
+        }
+
+        private async void OnReminderEdited(EditReminderPage sender, Reminder editedReminder)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine($"Received edited reminder: {editedReminder.Title}");
+
+                await Dispatcher.DispatchAsync(() =>
+                {
+                    // Находим оригинальное напоминание и заменяем его
+                    var index = _reminders.ToList().FindIndex(r => r.Id == editedReminder.Id);
+                    if (index >= 0)
+                    {
+                        _reminders[index] = editedReminder;
+
+                        // Обновляем ID уведомления если есть
+                        if (editedReminder.Metadata.ContainsKey("NotificationId"))
+                        {
+                            _notificationIds[editedReminder.Id] = editedReminder.Metadata["NotificationId"];
+                        }
+
+                        UpdateReminderCount();
+                    }
+                });
+
+                // Сохраняем изменения
+                await SaveReminders();
+
+                System.Diagnostics.Debug.WriteLine($"Reminder edited and saved: {editedReminder.Title}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error handling edited reminder: {ex.Message}");
+            }
+        }
+
+        private void StartStatusUpdateTimer()
+        {
+            try
+            {
+                // Обновляем статусы каждую минуту
+                var timer = new System.Timers.Timer(60000); // 60 секунд
+                timer.Elapsed += async (s, e) =>
+                {
+                    await UpdateReminderStatuses();
+                };
+                timer.Start();
+
+                System.Diagnostics.Debug.WriteLine("Status update timer started");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error starting status timer: {ex.Message}");
+            }
+        }
+
+        private async Task UpdateReminderStatuses()
+        {
+            try
+            {
+                bool hasChanges = false;
+
+                await Dispatcher.DispatchAsync(() =>
+                {
+                    foreach (var reminder in _reminders)
+                    {
+                        var wasActive = reminder.IsActive;
+                        reminder.UpdateStatus();
+
+                        if (wasActive != reminder.IsActive)
+                        {
+                            hasChanges = true;
+                        }
+                    }
+
+                    if (hasChanges)
+                    {
+                        UpdateReminderCount();
+                    }
+                });
+
+                if (hasChanges)
+                {
+                    await SaveReminders();
+                    System.Diagnostics.Debug.WriteLine("Reminder statuses updated and saved");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error updating reminder statuses: {ex.Message}");
+            }
+        }
 
         private async void OnAddReminderClicked(object sender, EventArgs e)
         {
             try
             {
-                System.Diagnostics.Debug.WriteLine("Add reminder button clicked");
-
-                // Проверяем разрешения
-                if (!await _notificationService.IsPermissionGranted())
-                {
-                    var permissionGranted = await _notificationService.RequestPermission();
-                    if (!permissionGranted)
-                    {
-                        await DisplayAlert("Ошибка", "Разрешение на уведомления не предоставлено", "OK");
-                        return;
-                    }
-                }
-
-                // Показываем форму создания напоминания
-                await ShowCreateReminderDialog();
+                System.Diagnostics.Debug.WriteLine("Add reminder button clicked - opening new page");
+                var addReminderPage = new AddReminderPage();
+                await Navigation.PushAsync(addReminderPage);
             }
             catch (Exception ex)
             {
@@ -83,109 +178,29 @@ namespace StudyMateTest.Views
             }
         }
 
-        private async Task ShowCreateReminderDialog()
+        private async void OnReminderCreated(AddReminderPage sender, Reminder reminder)
         {
             try
             {
-                // Создаем простую форму ввода
-                string title = await DisplayPromptAsync("Новое напоминание", "Введите заголовок:", "OK", "Отмена", "Напоминание", 50);
-
-                if (string.IsNullOrWhiteSpace(title))
+                System.Diagnostics.Debug.WriteLine($"Received new reminder: {reminder.Title}");
+                if (reminder.Metadata.ContainsKey("NotificationId"))
                 {
-                    System.Diagnostics.Debug.WriteLine("Title is empty, cancelling");
-                    return;
+                    _notificationIds[reminder.Id] = reminder.Metadata["NotificationId"];
                 }
-
-                string message = await DisplayPromptAsync("Описание", "Введите описание (необязательно):", "OK", "Отмена", "", 100);
-                if (message == null) message = ""; // Пользователь нажал отмена
-
-                // Запрашиваем время (упрощенно - на 1 минуту вперед для тестирования)
-                var scheduledTime = DateTime.Now.AddMinutes(1);
-
-                var timeChoice = await DisplayActionSheet(
-                    "Когда напомнить?",
-                    "Отмена",
-                    null,
-                    "Через 1 минуту (тест)",
-                    "Через 5 минут",
-                    "Через 1 час",
-                    "Завтра в это время"
-                );
-
-                switch (timeChoice)
-                {
-                    case "Через 1 минуту (тест)":
-                        scheduledTime = DateTime.Now.AddMinutes(1);
-                        break;
-                    case "Через 5 минут":
-                        scheduledTime = DateTime.Now.AddMinutes(5);
-                        break;
-                    case "Через 1 час":
-                        scheduledTime = DateTime.Now.AddHours(1);
-                        break;
-                    case "Завтра в это время":
-                        scheduledTime = DateTime.Now.AddDays(1);
-                        break;
-                    case "Отмена":
-                    case null:
-                        System.Diagnostics.Debug.WriteLine("Time selection cancelled");
-                        return;
-                }
-
-                // Создаем напоминание
-                await CreateReminder(title, message, scheduledTime);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error in ShowCreateReminderDialog: {ex.Message}");
-                await DisplayAlert("Ошибка", $"Ошибка создания формы: {ex.Message}", "OK");
-            }
-        }
-
-        private async Task CreateReminder(string title, string message, DateTime scheduledTime)
-        {
-            try
-            {
-                System.Diagnostics.Debug.WriteLine($"Creating reminder: {title} for {scheduledTime}");
-
-                // Создаем объект напоминания
-                var reminder = new Reminder
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Title = title,
-                    Message = message,
-                    ScheduledTime = scheduledTime,
-                    IsActive = true,
-                    CreatedAt = DateTime.Now,
-                    Metadata = new Dictionary<string, string>()
-                };
-
-                // Планируем уведомление
-                var notificationId = await _notificationService.ScheduleNotification(
-                    reminder.Title,
-                    reminder.Message,
-                    reminder.ScheduledTime,
-                    reminder.Metadata
-                );
-
-                // Сохраняем ID уведомления
-                _notificationIds[reminder.Id] = notificationId;
-
-                // ВАЖНО: Добавляем в коллекцию в UI потоке
                 await Dispatcher.DispatchAsync(() =>
                 {
                     _reminders.Add(reminder);
                     UpdateReminderCount();
                 });
 
-                System.Diagnostics.Debug.WriteLine($"Reminder created successfully. Total reminders: {_reminders.Count}");
+                // НОВОЕ: Сохраняем в локальное хранилище
+                await SaveReminders();
 
-                await DisplayAlert("Успех", $"Напоминание создано!\nВремя: {scheduledTime:HH:mm dd.MM.yyyy}", "OK");
+                System.Diagnostics.Debug.WriteLine($"Reminder added and saved. Total reminders: {_reminders.Count}");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error creating reminder: {ex.Message}");
-                await DisplayAlert("Ошибка", $"Не удалось создать напоминание: {ex.Message}", "OK");
+                System.Diagnostics.Debug.WriteLine($"Error adding received reminder: {ex.Message}");
             }
         }
 
@@ -195,32 +210,17 @@ namespace StudyMateTest.Views
             {
                 if (sender is Button button && button.BindingContext is Reminder reminder)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Editing reminder: {reminder.Title}");
+                    System.Diagnostics.Debug.WriteLine($"Opening edit page for reminder: {reminder.Title}");
 
-                    // Простое редактирование - изменяем только заголовок
-                    string newTitle = await DisplayPromptAsync("Редактировать", "Новый заголовок:", "OK", "Отмена", reminder.Title);
-
-                    if (!string.IsNullOrWhiteSpace(newTitle) && newTitle != reminder.Title)
-                    {
-                        await Dispatcher.DispatchAsync(() =>
-                        {
-                            reminder.Title = newTitle;
-                            // Принудительно обновляем UI
-                            var index = _reminders.IndexOf(reminder);
-                            if (index >= 0)
-                            {
-                                _reminders[index] = reminder;
-                            }
-                        });
-
-                        await DisplayAlert("Успех", "Напоминание обновлено", "OK");
-                    }
+                    // Открываем страницу редактирования
+                    var editPage = new EditReminderPage(reminder);
+                    await Navigation.PushAsync(editPage);
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error editing reminder: {ex.Message}");
-                await DisplayAlert("Ошибка", $"Ошибка редактирования: {ex.Message}", "OK");
+                System.Diagnostics.Debug.WriteLine($"Error opening edit page: {ex.Message}");
+                await DisplayAlert("Ошибка", $"Ошибка открытия редактора: {ex.Message}", "OK");
             }
         }
 
@@ -231,26 +231,24 @@ namespace StudyMateTest.Views
                 if (sender is Button button && button.BindingContext is Reminder reminder)
                 {
                     System.Diagnostics.Debug.WriteLine($"Deleting reminder: {reminder.Title}");
-
                     bool confirm = await DisplayAlert("Подтверждение", $"Удалить напоминание '{reminder.Title}'?", "Да", "Нет");
-
                     if (confirm)
                     {
-                        // Отменяем уведомление
                         if (_notificationIds.ContainsKey(reminder.Id))
                         {
                             await _notificationService.CancelNotification(_notificationIds[reminder.Id]);
                             _notificationIds.Remove(reminder.Id);
                         }
-
-                        // Удаляем из коллекции
                         await Dispatcher.DispatchAsync(() =>
                         {
                             _reminders.Remove(reminder);
                             UpdateReminderCount();
                         });
 
-                        System.Diagnostics.Debug.WriteLine($"Reminder deleted. Remaining: {_reminders.Count}");
+                        // НОВОЕ: Сохраняем изменения
+                        await SaveReminders();
+
+                        System.Diagnostics.Debug.WriteLine($"Reminder deleted and saved. Remaining: {_reminders.Count}");
                         await DisplayAlert("Успех", "Напоминание удалено", "OK");
                     }
                 }
@@ -266,7 +264,7 @@ namespace StudyMateTest.Views
         {
             try
             {
-                System.Diagnostics.Debug.WriteLine("Refresh clicked");
+                System.Diagnostics.Debug.WriteLine("Refresh clicked - reloading from storage");
                 await LoadReminders();
                 await DisplayAlert("Обновлено", $"Загружено {_reminders.Count} напоминаний", "OK");
             }
@@ -286,15 +284,10 @@ namespace StudyMateTest.Views
                     await DisplayAlert("Информация", "Нет напоминаний для удаления", "OK");
                     return;
                 }
-
                 bool confirm = await DisplayAlert("Подтверждение", $"Удалить все {_reminders.Count} напоминаний?", "Да", "Нет");
-
                 if (confirm)
                 {
-                    // Отменяем все уведомления
                     await _notificationService.CancelAllNotifications();
-
-                    // Очищаем коллекции
                     await Dispatcher.DispatchAsync(() =>
                     {
                         _reminders.Clear();
@@ -302,7 +295,10 @@ namespace StudyMateTest.Views
                         UpdateReminderCount();
                     });
 
-                    System.Diagnostics.Debug.WriteLine("All reminders cleared");
+                    // НОВОЕ: Удаляем файл хранилища
+                    await _localStorageService.DeleteAllRemindersAsync();
+
+                    System.Diagnostics.Debug.WriteLine("All reminders cleared from memory and storage");
                     await DisplayAlert("Успех", "Все напоминания удалены", "OK");
                 }
             }
@@ -317,17 +313,30 @@ namespace StudyMateTest.Views
         {
             try
             {
-                System.Diagnostics.Debug.WriteLine("Loading reminders...");
+                System.Diagnostics.Debug.WriteLine("Loading reminders from local storage...");
 
-                // В этой версии у нас нет постоянного хранилища, 
-                // но можно добавить позже
+                // Загружаем из локального хранилища
+                var savedReminders = await _localStorageService.LoadRemindersAsync();
 
                 await Dispatcher.DispatchAsync(() =>
                 {
+                    _reminders.Clear();
+
+                    foreach (var reminder in savedReminders)
+                    {
+                        _reminders.Add(reminder);
+
+                        // Восстанавливаем ID уведомлений если есть
+                        if (reminder.Metadata.ContainsKey("NotificationId"))
+                        {
+                            _notificationIds[reminder.Id] = reminder.Metadata["NotificationId"];
+                        }
+                    }
+
                     UpdateReminderCount();
                 });
 
-                System.Diagnostics.Debug.WriteLine($"Loaded {_reminders.Count} reminders");
+                System.Diagnostics.Debug.WriteLine($"Loaded {_reminders.Count} reminders from storage");
             }
             catch (Exception ex)
             {
@@ -335,17 +344,30 @@ namespace StudyMateTest.Views
             }
         }
 
+        private async Task SaveReminders()
+        {
+            try
+            {
+                var remindersList = _reminders.ToList();
+                await _localStorageService.SaveRemindersAsync(remindersList);
+                System.Diagnostics.Debug.WriteLine($"Saved {remindersList.Count} reminders to storage");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error saving reminders: {ex.Message}");
+            }
+        }
+
         private void UpdateReminderCount()
         {
             try
             {
-                var activeCount = _reminders.Count(r => r.IsActive);
+                var activeCount = _reminders.Count(r => r.IsCurrentlyActive);
                 ReminderCountLabel.Text = $"{activeCount} активных напоминаний";
-
-                // Показываем/скрываем EmptyState
-                EmptyStateLabel.IsVisible = _reminders.Count == 0;
-
-                System.Diagnostics.Debug.WriteLine($"Updated reminder count: {activeCount}");
+                bool isEmpty = _reminders.Count == 0;
+                EmptyStateLabel.IsVisible = isEmpty;
+                RemindersCollectionView.IsVisible = !isEmpty;
+                System.Diagnostics.Debug.WriteLine($"Updated reminder count: {activeCount}, isEmpty: {isEmpty}");
             }
             catch (Exception ex)
             {
@@ -353,5 +375,7 @@ namespace StudyMateTest.Views
                 ReminderCountLabel.Text = "0 активных напоминаний";
             }
         }
+
+        public ObservableCollection<Reminder> Reminders => _reminders;
     }
 }
