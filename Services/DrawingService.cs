@@ -376,8 +376,8 @@ namespace StudyMateTest.Services
                 return;
             }
 
-            _startPoint = point;
-            _lastPoint = point;
+            _startPoint = canvasPoint;
+            _lastPoint = canvasPoint;
             _isDragging = true;
 
             if (_currentTool == DrawingTool.Pen)
