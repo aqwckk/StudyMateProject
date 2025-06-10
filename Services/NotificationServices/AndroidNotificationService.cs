@@ -156,9 +156,14 @@ namespace StudyMateTest.Services
             {
                 var context = Platform.CurrentActivity ?? Android.App.Application.Context;
 
-                // Создаем intent для открытия приложения
+                // Создаем intent для открытия MainActivity
                 var intent = new Intent(context, typeof(MainActivity));
-                intent.SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTask);
+                intent.SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTask | ActivityFlags.SingleTop);
+
+                // Добавляем дополнительные данные для обработки в приложении
+                intent.PutExtra("FromNotification", true);
+                intent.PutExtra("NotificationTitle", title);
+                intent.PutExtra("NotificationMessage", message);
 
                 if (metadata != null)
                 {
@@ -171,21 +176,31 @@ namespace StudyMateTest.Services
                 var pendingIntent = PendingIntent.GetActivity(context, notificationId, intent,
                     PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
 
-                // Создаем уведомление
-                var builder = new NotificationCompat.Builder(context, "general")
+                // Создаем уведомление с улучшенным каналом
+                var builder = new NotificationCompat.Builder(context, "studymate_reminders")
                     .SetContentTitle(title)
                     .SetContentText(message)
-                    .SetSmallIcon(Resource.Drawable.ic_notification) // Убедитесь что иконка существует
+                    .SetSmallIcon(Android.Resource.Drawable.IcDialogInfo) // Используем системную иконку
                     .SetContentIntent(pendingIntent)
                     .SetAutoCancel(true)
                     .SetPriority(NotificationCompat.PriorityHigh)
-                    .SetDefaults(NotificationCompat.DefaultAll);
+                    .SetDefaults(NotificationCompat.DefaultAll)
+                    .SetStyle(new NotificationCompat.BigTextStyle().BigText(message)) // Поддержка длинного текста
+                    .SetCategory(NotificationCompat.CategoryReminder); // Указываем категорию
 
                 var notification = builder.Build();
                 var notificationManager = NotificationManagerCompat.From(context);
-                notificationManager.Notify(notificationId, notification);
-
-                System.Diagnostics.Debug.WriteLine($"Showed Android notification: {title} - {message}");
+        
+                // Проверяем разрешения перед показом
+                if (NotificationManagerCompat.From(context).AreNotificationsEnabled())
+                {
+                    notificationManager.Notify(notificationId, notification);
+                    System.Diagnostics.Debug.WriteLine($"Showed Android notification: {title} - {message}");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("Notifications are disabled for this app");
+                }
             }
             catch (Exception ex)
             {

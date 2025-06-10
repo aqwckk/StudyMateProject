@@ -43,7 +43,6 @@ namespace StudyMateTest.Views
                 {
                     return Application.Current.MainPage.Handler.MauiContext.Services.GetService<INotificationService>();
                 }
-                System.Diagnostics.Debug.WriteLine("Warning: Could not get NotificationService from DI, creating fallback");
                 return new DefaultNotificationService();
             }
             catch (Exception ex)
@@ -61,7 +60,6 @@ namespace StudyMateTest.Views
                 {
                     return Application.Current.MainPage.Handler.MauiContext.Services.GetService<ILocalStorageService>();
                 }
-                System.Diagnostics.Debug.WriteLine("Warning: Could not get LocalStorageService from DI, creating fallback");
                 return new LocalStorageService();
             }
             catch (Exception ex)
@@ -77,25 +75,42 @@ namespace StudyMateTest.Views
             {
                 System.Diagnostics.Debug.WriteLine($"Received edited reminder: {editedReminder.Title}");
 
+                // Отменяем старое уведомление если оно есть
+                if (_notificationIds.ContainsKey(editedReminder.Id))
+                {
+                    await _notificationService.CancelNotification(_notificationIds[editedReminder.Id]);
+                    _notificationIds.Remove(editedReminder.Id);
+                    System.Diagnostics.Debug.WriteLine($"Cancelled old notification for reminder: {editedReminder.Id}");
+                }
+
+                // Создаем новое уведомление если время в будущем
+                if (editedReminder.ScheduledTime > DateTime.Now)
+                {
+                    var notificationId = await _notificationService.ScheduleNotification(
+                        editedReminder.Title,
+                        string.IsNullOrWhiteSpace(editedReminder.Message)
+                            ? $"Напоминание на {editedReminder.ScheduledTime:HH:mm}"
+                            : editedReminder.Message,
+                        editedReminder.ScheduledTime,
+                        editedReminder.Metadata
+                    );
+
+                    editedReminder.Metadata["NotificationId"] = notificationId;
+                    _notificationIds[editedReminder.Id] = notificationId;
+
+                    System.Diagnostics.Debug.WriteLine($"Created new notification for edited reminder: {notificationId}");
+                }
+
                 await Dispatcher.DispatchAsync(() =>
                 {
-                    // Находим оригинальное напоминание и заменяем его
                     var index = _reminders.ToList().FindIndex(r => r.Id == editedReminder.Id);
                     if (index >= 0)
                     {
                         _reminders[index] = editedReminder;
-
-                        // Обновляем ID уведомления если есть
-                        if (editedReminder.Metadata.ContainsKey("NotificationId"))
-                        {
-                            _notificationIds[editedReminder.Id] = editedReminder.Metadata["NotificationId"];
-                        }
-
                         UpdateReminderCount();
                     }
                 });
 
-                // Сохраняем изменения
                 await SaveReminders();
 
                 System.Diagnostics.Debug.WriteLine($"Reminder edited and saved: {editedReminder.Title}");
@@ -110,8 +125,7 @@ namespace StudyMateTest.Views
         {
             try
             {
-                // Обновляем статусы каждую минуту
-                var timer = new System.Timers.Timer(60000); // 60 секунд
+                var timer = new System.Timers.Timer(60000);
                 timer.Elapsed += async (s, e) =>
                 {
                     await UpdateReminderStatuses();
@@ -193,7 +207,6 @@ namespace StudyMateTest.Views
                     UpdateReminderCount();
                 });
 
-                // НОВОЕ: Сохраняем в локальное хранилище
                 await SaveReminders();
 
                 System.Diagnostics.Debug.WriteLine($"Reminder added and saved. Total reminders: {_reminders.Count}");
@@ -211,8 +224,6 @@ namespace StudyMateTest.Views
                 if (sender is Button button && button.BindingContext is Reminder reminder)
                 {
                     System.Diagnostics.Debug.WriteLine($"Opening edit page for reminder: {reminder.Title}");
-
-                    // Открываем страницу редактирования
                     var editPage = new EditReminderPage(reminder);
                     await Navigation.PushAsync(editPage);
                 }
@@ -245,7 +256,6 @@ namespace StudyMateTest.Views
                             UpdateReminderCount();
                         });
 
-                        // НОВОЕ: Сохраняем изменения
                         await SaveReminders();
 
                         System.Diagnostics.Debug.WriteLine($"Reminder deleted and saved. Remaining: {_reminders.Count}");
@@ -295,7 +305,6 @@ namespace StudyMateTest.Views
                         UpdateReminderCount();
                     });
 
-                    // НОВОЕ: Удаляем файл хранилища
                     await _localStorageService.DeleteAllRemindersAsync();
 
                     System.Diagnostics.Debug.WriteLine("All reminders cleared from memory and storage");
@@ -315,7 +324,6 @@ namespace StudyMateTest.Views
             {
                 System.Diagnostics.Debug.WriteLine("Loading reminders from local storage...");
 
-                // Загружаем из локального хранилища
                 var savedReminders = await _localStorageService.LoadRemindersAsync();
 
                 await Dispatcher.DispatchAsync(() =>
@@ -326,7 +334,6 @@ namespace StudyMateTest.Views
                     {
                         _reminders.Add(reminder);
 
-                        // Восстанавливаем ID уведомлений если есть
                         if (reminder.Metadata.ContainsKey("NotificationId"))
                         {
                             _notificationIds[reminder.Id] = reminder.Metadata["NotificationId"];

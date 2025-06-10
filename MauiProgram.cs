@@ -2,9 +2,6 @@
 using StudyMateTest.Services;
 using StudyMateTest.Services.NotificationServices;
 using StudyMateTest.Views;
-using Microsoft.Extensions.Logging;
-using StudyMateTest.Services;
-using StudyMateTest.Services.NotificationServices;
 
 namespace StudyMateTest
 {
@@ -21,27 +18,44 @@ namespace StudyMateTest
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-            // Регистрируем наши сервисы уведомлений
+            // Регистрируем сервисы локального хранилища
             builder.Services.AddSingleton<ILocalStorageService, LocalStorageService>();
+
+            // Регистрируем сервисы уведомлений в зависимости от платформы
 #if WINDOWS
             builder.Services.AddSingleton<INotificationService, WindowsNotificationService>();
+            System.Diagnostics.Debug.WriteLine("Registered WindowsNotificationService");
 #elif ANDROID
             builder.Services.AddSingleton<INotificationService, AndroidNotificationService>();
+            System.Diagnostics.Debug.WriteLine("Registered AndroidNotificationService");
 #elif IOS
             builder.Services.AddSingleton<INotificationService, IOSNotificationService>();
+            System.Diagnostics.Debug.WriteLine("Registered IOSNotificationService");
 #else
             builder.Services.AddSingleton<INotificationService, DefaultNotificationService>();
+            System.Diagnostics.Debug.WriteLine("Registered DefaultNotificationService");
 #endif
 
-            // Регистрируем страницы
+            // Регистрируем страницы как Transient (создается новый экземпляр каждый раз)
             builder.Services.AddTransient<ReminderPage>();
             builder.Services.AddTransient<AddReminderPage>();
+            builder.Services.AddTransient<EditReminderPage>();
+
+            // Регистрируем MainPage если необходимо
+            builder.Services.AddTransient<MainPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();
+            // Включаем детальное логирование для отладки
+            builder.Logging.SetMinimumLevel(LogLevel.Debug);
 #endif
 
-            return builder.Build();
+            var app = builder.Build();
+
+            // Логируем успешную инициализацию
+            System.Diagnostics.Debug.WriteLine("MauiProgram: Application configured successfully");
+
+            return app;
         }
     }
 }
