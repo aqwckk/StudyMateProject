@@ -7,7 +7,7 @@ using SkiaSharp;
 using StudyMateTest.Models.Drawing;
 using StudyMateTest.Models.Drawing.DrawingElements;
 
-namespace StudyMateTest.Services
+namespace StudyMateTest.Services.DrawingServices
 {
     public class DrawingService : IDrawingService
     {
@@ -198,7 +198,7 @@ namespace StudyMateTest.Services
                 Color = _strokeColor,
                 StrokeWidth = _strokeWidth,
                 IsAntialias = true,
-                Style = (supportsFill && _isFilled) ? SKPaintStyle.Fill : SKPaintStyle.Stroke,
+                Style = supportsFill && _isFilled ? SKPaintStyle.Fill : SKPaintStyle.Stroke,
                 StrokeCap = SKStrokeCap.Round,
                 StrokeJoin = SKStrokeJoin.Round
             };

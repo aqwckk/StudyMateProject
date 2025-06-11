@@ -6,9 +6,17 @@
     xmlns:local="clr-namespace:StudyMateTest.Views"
     Shell.FlyoutBehavior="Disabled">
 
-    <ShellContent
-        Title="Графический редактор"
-        ContentTemplate="{DataTemplate local:DrawingPage}"
-        Route="DrawingPage" />
+    <TabBar>
+        <ShellContent
+            Title="Редактор заметок"
+            ContentTemplate="{DataTemplate local:CombinedEditorPage}"
+            Route="CombinedEditorPage"
+            Icon="edit.png" />
 
+        <ShellContent
+            Title="Графический редактор"
+            ContentTemplate="{DataTemplate local:DrawingPage}"
+            Route="DrawingPage"
+            Icon="draw.png" />
+    </TabBar>
 </Shell>

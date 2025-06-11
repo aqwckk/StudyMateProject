@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StudyMateTest.Services
+namespace StudyMateTest.Services.DrawingServices
 {
     public class CanvasSizeChangedEventArgs : EventArgs
     {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using SkiaSharp.Views.Maui.Controls.Hosting;
-using StudyMateTest.Services;
+using StudyMateTest.Services.DrawingServices;
+using StudyMateTest.Services.TextEditorServices;
 
 namespace StudyMateTest
 {
@@ -19,6 +20,7 @@ namespace StudyMateTest
                 });
 
             builder.Services.AddSingleton<IDrawingService, DrawingService>();
+            builder.Services.AddSingleton<ITextEditorService, TextEditorService>();
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
