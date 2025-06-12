@@ -14,7 +14,7 @@ using StudyMateTest.Services.DrawingServices;
 
 namespace StudyMateTest.ViewModels
 {
-    public class DrawingPageViewModel : INotifyPropertyChanged 
+    public class DrawingPageViewModel : INotifyPropertyChanged
     {
         private readonly IDrawingService _drawingService;
         private SKSize _currentViewSize;
@@ -33,30 +33,52 @@ namespace StudyMateTest.ViewModels
         public ICommand ResetZoomCommand { get; private set; }
 
         private DrawingTool _selectedTool = DrawingTool.Pen;
-        public DrawingTool SelectedTool 
+        public DrawingTool SelectedTool
         {
             get => _selectedTool;
-            set 
+            set
             {
-                if (_selectedTool != value) 
+                if (_selectedTool != value)
                 {
+                    var oldTool = _selectedTool;
                     _selectedTool = value;
                     _drawingService.SetCurrentTool(value);
+
+                    // При переключении на ластик скрываем выбор цвета и заливки
+                    if (value == DrawingTool.Eraser)
+                    {
+                        // Ластик автоматически использует белый цвет в DrawingService
+                        // Не меняем _selectedColor, чтобы сохранить выбранный пользователем цвет
+                    }
+                    // При переключении с ластика на другой инструмент восстанавливаем настройки
+                    else if (oldTool == DrawingTool.Eraser)
+                    {
+                        _drawingService.SetStrokeColor(_selectedColor);
+                        _drawingService.SetFillMode(_isFilled);
+                    }
+                    // Для обычного переключения между инструментами
+                    else
+                    {
+                        _drawingService.SetStrokeColor(_selectedColor);
+                        _drawingService.SetFillMode(_isFilled);
+                    }
+
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(IsFillSupported));
+                    OnPropertyChanged(nameof(IsColorSelectionVisible));
                 }
             }
         }
 
         private float _strokeWidth = 5;
-        public float StrokeWidth 
+        public float StrokeWidth
         {
             get => _strokeWidth;
-            set 
+            set
             {
-                if (_strokeWidth != value) 
+                if (_strokeWidth != value)
                 {
-                    _strokeWidth = value; 
+                    _strokeWidth = value;
                     _drawingService.SetStrokeWidth(value);
                     OnPropertyChanged();
                 }
@@ -64,12 +86,12 @@ namespace StudyMateTest.ViewModels
         }
 
         private SKColor _selectedColor = SKColors.Black;
-        public SKColor SelectedColor 
+        public SKColor SelectedColor
         {
             get => _selectedColor;
-            set 
+            set
             {
-                if (_selectedColor != value) 
+                if (_selectedColor != value && _selectedTool != DrawingTool.Eraser)
                 {
                     _selectedColor = value;
                     _drawingService.SetStrokeColor(value);
@@ -79,12 +101,12 @@ namespace StudyMateTest.ViewModels
         }
 
         private bool _isFilled = false;
-        public bool IsFilled 
+        public bool IsFilled
         {
             get => _isFilled;
-            set 
+            set
             {
-                if (_isFilled != value) 
+                if (_isFilled != value && _selectedTool != DrawingTool.Eraser)
                 {
                     _isFilled = value;
                     _drawingService.SetFillMode(value);
@@ -93,12 +115,12 @@ namespace StudyMateTest.ViewModels
             }
         }
 
-        public float CanvasWidth 
+        public float CanvasWidth
         {
             get => _drawingService.CanvasWidth;
-            set 
+            set
             {
-                if (_drawingService.CanvasWidth != value) 
+                if (_drawingService.CanvasWidth != value)
                 {
                     _drawingService.CanvasWidth = value;
                     OnPropertyChanged();
@@ -119,12 +141,12 @@ namespace StudyMateTest.ViewModels
             }
         }
 
-        public float Zoom 
+        public float Zoom
         {
             get => _drawingService.Zoom;
-            set 
+            set
             {
-                if (_drawingService.Zoom != value) 
+                if (_drawingService.Zoom != value)
                 {
                     _drawingService.Zoom = value;
                     OnPropertyChanged();
@@ -135,11 +157,15 @@ namespace StudyMateTest.ViewModels
 
         public string ZoomPercentage => $"{Zoom * 100:F0}%";
 
-        public bool IsFillSupported => _selectedTool == DrawingTool.Rectangle ||
-                                       _selectedTool == DrawingTool.Square ||
-                                       _selectedTool == DrawingTool.Ellipse ||
-                                       _selectedTool == DrawingTool.Circle ||
-                                       _selectedTool == DrawingTool.Triangle;
+        public bool IsFillSupported => _selectedTool != DrawingTool.Eraser &&
+                                       (_selectedTool == DrawingTool.Rectangle ||
+                                        _selectedTool == DrawingTool.Square ||
+                                        _selectedTool == DrawingTool.Ellipse ||
+                                        _selectedTool == DrawingTool.Circle ||
+                                        _selectedTool == DrawingTool.Triangle);
+
+        // Новое свойство для скрытия выбора цвета при использовании ластика
+        public bool IsColorSelectionVisible => _selectedTool != DrawingTool.Eraser;
 
         public bool CanUndo => _drawingService.CanUndo;
         public bool CanRedo => _drawingService.CanRedo;
@@ -160,13 +186,19 @@ namespace StudyMateTest.ViewModels
             SubscribeToEvents();
         }
 
-        private void InitializeCommands() 
+        private void InitializeCommands()
         {
             SetToolCommand = new Command<DrawingTool>(tool => SelectedTool = tool);
             UndoCommand = new Command(Undo, () => CanUndo);
             RedoCommand = new Command(Redo, () => CanRedo);
             ClearCommand = new Command(Clear);
-            ToggleFillModeCommand = new Command(() => IsFilled = !IsFilled);
+            ToggleFillModeCommand = new Command(() =>
+            {
+                if (_selectedTool != DrawingTool.Eraser)
+                {
+                    IsFilled = !IsFilled;
+                }
+            });
             SaveCommand = new Command(async () => await SaveDrawingAsync());
             SetColorCommand = new Command<string>(SetColor);
 
@@ -175,14 +207,14 @@ namespace StudyMateTest.ViewModels
             ResetZoomCommand = new Command(() => Zoom = 1.0f);
         }
 
-        private void SubscribeToEvents() 
+        private void SubscribeToEvents()
         {
             _drawingService.CanUndoRedoChanged += OnCanUndoRedoChanged;
             _drawingService.DrawingChanged += OnDrawingChanged;
             _drawingService.CanvasSizeChanged += OnCanvasSizeChanged;
         }
 
-        private void OnCanUndoRedoChanged(object sender, EventArgs e) 
+        private void OnCanUndoRedoChanged(object sender, EventArgs e)
         {
             OnPropertyChanged(nameof(CanUndo));
             OnPropertyChanged(nameof(CanRedo));
@@ -191,7 +223,7 @@ namespace StudyMateTest.ViewModels
             ((Command)RedoCommand).ChangeCanExecute();
         }
 
-        private void OnDrawingChanged(object sender, EventArgs e) 
+        private void OnDrawingChanged(object sender, EventArgs e)
         {
             OnPropertyChanged(nameof(CanUndo));
             OnPropertyChanged(nameof(CanRedo));
@@ -199,60 +231,60 @@ namespace StudyMateTest.ViewModels
             ((Command)RedoCommand).ChangeCanExecute();
         }
 
-        private void OnCanvasSizeChanged(object sender, CanvasSizeChangedEventArgs e) 
+        private void OnCanvasSizeChanged(object sender, CanvasSizeChangedEventArgs e)
         {
             OnPropertyChanged(nameof(CanvasWidth));
             OnPropertyChanged(nameof(CanvasHeight));
         }
 
-        public void SetViewSize(SKSize viewSize) 
+        public void SetViewSize(SKSize viewSize)
         {
             _currentViewSize = viewSize;
         }
 
-        public void Draw(SKCanvas canvas) 
+        public void Draw(SKCanvas canvas)
         {
             _drawingService.Draw(canvas, _currentViewSize);
         }
 
-        public void HandleTouchStart(SKPoint point) 
+        public void HandleTouchStart(SKPoint point)
         {
             _drawingService.HandleTouchStart(point, _currentViewSize);
         }
 
-        public void HandleTouchMove(SKPoint point) 
+        public void HandleTouchMove(SKPoint point)
         {
             _drawingService.HandleTouchMove(point, _currentViewSize);
         }
 
-        public void HandleTouchEnd(SKPoint point) 
+        public void HandleTouchEnd(SKPoint point)
         {
             _drawingService.HandleTouchEnd(point, _currentViewSize);
         }
 
-        public void HandleWheelZoom(float delta, SKPoint center) 
+        public void HandleWheelZoom(float delta, SKPoint center)
         {
             float zoomFactor = delta > 0 ? 1.1f : 0.9f;
             float newZoom = Math.Max(0.1f, Math.Min(5.0f, Zoom * zoomFactor));
             Zoom = newZoom;
         }
 
-        private void Undo() 
+        private void Undo()
         {
             _drawingService.Undo();
         }
 
-        private void Redo() 
+        private void Redo()
         {
             _drawingService.Redo();
         }
 
-        private void Clear() 
+        private void Clear()
         {
             _drawingService.Clear();
         }
 
-        private async Task SaveDrawingAsync() 
+        private async Task SaveDrawingAsync()
         {
             try
             {
@@ -268,7 +300,7 @@ namespace StudyMateTest.ViewModels
                     $"Рисунок сохранен: {fileName}",
                     "OK");
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 await Application.Current.MainPage.DisplayAlert(
                     "Ошибка",
@@ -277,10 +309,13 @@ namespace StudyMateTest.ViewModels
             }
         }
 
-        private void SetColor(string colorName) 
+        private void SetColor(string colorName)
         {
+            if (_selectedTool == DrawingTool.Eraser)
+                return; // Для ластика цвет не меняется
+
             SKColor color;
-            switch (colorName.ToLower()) 
+            switch (colorName.ToLower())
             {
                 case "red":
                     color = SKColors.Red;
@@ -298,16 +333,15 @@ namespace StudyMateTest.ViewModels
                     color = SKColors.Purple;
                     break;
                 default:
-                    color = SKColors.Black; 
+                    color = SKColors.Black;
                     break;
             }
             SelectedColor = color;
         }
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) 
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
-
 }

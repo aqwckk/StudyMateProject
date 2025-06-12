@@ -1,34 +1,67 @@
 ﻿using Microsoft.Maui.Controls;
-using System.Text;
+using System.ComponentModel;
 
 namespace StudyMateTest.Controls
 {
     public class RichTextEditor : ContentView
     {
-        private WebView _webView;
-        private string _htmlContent = "";
-
         public static readonly BindableProperty TextProperty = BindableProperty.Create(
             nameof(Text),
             typeof(string),
             typeof(RichTextEditor),
             string.Empty,
             BindingMode.TwoWay,
-            propertyChanged: OnTextChanged);
+            propertyChanged: OnTextPropertyChanged);
 
         public static readonly BindableProperty FontSizeProperty = BindableProperty.Create(
             nameof(FontSize),
             typeof(double),
             typeof(RichTextEditor),
             14.0,
-            propertyChanged: OnFontSizeChanged);
+            propertyChanged: OnFontSizePropertyChanged);
 
         public static readonly BindableProperty FontFamilyProperty = BindableProperty.Create(
             nameof(FontFamily),
             typeof(string),
             typeof(RichTextEditor),
             "Arial",
-            propertyChanged: OnFontFamilyChanged);
+            propertyChanged: OnFontFamilyPropertyChanged);
+
+        public static readonly BindableProperty IsBoldProperty = BindableProperty.Create(
+            nameof(IsBold),
+            typeof(bool),
+            typeof(RichTextEditor),
+            false,
+            BindingMode.TwoWay,
+            propertyChanged: OnFormattingPropertyChanged);
+
+        public static readonly BindableProperty IsItalicProperty = BindableProperty.Create(
+            nameof(IsItalic),
+            typeof(bool),
+            typeof(RichTextEditor),
+            false,
+            BindingMode.TwoWay,
+            propertyChanged: OnFormattingPropertyChanged);
+
+        public static readonly BindableProperty IsUnderlineProperty = BindableProperty.Create(
+            nameof(IsUnderline),
+            typeof(bool),
+            typeof(RichTextEditor),
+            false,
+            BindingMode.TwoWay,
+            propertyChanged: OnFormattingPropertyChanged);
+
+        public static readonly BindableProperty TextAlignmentProperty = BindableProperty.Create(
+            nameof(TextAlignment),
+            typeof(TextAlignment),
+            typeof(RichTextEditor),
+            TextAlignment.Start,
+            BindingMode.TwoWay,
+            propertyChanged: OnFormattingPropertyChanged);
+
+        private Editor _editor;
+        private ScrollView _scrollView;
+        private FormattingInfo _currentFormatting = new FormattingInfo();
 
         public string Text
         {
@@ -48,152 +81,307 @@ namespace StudyMateTest.Controls
             set => SetValue(FontFamilyProperty, value);
         }
 
+        public bool IsBold
+        {
+            get => (bool)GetValue(IsBoldProperty);
+            set => SetValue(IsBoldProperty, value);
+        }
+
+        public bool IsItalic
+        {
+            get => (bool)GetValue(IsItalicProperty);
+            set => SetValue(IsItalicProperty, value);
+        }
+
+        public bool IsUnderline
+        {
+            get => (bool)GetValue(IsUnderlineProperty);
+            set => SetValue(IsUnderlineProperty, value);
+        }
+
+        public TextAlignment TextAlignment
+        {
+            get => (TextAlignment)GetValue(TextAlignmentProperty);
+            set => SetValue(TextAlignmentProperty, value);
+        }
+
         public RichTextEditor()
         {
-            CreateWebView();
-            LoadEditor();
+            CreateContent();
         }
 
-        private void CreateWebView()
+        private void CreateContent()
         {
-            _webView = new WebView
+            _editor = new Editor
             {
-                BackgroundColor = Colors.White
+                BackgroundColor = Colors.White,
+                TextColor = Colors.Black,
+                AutoSize = EditorAutoSizeOption.TextChanges,
+                Placeholder = "Введите текст...",
+                PlaceholderColor = Colors.Gray,
+                MinimumHeightRequest = 300
             };
-            Content = _webView;
-        }
 
-        private void LoadEditor()
-        {
-            var html = GenerateHtml();
-            var htmlSource = new HtmlWebViewSource
+            _editor.TextChanged += OnEditorTextChanged;
+            _editor.Focused += OnEditorFocused;
+            _editor.Unfocused += OnEditorUnfocused;
+
+            _scrollView = new ScrollView
             {
-                Html = html
+                Content = _editor
             };
-            _webView.Source = htmlSource;
+
+            Content = _scrollView;
+            UpdateEditorProperties();
         }
 
-        private string GenerateHtml()
+        private void OnEditorTextChanged(object sender, TextChangedEventArgs e)
         {
-            var sb = new StringBuilder();
-            sb.AppendLine("<!DOCTYPE html>");
-            sb.AppendLine("<html>");
-            sb.AppendLine("<head>");
-            sb.AppendLine("<meta charset='UTF-8'>");
-            sb.AppendLine("<meta name='viewport' content='width=device-width, initial-scale=1.0'>");
-            sb.AppendLine("<style>");
-            sb.AppendLine("body { margin: 10px; font-family: Arial, sans-serif; }");
-            sb.AppendLine("#editor { min-height: 300px; border: 1px solid #ccc; padding: 10px; outline: none; }");
-            sb.AppendLine(".toolbar { margin-bottom: 10px; padding: 5px; border-bottom: 1px solid #ccc; }");
-            sb.AppendLine(".toolbar button { margin-right: 5px; padding: 5px 10px; border: 1px solid #ccc; background: #f9f9f9; }");
-            sb.AppendLine(".toolbar button:hover { background: #e9e9e9; }");
-            sb.AppendLine(".toolbar button.active { background: #007acc; color: white; }");
-            sb.AppendLine("</style>");
-            sb.AppendLine("</head>");
-            sb.AppendLine("<body>");
-
-            // Панель инструментов
-            sb.AppendLine("<div class='toolbar'>");
-            sb.AppendLine("<button onclick='execCmd(\"bold\")' title='Жирный'><b>B</b></button>");
-            sb.AppendLine("<button onclick='execCmd(\"italic\")' title='Курсив'><i>I</i></button>");
-            sb.AppendLine("<button onclick='execCmd(\"underline\")' title='Подчеркнутый'><u>U</u></button>");
-            sb.AppendLine("<button onclick='execCmd(\"insertUnorderedList\")' title='Маркированный список'>•</button>");
-            sb.AppendLine("<button onclick='execCmd(\"insertOrderedList\")' title='Нумерованный список'>1.</button>");
-            sb.AppendLine("<button onclick='execCmd(\"justifyLeft\")' title='По левому краю'>◀</button>");
-            sb.AppendLine("<button onclick='execCmd(\"justifyCenter\")' title='По центру'>■</button>");
-            sb.AppendLine("<button onclick='execCmd(\"justifyRight\")' title='По правому краю'>▶</button>");
-            sb.AppendLine("<button onclick='execCmd(\"indent\")' title='Увеличить отступ'>↱</button>");
-            sb.AppendLine("<button onclick='execCmd(\"outdent\")' title='Уменьшить отступ'>↰</button>");
-
-            // Селектор размера шрифта
-            sb.AppendLine("<select onchange='changeFontSize(this.value)'>");
-            sb.AppendLine("<option value='1'>8pt</option>");
-            sb.AppendLine("<option value='2'>10pt</option>");
-            sb.AppendLine("<option value='3' selected>12pt</option>");
-            sb.AppendLine("<option value='4'>14pt</option>");
-            sb.AppendLine("<option value='5'>18pt</option>");
-            sb.AppendLine("<option value='6'>24pt</option>");
-            sb.AppendLine("<option value='7'>36pt</option>");
-            sb.AppendLine("</select>");
-
-            // Селектор шрифта
-            sb.AppendLine("<select onchange='changeFontFamily(this.value)' style='margin-left: 5px;'>");
-            sb.AppendLine("<option value='Arial'>Arial</option>");
-            sb.AppendLine("<option value='Times New Roman'>Times New Roman</option>");
-            sb.AppendLine("<option value='Calibri'>Calibri</option>");
-            sb.AppendLine("<option value='Verdana'>Verdana</option>");
-            sb.AppendLine("<option value='Courier New'>Courier New</option>");
-            sb.AppendLine("</select>");
-
-            sb.AppendLine("</div>");
-
-            // Область редактирования
-            sb.AppendLine($"<div id='editor' contenteditable='true' style='font-family: {FontFamily}; font-size: {FontSize}px;'>");
-            sb.AppendLine(Text?.Replace("\n", "<br>") ?? "");
-            sb.AppendLine("</div>");
-
-            // JavaScript для функциональности
-            sb.AppendLine("<script>");
-            sb.AppendLine("function execCmd(command, value = null) {");
-            sb.AppendLine("    document.execCommand(command, false, value);");
-            sb.AppendLine("    updateContent();");
-            sb.AppendLine("}");
-
-            sb.AppendLine("function changeFontSize(size) {");
-            sb.AppendLine("    document.execCommand('fontSize', false, size);");
-            sb.AppendLine("    updateContent();");
-            sb.AppendLine("}");
-
-            sb.AppendLine("function changeFontFamily(font) {");
-            sb.AppendLine("    document.execCommand('fontName', false, font);");
-            sb.AppendLine("    updateContent();");
-            sb.AppendLine("}");
-
-            sb.AppendLine("function updateContent() {");
-            sb.AppendLine("    var content = document.getElementById('editor').innerHTML;");
-            sb.AppendLine("    window.location.href = 'maui://content-changed/' + encodeURIComponent(content);");
-            sb.AppendLine("}");
-
-            sb.AppendLine("document.getElementById('editor').addEventListener('input', updateContent);");
-            sb.AppendLine("document.getElementById('editor').addEventListener('blur', updateContent);");
-            sb.AppendLine("</script>");
-
-            sb.AppendLine("</body>");
-            sb.AppendLine("</html>");
-
-            return sb.ToString();
+            SetValue(TextProperty, e.NewTextValue);
         }
 
-        private static void OnTextChanged(BindableObject bindable, object oldValue, object newValue)
+        private void OnEditorFocused(object sender, FocusEventArgs e)
         {
-            if (bindable is RichTextEditor editor)
+            // При получении фокуса обновляем текущее форматирование
+            UpdateCurrentFormattingFromCursor();
+        }
+
+        private void OnEditorUnfocused(object sender, FocusEventArgs e)
+        {
+            // При потере фокуса можно сохранить текущее состояние
+        }
+
+        private void UpdateCurrentFormattingFromCursor()
+        {
+            // Здесь можно добавить логику для определения форматирования в позиции курсора
+            // Пока используем текущие значения свойств
+            _currentFormatting.IsBold = IsBold;
+            _currentFormatting.IsItalic = IsItalic;
+            _currentFormatting.IsUnderline = IsUnderline;
+            _currentFormatting.FontSize = FontSize;
+            _currentFormatting.FontFamily = FontFamily;
+            _currentFormatting.TextAlignment = TextAlignment;
+        }
+
+        private static void OnTextPropertyChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            if (bindable is RichTextEditor control && newValue is string text)
             {
-                editor.UpdateEditorContent();
+                if (control._editor != null && control._editor.Text != text)
+                {
+                    control._editor.Text = text;
+                }
             }
         }
 
-        private static void OnFontSizeChanged(BindableObject bindable, object oldValue, object newValue)
+        private static void OnFontSizePropertyChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            if (bindable is RichTextEditor editor)
+            if (bindable is RichTextEditor control)
             {
-                editor.LoadEditor();
+                control._currentFormatting.FontSize = (double)newValue;
+                control.ApplyFormattingToSelection();
             }
         }
 
-        private static void OnFontFamilyChanged(BindableObject bindable, object oldValue, object newValue)
+        private static void OnFontFamilyPropertyChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            if (bindable is RichTextEditor editor)
+            if (bindable is RichTextEditor control)
             {
-                editor.LoadEditor();
+                control._currentFormatting.FontFamily = (string)newValue;
+                control.ApplyFormattingToSelection();
             }
         }
 
-        private void UpdateEditorContent()
+        private static void OnFormattingPropertyChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            if (_webView != null)
+            if (bindable is RichTextEditor control)
             {
-                LoadEditor();
+                control.UpdateCurrentFormattingFromCursor();
+                control.ApplyFormattingToSelection();
             }
         }
+
+        private void UpdateEditorProperties()
+        {
+            if (_editor != null)
+            {
+                _editor.FontSize = FontSize;
+                _editor.FontFamily = FontFamily;
+                _editor.HorizontalTextAlignment = TextAlignment;
+
+                // Применяем форматирование
+                FontAttributes attributes = FontAttributes.None;
+                if (IsBold) attributes |= FontAttributes.Bold;
+                if (IsItalic) attributes |= FontAttributes.Italic;
+                _editor.FontAttributes = attributes;
+
+                // Подчеркивание в MAUI Editor не поддерживается напрямую
+                // Можно использовать TextDecorations, если доступно
+                if (IsUnderline)
+                {
+                    // В будущих версиях MAUI может появиться поддержка TextDecorations
+                    // Пока используем обходной путь через формат текста
+                }
+            }
+        }
+
+        private void ApplyFormattingToSelection()
+        {
+            if (_editor?.Text == null) return;
+
+            // Получаем выделенный текст (в базовом Editor это ограничено)
+            // Применяем форматирование ко всему тексту, если нет выделения
+            UpdateEditorProperties();
+        }
+
+        // Методы для работы со списками
+        public void CreateBulletList()
+        {
+            if (_editor?.Text == null) return;
+
+            var text = _editor.Text;
+            var lines = text.Split('\n').ToList();
+
+            // Получаем выделенные строки (упрощенная логика)
+            var selectedLines = GetSelectedLines(lines);
+
+            for (int i = 0; i < selectedLines.Count; i++)
+            {
+                var lineIndex = selectedLines[i];
+                if (lineIndex < lines.Count)
+                {
+                    var line = lines[lineIndex];
+                    var trimmedLine = RemoveExistingListFormatting(line);
+
+                    if (!string.IsNullOrWhiteSpace(trimmedLine))
+                    {
+                        lines[lineIndex] = $"• {trimmedLine}";
+                    }
+                    else if (string.IsNullOrEmpty(trimmedLine))
+                    {
+                        lines[lineIndex] = "• ";
+                    }
+                }
+            }
+
+            _editor.Text = string.Join('\n', lines);
+            Text = _editor.Text;
+        }
+
+        public void CreateNumberedList()
+        {
+            if (_editor?.Text == null) return;
+
+            var text = _editor.Text;
+            var lines = text.Split('\n').ToList();
+
+            // Получаем выделенные строки
+            var selectedLines = GetSelectedLines(lines);
+
+            for (int i = 0; i < selectedLines.Count; i++)
+            {
+                var lineIndex = selectedLines[i];
+                if (lineIndex < lines.Count)
+                {
+                    var line = lines[lineIndex];
+                    var trimmedLine = RemoveExistingListFormatting(line);
+
+                    if (!string.IsNullOrWhiteSpace(trimmedLine))
+                    {
+                        lines[lineIndex] = $"{i + 1}. {trimmedLine}";
+                    }
+                    else if (string.IsNullOrEmpty(trimmedLine))
+                    {
+                        lines[lineIndex] = $"{i + 1}. ";
+                    }
+                }
+            }
+
+            _editor.Text = string.Join('\n', lines);
+            Text = _editor.Text;
+        }
+
+        private List<int> GetSelectedLines(List<string> lines)
+        {
+            // Упрощенная логика: если нет выделения, применяем к текущей строке
+            // В реальной реализации нужно получить позицию курсора
+
+            // Для демонстрации возвращаем все строки с текстом
+            var result = new List<int>();
+            for (int i = 0; i < lines.Count; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(lines[i]))
+                {
+                    result.Add(i);
+                }
+            }
+
+            return result.Count > 0 ? result : new List<int> { 0 };
+        }
+
+        private string RemoveExistingListFormatting(string line)
+        {
+            if (string.IsNullOrEmpty(line)) return line;
+
+            // Удаляем маркеры списков
+            line = line.TrimStart();
+
+            // Удаляем маркированный список
+            if (line.StartsWith("• "))
+            {
+                line = line.Substring(2);
+            }
+
+            // Удаляем нумерованный список
+            var numberedPattern = @"^\d+\.\s";
+            if (System.Text.RegularExpressions.Regex.IsMatch(line, numberedPattern))
+            {
+                line = System.Text.RegularExpressions.Regex.Replace(line, numberedPattern, "");
+            }
+
+            return line;
+        }
+
+        // Методы для применения форматирования
+        public void ApplyBold()
+        {
+            IsBold = !IsBold;
+        }
+
+        public void ApplyItalic()
+        {
+            IsItalic = !IsItalic;
+        }
+
+        public void ApplyUnderline()
+        {
+            IsUnderline = !IsUnderline;
+        }
+
+        public void ApplyAlignment(TextAlignment alignment)
+        {
+            TextAlignment = alignment;
+        }
+
+        public void Focus()
+        {
+            _editor?.Focus();
+        }
+
+        public void Unfocus()
+        {
+            _editor?.Unfocus();
+        }
+    }
+
+    // Вспомогательный класс для хранения информации о форматировании
+    public class FormattingInfo
+    {
+        public bool IsBold { get; set; }
+        public bool IsItalic { get; set; }
+        public bool IsUnderline { get; set; }
+        public double FontSize { get; set; } = 14.0;
+        public string FontFamily { get; set; } = "Arial";
+        public TextAlignment TextAlignment { get; set; } = TextAlignment.Start;
     }
 }

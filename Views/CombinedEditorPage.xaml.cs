@@ -2,11 +2,10 @@ using Microsoft.Maui.Controls;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
-using StudyMateTest.Services;
 using StudyMateTest.Services.DrawingServices;
 using StudyMateTest.Services.TextEditorServices;
 using StudyMateTest.ViewModels;
-using StudyMateTest.Views.Enums;
+
 namespace StudyMateTest.Views;
 
 public partial class CombinedEditorPage : ContentPage
@@ -20,19 +19,24 @@ public partial class CombinedEditorPage : ContentPage
     private bool _isDraggingSplitter = false;
     private double _totalWidth = 0;
 
-    public CombinedEditorPage(IDrawingService drawingService, ITextEditorService textEditorService) 
+    public CombinedEditorPage(IDrawingService drawingService, ITextEditorService textEditorService)
     {
         InitializeComponent();
         _viewModel = new CombinedEditorViewModel(drawingService, textEditorService);
         BindingContext = _viewModel;
 
         drawingService.DrawingChanged += OnDrawingChanged;
+        drawingService.CanUndoRedoChanged += OnDrawingChanged; // Добавляем принудительную перерисовку
 
-        UpdateUIForMode(EditorMode.Graphics);
+        // Подписываемся на изменения форматирования для обновления RichTextEditor
+        textEditorService.FormattingChanged += OnTextFormattingChanged;
+
+        UpdateSplitterLayout();
     }
+
     public CombinedEditorPage()
-	{
-		InitializeComponent();
+    {
+        InitializeComponent();
 
         var drawingService = App.Current.Handler.MauiContext.Services.GetService<IDrawingService>();
         var textEditorService = App.Current.Handler.MauiContext.Services.GetService<ITextEditorService>();
@@ -41,97 +45,41 @@ public partial class CombinedEditorPage : ContentPage
         BindingContext = _viewModel;
 
         drawingService.DrawingChanged += OnDrawingChanged;
-        UpdateUIForMode(EditorMode.Graphics);
-	}
+        drawingService.CanUndoRedoChanged += OnDrawingChanged; // Добавляем принудительную перерисовку
 
-    private void OnGraphicsModeClicked(object sender, EventArgs e) 
-    {
-        _viewModel.CurrentMode = EditorMode.Graphics;
-        UpdateUIForMode(EditorMode.Graphics);
-    }
-    private void OnTextModeClicked(object sender, EventArgs e)
-    {
-        _viewModel.CurrentMode = EditorMode.Text;
-        UpdateUIForMode(EditorMode.Text);
-    }
-    private void OnSplitModeClicked(object sender, EventArgs e)
-    {
-        _viewModel.CurrentMode = EditorMode.Split;
-        UpdateUIForMode(EditorMode.Split);
-    }
+        // Подписываемся на изменения форматирования для обновления RichTextEditor
+        textEditorService.FormattingChanged += OnTextFormattingChanged;
 
-    private void UpdateUIForMode(EditorMode mode) 
-    {
-        GraphicsButton.BackgroundColor = Colors.LightGray;
-        TextButton.BackgroundColor = Colors.LightGray;
-        SplitButton.BackgroundColor = Colors.LightGray;
-
-        GraphicsToolbar.IsVisible = false;
-        TextToolbar.IsVisible = false;
-        SplitToolbar.IsVisible = false;
-
-        GraphicsOnlyMode.IsVisible = false;
-        TextOnlyMode.IsVisible = false;
-        SplitMode.IsVisible = false;
-
-        switch (mode) 
-        {
-            case EditorMode.Graphics:
-                GraphicsButton.BackgroundColor = Colors.LightBlue;
-                GraphicsOnlyMode.IsVisible = true;
-                GraphicsToolbar.IsVisible = true;
-
-                StatusLabel.Text = "Графический редактор";
-                SaveDrawingButton.IsVisible = true;
-                SaveTextButton.IsVisible = false;
-                break;
-            case EditorMode.Text:
-                TextButton.BackgroundColor = Colors.LightBlue;
-                TextOnlyMode.IsVisible = true;
-                TextToolbar.IsVisible = true;
-
-                StatusLabel.Text = "Текстовый редактор";
-                SaveTextButton.IsVisible = true;
-                SaveDrawingButton.IsVisible = false;
-                break;
-
-            case EditorMode.Split:
-                SplitButton.BackgroundColor = Colors.LightBlue;
-                SplitMode.IsVisible = true;
-                SplitToolbar.IsVisible = true;
-
-                StatusLabel.Text = "Разделенный режим";
-                SaveDrawingButton.IsVisible = true;
-                SaveTextButton.IsVisible = true;
-
-                UpdateSplitterLayout();
-                break;
-        }
+        UpdateSplitterLayout();
     }
 
     private void UpdateSplitterLayout()
     {
-        if (SplitMode.IsVisible && SplitMode is Grid splitGrid)
+        if (SplitMode is Grid splitGrid)
         {
             LeftColumn.Width = new GridLength(_splitterPosition, GridUnitType.Star);
-            RightColumn.Width = new GridLength (1 - _splitterPosition, GridUnitType.Star);
+            RightColumn.Width = new GridLength(1 - _splitterPosition, GridUnitType.Star);
         }
     }
 
     private void OnSplitterPanUpdated(object sender, PanUpdatedEventArgs e)
     {
-        switch (e.StatusType) 
+        switch (e.StatusType)
         {
             case GestureStatus.Started:
                 _isDraggingSplitter = true;
                 _totalWidth = SplitMode.Width;
                 Splitter.BackgroundColor = Colors.Blue;
+                StatusLabel.Text = "Перетаскивание разделителя...";
                 break;
+
             case GestureStatus.Running:
-                if (_isDraggingSplitter && _totalWidth > 0) 
+                if (_isDraggingSplitter && _totalWidth > 0)
                 {
-                    double deltaRatio = e.TotalX / _totalWidth;
-                    double newPosition = Math.Max(0.1, Math.Min(0.9, _splitterPosition + deltaRatio));
+                    // Исправленный расчет движения разделителя
+                    double currentX = e.TotalX;
+                    double deltaRatio = currentX / _totalWidth;
+                    double newPosition = Math.Max(0.1, Math.Min(0.9, 0.5 + deltaRatio));
 
                     _splitterPosition = newPosition;
                     UpdateSplitterLayout();
@@ -139,11 +87,12 @@ public partial class CombinedEditorPage : ContentPage
                     StatusLabel.Text = $"Разделение: {_splitterPosition:P0} | {(1 - _splitterPosition):P0}";
                 }
                 break;
+
             case GestureStatus.Completed:
             case GestureStatus.Canceled:
                 _isDraggingSplitter = false;
                 Splitter.BackgroundColor = Colors.DarkGray;
-                StatusLabel.Text = "Разделенный режим";
+                StatusLabel.Text = "Готов";
                 break;
         }
     }
@@ -159,7 +108,42 @@ public partial class CombinedEditorPage : ContentPage
         MainThread.BeginInvokeOnMainThread(() =>
         {
             canvasView?.InvalidateSurface();
-            canvasViewSplit?.InvalidateSurface();
+        });
+    }
+
+    private void OnBulletListClicked(object sender, EventArgs e)
+    {
+        richTextEditor?.CreateBulletList();
+    }
+
+    private void OnNumberedListClicked(object sender, EventArgs e)
+    {
+        richTextEditor?.CreateNumberedList();
+    }
+
+    private void OnUnderlineClicked(object sender, EventArgs e)
+    {
+        richTextEditor?.ApplyUnderline();
+    }
+
+    private void OnTextFormattingChanged(object sender, EventArgs e)
+    {
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            // Обновляем RichTextEditor при изменении форматирования
+            if (richTextEditor != null && _viewModel?.TextViewModel != null)
+            {
+                richTextEditor.IsBold = _viewModel.TextViewModel.IsBold;
+                richTextEditor.IsItalic = _viewModel.TextViewModel.IsItalic;
+                richTextEditor.FontSize = _viewModel.TextViewModel.FontSize;
+                richTextEditor.FontFamily = _viewModel.TextViewModel.FontFamily;
+
+                // Обработка списков
+                if (_viewModel.TextViewModel.CurrentFormatting != null)
+                {
+                    // Здесь можно добавить логику для обновления списков
+                }
+            }
         });
     }
 
@@ -196,33 +180,33 @@ public partial class CombinedEditorPage : ContentPage
             try
             {
 #if WINDOWS
-                    if (Handler.PlatformView is Microsoft.UI.Xaml.FrameworkElement frameworkElement)
+                if (Handler.PlatformView is Microsoft.UI.Xaml.FrameworkElement frameworkElement)
+                {
+                    frameworkElement.KeyDown += (s, e) =>
                     {
-                        frameworkElement.KeyDown += (s, e) =>
+                        _isCtrlPressed = e.Key == Windows.System.VirtualKey.Control;
+                    };
+                    frameworkElement.KeyUp += (s, e) =>
+                    {
+                        if (e.Key == Windows.System.VirtualKey.Control)
+                            _isCtrlPressed = false;
+                    };
+                    frameworkElement.PointerWheelChanged += (s, e) =>
+                    {
+                        if (_isCtrlPressed)
                         {
-                            _isCtrlPressed = e.Key == Windows.System.VirtualKey.Control;
-                        };
-                        frameworkElement.KeyUp += (s, e) =>
-                        {
-                            if (e.Key == Windows.System.VirtualKey.Control)
-                                _isCtrlPressed = false;
-                        };
-                        frameworkElement.PointerWheelChanged += (s, e) =>
-                        {
-                            if (_isCtrlPressed)
-                            {
-                                var delta = e.GetCurrentPoint(frameworkElement).Properties.MouseWheelDelta;
-                                var location = e.GetCurrentPoint(frameworkElement).Position;
-                                _viewModel.DrawingViewModel.HandleWheelZoom(delta, new SKPoint((float)location.X, (float)location.Y));
-                                e.Handled = true;
-                            }
-                        };
-                    }
+                            var delta = e.GetCurrentPoint(frameworkElement).Properties.MouseWheelDelta;
+                            var location = e.GetCurrentPoint(frameworkElement).Position;
+                            _viewModel.DrawingViewModel.HandleWheelZoom(delta, new SKPoint((float)location.X, (float)location.Y));
+                            e.Handled = true;
+                        }
+                    };
+                }
 #endif
             }
             catch
             {
-                
+
             }
         }
     }
@@ -235,6 +219,7 @@ public partial class CombinedEditorPage : ContentPage
             if (drawingService != null)
             {
                 drawingService.DrawingChanged -= OnDrawingChanged;
+                drawingService.CanUndoRedoChanged -= OnDrawingChanged;
             }
         }
         base.OnDisappearing();
