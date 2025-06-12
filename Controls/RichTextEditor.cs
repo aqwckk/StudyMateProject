@@ -43,14 +43,6 @@ namespace StudyMateTest.Controls
             BindingMode.TwoWay,
             propertyChanged: OnFormattingPropertyChanged);
 
-        public static readonly BindableProperty IsUnderlineProperty = BindableProperty.Create(
-            nameof(IsUnderline),
-            typeof(bool),
-            typeof(RichTextEditor),
-            false,
-            BindingMode.TwoWay,
-            propertyChanged: OnFormattingPropertyChanged);
-
         public static readonly BindableProperty TextAlignmentProperty = BindableProperty.Create(
             nameof(TextAlignment),
             typeof(TextAlignment),
@@ -91,12 +83,6 @@ namespace StudyMateTest.Controls
         {
             get => (bool)GetValue(IsItalicProperty);
             set => SetValue(IsItalicProperty, value);
-        }
-
-        public bool IsUnderline
-        {
-            get => (bool)GetValue(IsUnderlineProperty);
-            set => SetValue(IsUnderlineProperty, value);
         }
 
         public TextAlignment TextAlignment
@@ -153,11 +139,8 @@ namespace StudyMateTest.Controls
 
         private void UpdateCurrentFormattingFromCursor()
         {
-            // Здесь можно добавить логику для определения форматирования в позиции курсора
-            // Пока используем текущие значения свойств
             _currentFormatting.IsBold = IsBold;
             _currentFormatting.IsItalic = IsItalic;
-            _currentFormatting.IsUnderline = IsUnderline;
             _currentFormatting.FontSize = FontSize;
             _currentFormatting.FontFamily = FontFamily;
             _currentFormatting.TextAlignment = TextAlignment;
@@ -217,11 +200,6 @@ namespace StudyMateTest.Controls
 
                 // Подчеркивание в MAUI Editor не поддерживается напрямую
                 // Можно использовать TextDecorations, если доступно
-                if (IsUnderline)
-                {
-                    // В будущих версиях MAUI может появиться поддержка TextDecorations
-                    // Пока используем обходной путь через формат текста
-                }
             }
         }
 
@@ -229,8 +207,6 @@ namespace StudyMateTest.Controls
         {
             if (_editor?.Text == null) return;
 
-            // Получаем выделенный текст (в базовом Editor это ограничено)
-            // Применяем форматирование ко всему тексту, если нет выделения
             UpdateEditorProperties();
         }
 
@@ -242,7 +218,6 @@ namespace StudyMateTest.Controls
             var text = _editor.Text;
             var lines = text.Split('\n').ToList();
 
-            // Получаем выделенные строки (упрощенная логика)
             var selectedLines = GetSelectedLines(lines);
 
             for (int i = 0; i < selectedLines.Count; i++)
@@ -303,10 +278,6 @@ namespace StudyMateTest.Controls
 
         private List<int> GetSelectedLines(List<string> lines)
         {
-            // Упрощенная логика: если нет выделения, применяем к текущей строке
-            // В реальной реализации нужно получить позицию курсора
-
-            // Для демонстрации возвращаем все строки с текстом
             var result = new List<int>();
             for (int i = 0; i < lines.Count; i++)
             {
@@ -353,10 +324,6 @@ namespace StudyMateTest.Controls
             IsItalic = !IsItalic;
         }
 
-        public void ApplyUnderline()
-        {
-            IsUnderline = !IsUnderline;
-        }
 
         public void ApplyAlignment(TextAlignment alignment)
         {
@@ -379,7 +346,6 @@ namespace StudyMateTest.Controls
     {
         public bool IsBold { get; set; }
         public bool IsItalic { get; set; }
-        public bool IsUnderline { get; set; }
         public double FontSize { get; set; } = 14.0;
         public string FontFamily { get; set; } = "Arial";
         public TextAlignment TextAlignment { get; set; } = TextAlignment.Start;

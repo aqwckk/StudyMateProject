@@ -24,7 +24,6 @@ namespace StudyMateTest.ViewModels
         public ICommand SaveAsDocumentCommand { get; private set; }
         public ICommand ToggleBoldCommand { get; private set; }
         public ICommand ToggleItalicCommand { get; private set; }
-        public ICommand ToggleUnderlineCommand { get; private set; }
         public ICommand SetAlignmentCommand { get; private set; }
         public ICommand CreateListCommand { get; private set; }
         public ICommand IncreaseIndentCommand { get; private set; }
@@ -81,16 +80,6 @@ namespace StudyMateTest.ViewModels
             set 
             {
                 _textEditorService.SetItalic(value);
-                OnPropertyChanged();
-            }
-        }
-
-        public bool IsUnderlined 
-        {
-            get => CurrentFormatting?.IsUnderlined ?? false;
-            set 
-            {
-                _textEditorService?.SetUnderlined(value);
                 OnPropertyChanged();
             }
         }
@@ -162,7 +151,6 @@ namespace StudyMateTest.ViewModels
 
             ToggleBoldCommand = new Command(() => IsBold = !IsBold);
             ToggleItalicCommand = new Command(() => IsItalic = !IsItalic);
-            ToggleUnderlineCommand = new Command(() => IsUnderlined = !IsUnderlined);
 
             SetAlignmentCommand = new Command<string>(SetAlignment);
             CreateListCommand = new Command<string>(CreateList);
@@ -254,7 +242,6 @@ namespace StudyMateTest.ViewModels
             OnPropertyChanged(nameof(CurrentFormatting));
             OnPropertyChanged(nameof(IsBold));
             OnPropertyChanged(nameof(IsItalic));
-            OnPropertyChanged(nameof(IsUnderlined));
             OnPropertyChanged(nameof(FontSize));
             OnPropertyChanged(nameof(FontSizeText));
             OnPropertyChanged(nameof(FontFamily));

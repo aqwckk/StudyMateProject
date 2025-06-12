@@ -10,7 +10,6 @@ namespace StudyMateTest.Models.TextEditor
     {
         public bool IsBold { get; set; }
         public bool IsItalic { get; set; }
-        public bool IsUnderlined{ get; set; }
         public string FontFamily { get; set; } = "Arial";
         public double FontSize { get; set; } = 14;
         public string TextColor { get; set; } = "#000000";

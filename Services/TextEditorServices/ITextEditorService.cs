@@ -21,7 +21,6 @@ namespace StudyMateTest.Services.TextEditorServices
         void ApplyFormatting(TextFormatting formatting);
         void SetBold(bool isBold);
         void SetItalic(bool isItalic);
-        void SetUnderlined(bool isUnderlined);
         void SetFontSize(double fontSize);
         void SetFontFamily(string fontFamily);
         void SetTextColor(string color);

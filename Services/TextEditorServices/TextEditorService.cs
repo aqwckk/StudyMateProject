@@ -145,12 +145,6 @@ namespace StudyMateTest.Services.TextEditorServices
             OnFormattingChanged();
         }
 
-        public void SetUnderlined(bool isUnderlined) 
-        {
-            CurrentFormatting.IsUnderlined = isUnderlined;
-            OnFormattingChanged();
-        }
-
         public void SetFontSize(double fontSize) 
         {
             CurrentFormatting.FontSize = Math.Max(8, Math.Min(72, fontSize));

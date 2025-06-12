@@ -151,11 +151,6 @@
                             BackgroundColor="{Binding TextViewModel.IsItalic, Converter={StaticResource BoolToBgConverter}}"
                             FontSize="10" Padding="4,2" WidthRequest="30" HeightRequest="25" FontAttributes="Italic" />
 
-                    <Button Text="U" ToolTipProperties.Text="Подчеркнутый"
-                            Command="{Binding TextViewModel.ToggleUnderlineCommand}"
-                            BackgroundColor="{Binding TextViewModel.IsUnderlined, Converter={StaticResource BoolToBgConverter}}"
-                            FontSize="10" Padding="4,2" WidthRequest="30" HeightRequest="25" />
-
                     <BoxView Color="Gray" WidthRequest="1" Margin="3,0" />
 
                     <!-- Выравнивание -->
@@ -268,7 +263,6 @@
                                        FontSize="{Binding TextViewModel.FontSize}"
                                        IsBold="{Binding TextViewModel.IsBold}"
                                        IsItalic="{Binding TextViewModel.IsItalic}"
-                                       IsUnderline="{Binding TextViewModel.IsUnderline}"
                                        TextAlignment="{Binding TextViewModel.TextAlignment, Converter={StaticResource TextAlignmentConverter}}" />
             </Grid>
         </Grid>

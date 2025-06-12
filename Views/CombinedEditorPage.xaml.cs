@@ -121,11 +121,6 @@ public partial class CombinedEditorPage : ContentPage
         richTextEditor?.CreateNumberedList();
     }
 
-    private void OnUnderlineClicked(object sender, EventArgs e)
-    {
-        richTextEditor?.ApplyUnderline();
-    }
-
     private void OnTextFormattingChanged(object sender, EventArgs e)
     {
         MainThread.BeginInvokeOnMainThread(() =>
