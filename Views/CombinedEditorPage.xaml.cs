@@ -17,6 +17,8 @@ public partial class CombinedEditorPage : ContentPage
     private bool _isCtrlPressed = false;
 
     private double _splitterPosition = 0.5;
+    private bool _isDraggingSplitter = false;
+    private double _totalWidth = 0;
 
     public CombinedEditorPage(IDrawingService drawingService, ITextEditorService textEditorService) 
     {
@@ -64,12 +66,13 @@ public partial class CombinedEditorPage : ContentPage
         TextButton.BackgroundColor = Colors.LightGray;
         SplitButton.BackgroundColor = Colors.LightGray;
 
+        GraphicsToolbar.IsVisible = false;
+        TextToolbar.IsVisible = false;
+        SplitToolbar.IsVisible = false;
+
         GraphicsOnlyMode.IsVisible = false;
         TextOnlyMode.IsVisible = false;
         SplitMode.IsVisible = false;
-
-        GraphicsToolbar.IsVisible = false;
-        TextToolbar.IsVisible = false;
 
         switch (mode) 
         {
@@ -78,12 +81,8 @@ public partial class CombinedEditorPage : ContentPage
                 GraphicsOnlyMode.IsVisible = true;
                 GraphicsToolbar.IsVisible = true;
 
-                GraphicsControls.IsVisible = true;
-                BrushSettings.IsVisible = true;
-                ZoomSettings.IsVisible = true;
+                StatusLabel.Text = "Графический редактор";
                 SaveDrawingButton.IsVisible = true;
-
-                DocumentStatus.IsVisible = false;
                 SaveTextButton.IsVisible = false;
                 break;
             case EditorMode.Text:
@@ -91,25 +90,17 @@ public partial class CombinedEditorPage : ContentPage
                 TextOnlyMode.IsVisible = true;
                 TextToolbar.IsVisible = true;
 
-                DocumentStatus.IsVisible = true;
+                StatusLabel.Text = "Текстовый редактор";
                 SaveTextButton.IsVisible = true;
-
-                GraphicsControls.IsVisible = false;
-                BrushSettings.IsVisible = false;
-                ZoomSettings.IsVisible = false;
                 SaveDrawingButton.IsVisible = false;
                 break;
 
             case EditorMode.Split:
                 SplitButton.BackgroundColor = Colors.LightBlue;
                 SplitMode.IsVisible = true;
-                GraphicsToolbar.IsVisible = true;
-                TextToolbar.IsVisible = true;
+                SplitToolbar.IsVisible = true;
 
-                GraphicsControls.IsVisible = true;
-                DocumentStatus.IsVisible = true;
-                BrushSettings.IsVisible = true;
-                ZoomSettings.IsVisible = true;
+                StatusLabel.Text = "Разделенный режим";
                 SaveDrawingButton.IsVisible = true;
                 SaveTextButton.IsVisible = true;
 
@@ -120,25 +111,40 @@ public partial class CombinedEditorPage : ContentPage
 
     private void UpdateSplitterLayout()
     {
-        if (SplitMode.IsVisible)
+        if (SplitMode.IsVisible && SplitMode is Grid splitGrid)
         {
-            var columnDefinitions = SplitMode.ColumnDefinitions;
-            columnDefinitions[0].Width = new GridLength(_splitterPosition, GridUnitType.Star);
-            columnDefinitions[2].Width = new GridLength(1 - _splitterPosition, GridUnitType.Star);
+            LeftColumn.Width = new GridLength(_splitterPosition, GridUnitType.Star);
+            RightColumn.Width = new GridLength (1 - _splitterPosition, GridUnitType.Star);
         }
     }
 
     private void OnSplitterPanUpdated(object sender, PanUpdatedEventArgs e)
     {
-        if (e.StatusType == GestureStatus.Running)
+        switch (e.StatusType) 
         {
-            var totalWidth = SplitMode.Width;
-            if (totalWidth > 0)
-            {
-                var deltaRatio = e.TotalX / totalWidth;
-                _splitterPosition = Math.Max(0.1, Math.Min(0.9, _splitterPosition + deltaRatio));
-                UpdateSplitterLayout();
-            }
+            case GestureStatus.Started:
+                _isDraggingSplitter = true;
+                _totalWidth = SplitMode.Width;
+                Splitter.BackgroundColor = Colors.Blue;
+                break;
+            case GestureStatus.Running:
+                if (_isDraggingSplitter && _totalWidth > 0) 
+                {
+                    double deltaRatio = e.TotalX / _totalWidth;
+                    double newPosition = Math.Max(0.1, Math.Min(0.9, _splitterPosition + deltaRatio));
+
+                    _splitterPosition = newPosition;
+                    UpdateSplitterLayout();
+
+                    StatusLabel.Text = $"Разделение: {_splitterPosition:P0} | {(1 - _splitterPosition):P0}";
+                }
+                break;
+            case GestureStatus.Completed:
+            case GestureStatus.Canceled:
+                _isDraggingSplitter = false;
+                Splitter.BackgroundColor = Colors.DarkGray;
+                StatusLabel.Text = "Разделенный режим";
+                break;
         }
     }
 

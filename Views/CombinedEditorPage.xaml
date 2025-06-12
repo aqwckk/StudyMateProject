@@ -13,76 +13,187 @@
 
     <Grid RowDefinitions="Auto,Auto,*,Auto">
 
-        <!-- Переключатель режимов -->
-        <HorizontalStackLayout Grid.Row="0" Padding="10" Spacing="10" HorizontalOptions="Center">
-            <Button Text="Графический редактор" 
+        <!-- Переключатель режимов - компактный -->
+        <HorizontalStackLayout Grid.Row="0" Padding="5" Spacing="5" HorizontalOptions="Center" BackgroundColor="#3E3E3E">
+            <Button Text="Графика" 
                     x:Name="GraphicsButton"
                     BackgroundColor="LightBlue"
+                    FontSize="12"
+                    Padding="8,4"
                     Clicked="OnGraphicsModeClicked" />
-            <Button Text="Текстовый редактор" 
+            <Button Text="Текст" 
                     x:Name="TextButton"
                     BackgroundColor="LightGray"
+                    FontSize="12"
+                    Padding="8,4"
                     Clicked="OnTextModeClicked" />
-            <Button Text="Разделенный режим" 
+            <Button Text="Оба" 
                     x:Name="SplitButton"
                     BackgroundColor="LightGray"
+                    FontSize="12"
+                    Padding="8,4"
                     Clicked="OnSplitModeClicked" />
         </HorizontalStackLayout>
 
-        <!-- Панель инструментов графического редактора -->
-        <ScrollView Grid.Row="1" x:Name="GraphicsToolbar" Orientation="Horizontal" IsVisible="True">
-            <HorizontalStackLayout Padding="10" Spacing="8">
-                <Button Text="Карандаш"
-                        Command="{Binding DrawingViewModel.SetToolCommand}"
-                        CommandParameter="{x:Static models:DrawingTool.Pen}"
-                        BackgroundColor="{Binding DrawingViewModel.SelectedTool, Converter={StaticResource ToolToBgConverter}, ConverterParameter={x:Static local:DrawingTool.Pen}}" />
+        <!-- Компактная панель инструментов -->
+        <Grid Grid.Row="1" BackgroundColor="#3E3E3E" Padding="5">
 
-                <Button Text="Линия"
-                        Command="{Binding DrawingViewModel.SetToolCommand}"
-                        CommandParameter="{x:Static models:DrawingTool.Line}"
-                        BackgroundColor="{Binding DrawingViewModel.SelectedTool, Converter={StaticResource ToolToBgConverter}, ConverterParameter={x:Static local:DrawingTool.Line}}" />
+            <!-- Инструменты графического редактора -->
+            <ScrollView x:Name="GraphicsToolbar" Orientation="Horizontal" IsVisible="True">
+                <HorizontalStackLayout Spacing="3">
+                    <Button Text="✏️" ToolTipProperties.Text="Карандаш"
+                            Command="{Binding DrawingViewModel.SetToolCommand}"
+                            CommandParameter="{x:Static models:DrawingTool.Pen}"
+                            BackgroundColor="{Binding DrawingViewModel.SelectedTool, Converter={StaticResource ToolToBgConverter}, ConverterParameter={x:Static local:DrawingTool.Pen}}"
+                            FontSize="10" Padding="4,2" WidthRequest="30" HeightRequest="25" />
 
-                <Button Text="Прямоугольник"
-                        Command="{Binding DrawingViewModel.SetToolCommand}"
-                        CommandParameter="{x:Static models:DrawingTool.Rectangle}"
-                        BackgroundColor="{Binding DrawingViewModel.SelectedTool, Converter={StaticResource ToolToBgConverter}, ConverterParameter={x:Static local:DrawingTool.Rectangle}}" />
+                    <Button Text="📏" ToolTipProperties.Text="Линия"
+                            Command="{Binding DrawingViewModel.SetToolCommand}"
+                            CommandParameter="{x:Static models:DrawingTool.Line}"
+                            BackgroundColor="{Binding DrawingViewModel.SelectedTool, Converter={StaticResource ToolToBgConverter}, ConverterParameter={x:Static local:DrawingTool.Line}}"
+                            FontSize="10" Padding="4,2" WidthRequest="30" HeightRequest="25" />
 
-                <Button Text="Эллипс"
-                        Command="{Binding DrawingViewModel.SetToolCommand}"
-                        CommandParameter="{x:Static models:DrawingTool.Ellipse}"
-                        BackgroundColor="{Binding DrawingViewModel.SelectedTool, Converter={StaticResource ToolToBgConverter}, ConverterParameter={x:Static local:DrawingTool.Ellipse}}" />
+                    <Button Text="⬜" ToolTipProperties.Text="Прямоугольник"
+                            Command="{Binding DrawingViewModel.SetToolCommand}"
+                            CommandParameter="{x:Static models:DrawingTool.Rectangle}"
+                            BackgroundColor="{Binding DrawingViewModel.SelectedTool, Converter={StaticResource ToolToBgConverter}, ConverterParameter={x:Static local:DrawingTool.Rectangle}}"
+                            FontSize="10" Padding="4,2" WidthRequest="30" HeightRequest="25" />
 
-                <Button Text="Заливка"
-                        Command="{Binding DrawingViewModel.ToggleFillModeCommand}"
-                        BackgroundColor="{Binding DrawingViewModel.IsFilled, Converter={StaticResource BoolToBgConverter}}"
-                        IsVisible="{Binding DrawingViewModel.IsFillSupported}"/>
-            </HorizontalStackLayout>
-        </ScrollView>
+                    <Button Text="⭕" ToolTipProperties.Text="Эллипс"
+                            Command="{Binding DrawingViewModel.SetToolCommand}"
+                            CommandParameter="{x:Static models:DrawingTool.Ellipse}"
+                            BackgroundColor="{Binding DrawingViewModel.SelectedTool, Converter={StaticResource ToolToBgConverter}, ConverterParameter={x:Static local:DrawingTool.Ellipse}}"
+                            FontSize="10" Padding="4,2" WidthRequest="30" HeightRequest="25" />
 
-        <!-- Панель инструментов текстового редактора (упрощенная, так как RichTextEditor имеет встроенную) -->
-        <Grid Grid.Row="1" x:Name="TextToolbar" IsVisible="False" Padding="10">
-            <HorizontalStackLayout Spacing="8" HorizontalOptions="Start">
-                <Button Text="Новый" Command="{Binding TextViewModel.NewDocumentCommand}" />
-                <Button Text="Открыть" Command="{Binding TextViewModel.OpenDocumentCommand}" />
-                <Button Text="Сохранить" Command="{Binding TextViewModel.SaveDocumentCommand}" />
+                    <Button Text="🔸" ToolTipProperties.Text="Треугольник"
+                            Command="{Binding DrawingViewModel.SetToolCommand}"
+                            CommandParameter="{x:Static models:DrawingTool.Triangle}"
+                            BackgroundColor="{Binding DrawingViewModel.SelectedTool, Converter={StaticResource ToolToBgConverter}, ConverterParameter={x:Static local:DrawingTool.Triangle}}"
+                            FontSize="10" Padding="4,2" WidthRequest="30" HeightRequest="25" />
 
-                <BoxView Color="LightGray" WidthRequest="1" Margin="5,0" />
+                    <Button Text="🎨" ToolTipProperties.Text="Заливка"
+                            Command="{Binding DrawingViewModel.ToggleFillModeCommand}"
+                            BackgroundColor="{Binding DrawingViewModel.IsFilled, Converter={StaticResource BoolToBgConverter}}"
+                            IsVisible="{Binding DrawingViewModel.IsFillSupported}"
+                            FontSize="10" Padding="4,2" WidthRequest="30" HeightRequest="25" />
 
-                <Label Text="{Binding TextViewModel.DocumentTitle}" 
-                       VerticalOptions="Center" 
-                       FontAttributes="Bold" />
+                    <BoxView Color="Gray" WidthRequest="1" Margin="3,0" />
 
-                <Label Text="*" 
-                       VerticalOptions="Center" 
-                       TextColor="Red"
-                       IsVisible="{Binding TextViewModel.IsDocumentModified}" />
-            </HorizontalStackLayout>
+                    <!-- Цвета -->
+                    <Button WidthRequest="20" HeightRequest="20" Margin="1"
+                            BackgroundColor="Black"
+                            Command="{Binding DrawingViewModel.SetColorCommand}"
+                            CommandParameter="Black" />
+                    <Button WidthRequest="20" HeightRequest="20" Margin="1"
+                            BackgroundColor="Red"
+                            Command="{Binding DrawingViewModel.SetColorCommand}"
+                            CommandParameter="Red" />
+                    <Button WidthRequest="20" HeightRequest="20" Margin="1"
+                            BackgroundColor="Blue"
+                            Command="{Binding DrawingViewModel.SetColorCommand}"
+                            CommandParameter="Blue" />
+                    <Button WidthRequest="20" HeightRequest="20" Margin="1"
+                            BackgroundColor="Green"
+                            Command="{Binding DrawingViewModel.SetColorCommand}"
+                            CommandParameter="Green" />
+
+                    <BoxView Color="Gray" WidthRequest="1" Margin="3,0" />
+
+                    <!-- Толщина кисти -->
+                    <Label Text="Толщина:" VerticalOptions="Center" FontSize="10" TextColor="White" />
+                    <Slider Value="{Binding DrawingViewModel.StrokeWidth}"
+                            Minimum="1" Maximum="20"
+                            WidthRequest="80" VerticalOptions="Center"
+                            MinimumTrackColor="White" MaximumTrackColor="Gray" />
+                    <Label Text="{Binding DrawingViewModel.StrokeWidth, StringFormat='{0:F0}'}" 
+                           VerticalOptions="Center" FontSize="10" TextColor="White" WidthRequest="20" />
+
+                    <BoxView Color="Gray" WidthRequest="1" Margin="3,0" />
+
+                    <!-- Масштаб -->
+                    <Button Text="🔍-" Command="{Binding DrawingViewModel.ZoomOutCommand}" 
+                            FontSize="10" Padding="4,2" WidthRequest="30" HeightRequest="25" />
+                    <Label Text="{Binding DrawingViewModel.ZoomPercentage}" 
+                           VerticalOptions="Center" FontSize="10" TextColor="White" WidthRequest="40" HorizontalTextAlignment="Center" />
+                    <Button Text="🔍+" Command="{Binding DrawingViewModel.ZoomInCommand}" 
+                            FontSize="10" Padding="4,2" WidthRequest="30" HeightRequest="25" />
+                </HorizontalStackLayout>
+            </ScrollView>
+
+            <!-- Инструменты текстового редактора -->
+            <Grid x:Name="TextToolbar" IsVisible="False">
+                <HorizontalStackLayout Spacing="3">
+                    <Button Text="📄" ToolTipProperties.Text="Новый"
+                            Command="{Binding TextViewModel.NewDocumentCommand}" 
+                            FontSize="10" Padding="4,2" WidthRequest="30" HeightRequest="25" />
+                    <Button Text="📁" ToolTipProperties.Text="Открыть"
+                            Command="{Binding TextViewModel.OpenDocumentCommand}" 
+                            FontSize="10" Padding="4,2" WidthRequest="30" HeightRequest="25" />
+                    <Button Text="💾" ToolTipProperties.Text="Сохранить"
+                            Command="{Binding TextViewModel.SaveDocumentCommand}" 
+                            FontSize="10" Padding="4,2" WidthRequest="30" HeightRequest="25" />
+
+                    <BoxView Color="Gray" WidthRequest="1" Margin="3,0" />
+
+                    <Label Text="{Binding TextViewModel.DocumentTitle}" 
+                           VerticalOptions="Center" FontSize="10" TextColor="White" MaximumWidthRequest="150" />
+
+                    <Label Text="*" VerticalOptions="Center" TextColor="Orange" FontSize="12"
+                           IsVisible="{Binding TextViewModel.IsDocumentModified}" />
+                </HorizontalStackLayout>
+            </Grid>
+
+            <!-- Инструменты для разделенного режима -->
+            <Grid x:Name="SplitToolbar" IsVisible="False" RowDefinitions="Auto,Auto">
+                <!-- Первая строка: графические инструменты -->
+                <HorizontalStackLayout Grid.Row="0" Spacing="3">
+                    <Label Text="🎨" VerticalOptions="Center" FontSize="12" TextColor="LightBlue" />
+
+                    <Button Text="✏️" Command="{Binding DrawingViewModel.SetToolCommand}"
+                            CommandParameter="{x:Static models:DrawingTool.Pen}"
+                            FontSize="8" Padding="3,1" WidthRequest="25" HeightRequest="20" />
+                    <Button Text="📏" Command="{Binding DrawingViewModel.SetToolCommand}"
+                            CommandParameter="{x:Static models:DrawingTool.Line}"
+                            FontSize="8" Padding="3,1" WidthRequest="25" HeightRequest="20" />
+                    <Button Text="⬜" Command="{Binding DrawingViewModel.SetToolCommand}"
+                            CommandParameter="{x:Static models:DrawingTool.Rectangle}"
+                            FontSize="8" Padding="3,1" WidthRequest="25" HeightRequest="20" />
+                    <Button Text="⭕" Command="{Binding DrawingViewModel.SetToolCommand}"
+                            CommandParameter="{x:Static models:DrawingTool.Ellipse}"
+                            FontSize="8" Padding="3,1" WidthRequest="25" HeightRequest="20" />
+
+                    <Button WidthRequest="15" HeightRequest="15" BackgroundColor="Black"
+                            Command="{Binding DrawingViewModel.SetColorCommand}" CommandParameter="Black" />
+                    <Button WidthRequest="15" HeightRequest="15" BackgroundColor="Red"
+                            Command="{Binding DrawingViewModel.SetColorCommand}" CommandParameter="Red" />
+                    <Button WidthRequest="15" HeightRequest="15" BackgroundColor="Blue"
+                            Command="{Binding DrawingViewModel.SetColorCommand}" CommandParameter="Blue" />
+
+                    <Slider Value="{Binding DrawingViewModel.StrokeWidth}" Minimum="1" Maximum="20"
+                            WidthRequest="60" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+
+                <!-- Вторая строка: текстовые инструменты -->
+                <HorizontalStackLayout Grid.Row="1" Spacing="3" Margin="0,2,0,0">
+                    <Label Text="📝" VerticalOptions="Center" FontSize="12" TextColor="LightGreen" />
+
+                    <Button Text="📄" Command="{Binding TextViewModel.NewDocumentCommand}" 
+                            FontSize="8" Padding="3,1" WidthRequest="25" HeightRequest="20" />
+                    <Button Text="📁" Command="{Binding TextViewModel.OpenDocumentCommand}" 
+                            FontSize="8" Padding="3,1" WidthRequest="25" HeightRequest="20" />
+                    <Button Text="💾" Command="{Binding TextViewModel.SaveDocumentCommand}" 
+                            FontSize="8" Padding="3,1" WidthRequest="25" HeightRequest="20" />
+
+                    <Label Text="{Binding TextViewModel.DocumentTitle}" 
+                           VerticalOptions="Center" FontSize="9" TextColor="White" MaximumWidthRequest="100" />
+                </HorizontalStackLayout>
+            </Grid>
         </Grid>
 
         <!-- Основная рабочая область -->
         <Grid Grid.Row="2" x:Name="MainWorkArea">
             <!-- Режим только графики -->
-            <Grid x:Name="GraphicsOnlyMode" IsVisible="True" BackgroundColor="#404040" Padding="20">
+            <Grid x:Name="GraphicsOnlyMode" IsVisible="True" BackgroundColor="#404040" Padding="10">
                 <skia:SKCanvasView x:Name="canvasView"
                                    PaintSurface="OnCanvasViewPaintSurface"
                                    EnableTouchEvents="True"
@@ -90,18 +201,40 @@
             </Grid>
 
             <!-- Режим только текста -->
-            <Grid x:Name="TextOnlyMode" IsVisible="False" BackgroundColor="White" Padding="20">
-                <controls:RichTextEditor x:Name="richTextEditor"
-                                         Text="{Binding TextViewModel.DocumentContent, Mode=TwoWay}"
-                                         FontFamily="{Binding TextViewModel.FontFamily}"
-                                         FontSize="{Binding TextViewModel.FontSize}" />
+            <Grid x:Name="TextOnlyMode" IsVisible="False" BackgroundColor="White" Padding="10">
+                <!-- Временно используем обычный Editor вместо RichTextEditor -->
+                <ScrollView>
+                    <Editor x:Name="textEditor"
+                            Text="{Binding TextViewModel.DocumentContent}"
+                            FontFamily="{Binding TextViewModel.FontFamily}"
+                            FontSize="{Binding TextViewModel.FontSize}"
+                            BackgroundColor="White"
+                            TextColor="Black"
+                            AutoSize="TextChanges"
+                            MinimumHeightRequest="400" />
+                </ScrollView>
             </Grid>
 
             <!-- Разделенный режим -->
-            <Grid x:Name="SplitMode" IsVisible="False" ColumnDefinitions="*,5,*">
+            <Grid x:Name="SplitMode" IsVisible="False">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" x:Name="LeftColumn" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" x:Name="RightColumn" />
+                </Grid.ColumnDefinitions>
+
                 <!-- Графический редактор слева -->
-                <Grid Grid.Column="0" BackgroundColor="#404040" Padding="10">
-                    <skia:SKCanvasView x:Name="canvasViewSplit"
+                <Grid Grid.Column="0" BackgroundColor="#404040" Padding="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Row="0" Text="🎨 Графический редактор" 
+                           FontSize="10" TextColor="LightBlue" 
+                           HorizontalOptions="Center" Margin="0,0,0,5" />
+
+                    <skia:SKCanvasView Grid.Row="1" x:Name="canvasViewSplit"
                                        PaintSurface="OnCanvasViewPaintSurface"
                                        EnableTouchEvents="True"
                                        Touch="OnCanvasViewTouch" />
@@ -110,95 +243,72 @@
                 <!-- Разделитель с возможностью изменения размера -->
                 <BoxView Grid.Column="1" 
                          Color="Gray" 
-                         x:Name="Splitter">
+                         WidthRequest="8"
+                         x:Name="Splitter"
+                         BackgroundColor="DarkGray">
                     <BoxView.GestureRecognizers>
                         <PanGestureRecognizer PanUpdated="OnSplitterPanUpdated" />
                     </BoxView.GestureRecognizers>
                 </BoxView>
 
                 <!-- Текстовый редактор справа -->
-                <Grid Grid.Column="2" BackgroundColor="White" Padding="10">
-                    <controls:RichTextEditor x:Name="richTextEditorSplit"
-                                             Text="{Binding TextViewModel.DocumentContent, Mode=TwoWay}"
-                                             FontFamily="{Binding TextViewModel.FontFamily}"
-                                             FontSize="{Binding TextViewModel.FontSize}" />
+                <Grid Grid.Column="2" BackgroundColor="White" Padding="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Row="0" Text="📝 Текстовый редактор" 
+                           FontSize="10" TextColor="DarkGreen" 
+                           HorizontalOptions="Center" Margin="0,0,0,5" />
+
+                    <!-- Временно используем обычный Editor вместо RichTextEditor -->
+                    <ScrollView Grid.Row="1">
+                        <Editor x:Name="textEditorSplit"
+                                Text="{Binding TextViewModel.DocumentContent}"
+                                FontFamily="{Binding TextViewModel.FontFamily}"
+                                FontSize="{Binding TextViewModel.FontSize}"
+                                BackgroundColor="White"
+                                TextColor="Black"
+                                AutoSize="TextChanges"
+                                MinimumHeightRequest="300" />
+                    </ScrollView>
                 </Grid>
             </Grid>
         </Grid>
 
-        <!-- Нижняя панель управления -->
-        <Grid Grid.Row="3" Padding="10" ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="10">
-            <!-- Кнопки отмены/повтора для графики -->
-            <HorizontalStackLayout Grid.Column="0" x:Name="GraphicsControls" Spacing="5">
-                <Button Text="Отменить"
+        <!-- Компактная нижняя панель -->
+        <Grid Grid.Row="3" Padding="5" BackgroundColor="#3E3E3E" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+
+            <!-- Левая часть: Отмена/Повтор -->
+            <HorizontalStackLayout Grid.Column="0" x:Name="UndoRedoControls" Spacing="3">
+                <Button Text="↶" ToolTipProperties.Text="Отменить"
                         Command="{Binding DrawingViewModel.UndoCommand}"
-                        IsEnabled="{Binding DrawingViewModel.CanUndo}" />
-                <Button Text="Повторить"
+                        IsEnabled="{Binding DrawingViewModel.CanUndo}"
+                        FontSize="12" Padding="6,3" WidthRequest="35" HeightRequest="25" />
+                <Button Text="↷" ToolTipProperties.Text="Повторить"
                         Command="{Binding DrawingViewModel.RedoCommand}"
-                        IsEnabled="{Binding DrawingViewModel.CanRedo}" />
+                        IsEnabled="{Binding DrawingViewModel.CanRedo}"
+                        FontSize="12" Padding="6,3" WidthRequest="35" HeightRequest="25" />
             </HorizontalStackLayout>
 
-            <!-- Статус документа -->
-            <VerticalStackLayout Grid.Column="1" x:Name="DocumentStatus">
-                <Label Text="{Binding TextViewModel.DocumentTitle}" 
-                       FontSize="12" 
-                       HorizontalOptions="Center"/>
-                <Label Text="Изменен" 
-                       FontSize="10" 
-                       HorizontalOptions="Center"
-                       TextColor="Orange"
-                       IsVisible="{Binding TextViewModel.IsDocumentModified}"/>
-            </VerticalStackLayout>
+            <!-- Центр: Статус -->
+            <StackLayout Grid.Column="1" Orientation="Horizontal" HorizontalOptions="Center" x:Name="StatusArea">
+                <Label x:Name="StatusLabel" Text="Готов" 
+                       FontSize="10" TextColor="LightGray" VerticalOptions="Center" />
+            </StackLayout>
 
-            <!-- Настройки кисти для графики -->
-            <VerticalStackLayout Grid.Column="2" x:Name="BrushSettings" HorizontalOptions="Center">
-                <Label Text="{Binding DrawingViewModel.StrokeWidth, StringFormat='Толщина: {0:F1}'}"
-                       HorizontalOptions="Center" />
-                <Slider Value="{Binding DrawingViewModel.StrokeWidth}"
-                        Minimum="1" Maximum="20"
-                        MinimumTrackColor="Black"
-                        MaximumTrackColor="LightGray"
-                        WidthRequest="200" />
-
-                <HorizontalStackLayout HorizontalOptions="Center" Spacing="8" Margin="0,8,0,0">
-                    <Button WidthRequest="32" HeightRequest="32"
-                            BackgroundColor="Black"
-                            Command="{Binding DrawingViewModel.SetColorCommand}"
-                            CommandParameter="Black" />
-                    <Button WidthRequest="32" HeightRequest="32"
-                            BackgroundColor="Red"
-                            Command="{Binding DrawingViewModel.SetColorCommand}"
-                            CommandParameter="Red" />
-                    <Button WidthRequest="32" HeightRequest="32"
-                            BackgroundColor="Green"
-                            Command="{Binding DrawingViewModel.SetColorCommand}"
-                            CommandParameter="Green" />
-                    <Button WidthRequest="32" HeightRequest="32"
-                            BackgroundColor="Blue"
-                            Command="{Binding DrawingViewModel.SetColorCommand}"
-                            CommandParameter="Blue" />
-                </HorizontalStackLayout>
-            </VerticalStackLayout>
-
-            <!-- Настройки масштаба для графики -->
-            <VerticalStackLayout Grid.Column="3" x:Name="ZoomSettings">
-                <Label Text="{Binding DrawingViewModel.ZoomPercentage}" FontSize="12" HorizontalOptions="Center"/>
-                <HorizontalStackLayout Spacing="5">
-                    <Button Text="-" Command="{Binding DrawingViewModel.ZoomOutCommand}" WidthRequest="30" HeightRequest="30"/>
-                    <Button Text="100%" Command="{Binding DrawingViewModel.ResetZoomCommand}" WidthRequest="50" HeightRequest="30"/>
-                    <Button Text="+" Command="{Binding DrawingViewModel.ZoomInCommand}" WidthRequest="30" HeightRequest="30"/>
-                </HorizontalStackLayout>
-            </VerticalStackLayout>
-
-            <!-- Кнопки сохранения -->
-            <VerticalStackLayout Grid.Column="4" Spacing="5">
-                <Button Text="Сохранить рисунок"
-                        Command="{Binding DrawingViewModel.SaveCommand}" 
-                        x:Name="SaveDrawingButton" />
-                <Button Text="Сохранить текст"
+            <!-- Правая часть: Сохранение -->
+            <HorizontalStackLayout Grid.Column="2" Spacing="3">
+                <Button Text="💾🎨" ToolTipProperties.Text="Сохранить рисунок"
+                        Command="{Binding DrawingViewModel.SaveCommand}"
+                        x:Name="SaveDrawingButton"
+                        FontSize="10" Padding="6,3" WidthRequest="50" HeightRequest="25" />
+                <Button Text="💾📝" ToolTipProperties.Text="Сохранить текст"
                         Command="{Binding TextViewModel.SaveDocumentCommand}"
-                        x:Name="SaveTextButton" />
-            </VerticalStackLayout>
+                        x:Name="SaveTextButton"
+                        FontSize="10" Padding="6,3" WidthRequest="50" HeightRequest="25" />
+            </HorizontalStackLayout>
         </Grid>
 
     </Grid>
