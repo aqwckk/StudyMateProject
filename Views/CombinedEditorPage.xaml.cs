@@ -111,33 +111,16 @@ public partial class CombinedEditorPage : ContentPage
         });
     }
 
-    private void OnBulletListClicked(object sender, EventArgs e)
-    {
-        richTextEditor?.CreateBulletList();
-    }
-
-    private void OnNumberedListClicked(object sender, EventArgs e)
-    {
-        richTextEditor?.CreateNumberedList();
-    }
-
     private void OnTextFormattingChanged(object sender, EventArgs e)
     {
         MainThread.BeginInvokeOnMainThread(() =>
         {
-            // Обновляем RichTextEditor при изменении форматирования
             if (richTextEditor != null && _viewModel?.TextViewModel != null)
             {
                 richTextEditor.IsBold = _viewModel.TextViewModel.IsBold;
                 richTextEditor.IsItalic = _viewModel.TextViewModel.IsItalic;
                 richTextEditor.FontSize = _viewModel.TextViewModel.FontSize;
                 richTextEditor.FontFamily = _viewModel.TextViewModel.FontFamily;
-
-                // Обработка списков
-                if (_viewModel.TextViewModel.CurrentFormatting != null)
-                {
-                    // Здесь можно добавить логику для обновления списков
-                }
             }
         });
     }

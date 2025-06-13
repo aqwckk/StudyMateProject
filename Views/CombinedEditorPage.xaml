@@ -169,20 +169,6 @@
 
                     <BoxView Color="Gray" WidthRequest="1" Margin="3,0" />
 
-                    <!-- Списки -->
-                    <Button Text="•" ToolTipProperties.Text="Маркированный список"
-                            Command="{Binding TextViewModel.CreateListCommand}"
-                            CommandParameter="Bulleted"
-                            Clicked="OnBulletListClicked"
-                            FontSize="10" Padding="4,2" WidthRequest="30" HeightRequest="25" />
-                    <Button Text="1." ToolTipProperties.Text="Нумерованный список"
-                            Command="{Binding TextViewModel.CreateListCommand}"
-                            CommandParameter="Numbered"
-                            Clicked="OnNumberedListClicked"
-                            FontSize="10" Padding="4,2" WidthRequest="30" HeightRequest="25" />
-
-                    <BoxView Color="Gray" WidthRequest="1" Margin="3,0" />
-
                     <!-- Размер шрифта -->
                     <Button Text="A-" ToolTipProperties.Text="Уменьшить шрифт"
                             Command="{Binding TextViewModel.DecreaseFontSizeCommand}"

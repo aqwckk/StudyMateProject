@@ -169,32 +169,6 @@ namespace StudyMateTest.Services.TextEditorServices
             OnFormattingChanged();
         }
 
-        public void CreateList(ListType listType) 
-        {
-            string[] lines = CurrentDocument.Content.Split('\n');
-            List<string> newLines = new List<string>();
-
-            for (int i = 0; i < lines.Length; i++) 
-            {
-                string line = lines[i].TrimStart('•', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', ' ');
-
-                switch (listType) 
-                {
-                    case ListType.Bulleted:
-                        newLines.Add($"• {line}");
-                        break;
-                    case ListType.Numbered:
-                        newLines.Add($"{i + 1}. {line}");
-                        break;
-                    default:
-                        newLines.Add(line);
-                        break;
-                }
-            }
-
-            CurrentDocument.Content = string.Join('\n', newLines);
-        }
-
         public void IncreaseIndent() 
         {
             CurrentFormatting.Indent += 20;

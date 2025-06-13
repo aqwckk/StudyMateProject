@@ -25,7 +25,6 @@ namespace StudyMateTest.Services.TextEditorServices
         void SetFontFamily(string fontFamily);
         void SetTextColor(string color);
         void SetAlignment(Models.TextEditor.TextAlignment alignment);
-        void CreateList(ListType listType);
         void IncreaseIndent();
         void DecreaseIndent();
 

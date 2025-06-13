@@ -25,7 +25,6 @@ namespace StudyMateTest.ViewModels
         public ICommand ToggleBoldCommand { get; private set; }
         public ICommand ToggleItalicCommand { get; private set; }
         public ICommand SetAlignmentCommand { get; private set; }
-        public ICommand CreateListCommand { get; private set; }
         public ICommand IncreaseIndentCommand { get; private set; }
         public ICommand DecreaseIndentCommand { get; private set; }
         public ICommand IncreaseFontSizeCommand { get; private set; }
@@ -153,7 +152,6 @@ namespace StudyMateTest.ViewModels
             ToggleItalicCommand = new Command(() => IsItalic = !IsItalic);
 
             SetAlignmentCommand = new Command<string>(SetAlignment);
-            CreateListCommand = new Command<string>(CreateList);
 
             IncreaseIndentCommand = new Command(() => _textEditorService.IncreaseIndent());
             DecreaseIndentCommand = new Command(() => _textEditorService.DecreaseIndent());
@@ -218,14 +216,6 @@ namespace StudyMateTest.ViewModels
             if (Enum.TryParse<Models.TextEditor.TextAlignment>(alignment, out var textAlignment)) 
             {
                 TextAlignment = textAlignment;
-            }
-        }
-
-        private void CreateList(string listType) 
-        {
-            if (Enum.TryParse<ListType>(listType, out var type)) 
-            {
-                _textEditorService.CreateList(type);
             }
         }
 
