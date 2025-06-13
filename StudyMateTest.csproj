@@ -52,9 +52,14 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\ReminderPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\CombinedEditorPage.xaml">
+
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
+
 
 	<ItemGroup>
 	  <Folder Include="Platforms\Android\Resources\drawable\" />
@@ -65,5 +70,6 @@
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </MauiImage>
 	</ItemGroup>
+
 
 </Project>

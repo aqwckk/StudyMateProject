@@ -6,16 +6,17 @@
     xmlns:local="clr-namespace:StudyMateTest.Views"
     xmlns:views="clr-namespace:StudyMateTest.Views"
     Shell.FlyoutBehavior="Disabled">
-
-    <ShellContent
-        Title="Графический редактор"
-        ContentTemplate="{DataTemplate local:ReminderPage}"
-        Route="ReminderPage" />
-
-    <FlyoutItem Title="Напоминания" Icon="bell.png">
+    <TabBar>
         <ShellContent
-        Title="Напоминания"
-        ContentTemplate="{DataTemplate views:ReminderPage}"
-        Route="ReminderPage" />
-    </FlyoutItem>
+            Title="Редактор заметок"
+            ContentTemplate="{DataTemplate local:CombinedEditorPage}"
+            Route="CombinedEditorPage"
+            Icon="edit.png" />
+
+        <ShellContent
+            Title="Графический редактор"
+            ContentTemplate="{DataTemplate local:DrawingPage}"
+            Route="DrawingPage"
+            Icon="draw.png" />
+    </TabBar>
 </Shell>

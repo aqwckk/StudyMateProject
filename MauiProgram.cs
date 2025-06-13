@@ -2,6 +2,9 @@
 using StudyMateTest.Services;
 using StudyMateTest.Services.NotificationServices;
 using StudyMateTest.Views;
+using SkiaSharp.Views.Maui.Controls.Hosting;
+using StudyMateTest.Services.DrawingServices;
+using StudyMateTest.Services.TextEditorServices;
 
 namespace StudyMateTest
 {
@@ -44,6 +47,8 @@ namespace StudyMateTest
             // Регистрируем MainPage если необходимо
             builder.Services.AddTransient<MainPage>();
 
+            builder.Services.AddSingleton<IDrawingService, DrawingService>();
+            builder.Services.AddSingleton<ITextEditorService, TextEditorService>();
 #if DEBUG
             builder.Logging.AddDebug();
             // Включаем детальное логирование для отладки
