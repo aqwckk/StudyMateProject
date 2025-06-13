@@ -36,9 +36,40 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Views\EditReminderPage.xaml.cs">
+	    <DependentUpon>EditReminderPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\ReminderPage.xaml.cs">
+	    <DependentUpon>ReminderPage.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Views\AddReminderPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\EditReminderPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\ReminderPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\CombinedEditorPage.xaml">
+
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
+
+
+	<ItemGroup>
+	  <Folder Include="Platforms\Android\Resources\drawable\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiImage Update="Resources\Images\Bell.png">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </MauiImage>
+	</ItemGroup>
+
 
 </Project>

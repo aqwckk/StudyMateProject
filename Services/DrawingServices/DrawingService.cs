@@ -63,7 +63,7 @@ namespace StudyMateTest.Services.DrawingServices
         private bool _isBatchOperation = false;
         private bool _hasChangedDuringBatch = false;
 
-        // свойства для проверки возможности отмены/повтора
+
         public bool CanUndo => _undoStack.Count > 0;
         public bool CanRedo => _redoStack.Count > 0;
 
@@ -115,11 +115,13 @@ namespace StudyMateTest.Services.DrawingServices
         {
             _isBatchOperation = false;
             if (_hasChangedDuringBatch)
+
             {
                 OnDrawingChanged();
                 _hasChangedDuringBatch = false;
             }
         }
+
 
         private SKPoint ScreenToCanvas(SKPoint screenPoint, SKSize viewSize)
         {
@@ -253,7 +255,7 @@ namespace StudyMateTest.Services.DrawingServices
                 _elements[i].Draw(canvas);
             }
 
-            // рисуем текущий элемент в процессе создания
+
             if (_isDragging)
             {
                 SKPaint paint = CreatePaint();
@@ -268,6 +270,7 @@ namespace StudyMateTest.Services.DrawingServices
                         }
                         break;
                     case DrawingTool.Line:
+
                         if (_startPoint != null && _lastPoint != null)
                         {
                             canvas.DrawLine(_startPoint, _lastPoint, paint);
@@ -275,6 +278,7 @@ namespace StudyMateTest.Services.DrawingServices
                         break;
                     case DrawingTool.Rectangle:
                     case DrawingTool.Square:
+
                         if (_startPoint != null && _lastPoint != null)
                         {
                             SKRect rect = CalculateRect(_startPoint, _lastPoint, _currentTool == DrawingTool.Square);
@@ -282,6 +286,7 @@ namespace StudyMateTest.Services.DrawingServices
                         }
                         break;
                     case DrawingTool.Ellipse:
+
                     case DrawingTool.Circle:
                         if (_startPoint != null && _lastPoint != null)
                         {
@@ -289,6 +294,7 @@ namespace StudyMateTest.Services.DrawingServices
                             canvas.DrawOval(rect, paint);
                         }
                         break;
+
                     case DrawingTool.Triangle:
                         if (_startPoint != null && _lastPoint != null)
                         {
@@ -341,6 +347,7 @@ namespace StudyMateTest.Services.DrawingServices
             float left = Math.Min(start.X, end.X);
             float top = Math.Min(start.Y, end.Y);
             float right = Math.Max(start.X, end.X);
+
             float bottom = Math.Max(start.Y, end.Y);
 
             if (isSquareorCircle)
@@ -350,6 +357,7 @@ namespace StudyMateTest.Services.DrawingServices
                     left = right - size;
                 else
                     right = left + size;
+
 
                 if (end.Y < start.Y)
                     top = bottom - size;
@@ -404,10 +412,12 @@ namespace StudyMateTest.Services.DrawingServices
             {
                 _currentPath = new SKPath();
                 _currentPath.MoveTo(canvasPoint);
+
             }
 
             OnDrawingChanged();
         }
+
 
         public void HandleTouchMove(SKPoint point, SKSize viewSize)
         {
@@ -505,6 +515,7 @@ namespace StudyMateTest.Services.DrawingServices
                     Type = DrawingAction.ActionType.Add,
                     Element = newElement,
                     Index = index
+
                 });
                 _elements.Add(newElement);
                 _redoStack.Clear();
@@ -574,6 +585,7 @@ namespace StudyMateTest.Services.DrawingServices
             _strokeWidth = Math.Max(1, width);
         }
 
+
         public void SetStrokeColor(SKColor color)
         {
             _strokeColor = color;
@@ -584,7 +596,6 @@ namespace StudyMateTest.Services.DrawingServices
             _isFilled = isFilled;
             return _isFilled;
         }
-
         public void Undo()
         {
             if (!CanUndo)
@@ -657,6 +668,7 @@ namespace StudyMateTest.Services.DrawingServices
                         _undoStack.Push(new DrawingAction
                         {
                             Type = DrawingAction.ActionType.Add,
+
                             Element = action.Element,
                             Index = action.Index
                         });
@@ -733,7 +745,6 @@ namespace StudyMateTest.Services.DrawingServices
                 {
                     _elements[i].Draw(canvas);
                 }
-
                 using (SKImage image = surface.Snapshot())
                 using (SKData data = image.Encode(SKEncodedImageFormat.Png, 100))
                 {
@@ -746,7 +757,6 @@ namespace StudyMateTest.Services.DrawingServices
         {
             CanUndoRedoChanged?.Invoke(this, EventArgs.Empty);
         }
-
         protected virtual void OnDrawingChanged()
         {
             if (_isBatchOperation)
