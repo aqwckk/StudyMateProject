@@ -35,4 +35,10 @@
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.6" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <MauiXaml Update="Views\CombinedEditorPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
+
 </Project>

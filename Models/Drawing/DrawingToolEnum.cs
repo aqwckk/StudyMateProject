@@ -10,6 +10,7 @@ namespace StudyMateTest.Models.Drawing
     public enum DrawingTool // перечисление всех элементов для рисования
     {
         Pen,
+        Eraser,
         Line,
         Rectangle,
         Square,
