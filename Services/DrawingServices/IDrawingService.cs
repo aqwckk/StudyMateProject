@@ -20,6 +20,7 @@ namespace StudyMateTest.Services.DrawingServices
         void SetStrokeColor(SKColor color);
         bool SetFillMode(bool isFilled);
 
+
         void SetZoom(float zoom);
         void SetCanvasSize(float width, float height);
 
@@ -37,7 +38,6 @@ namespace StudyMateTest.Services.DrawingServices
 
         event EventHandler CanUndoRedoChanged;
         event EventHandler DrawingChanged;
-
         event EventHandler<CanvasSizeChangedEventArgs> CanvasSizeChanged;
     }
 }
