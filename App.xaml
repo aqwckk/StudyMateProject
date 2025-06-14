@@ -11,10 +11,11 @@
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <!-- Конвертеры для графического редактора -->
             <converters:ToolToBackgroundColorConverter x:Key="ToolToBgConverter"/>
             <converters:BoolToBackgroundColorConverter x:Key="BoolToBgConverter"/>
             <converters:TextAlignmentConverter x:Key="TextAlignmentConverter"/>
-            
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

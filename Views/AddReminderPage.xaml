@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="StudyMateTest.Views.AddReminderPage"
+             Title="Новое напоминание"
+             BackgroundColor="#F8FAFC">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="20">
+
+            <!-- Заголовок -->
+            <Frame BackgroundColor="White" 
+                   BorderColor="#E5E7EB" 
+                   CornerRadius="12" 
+                   Padding="20"
+                   HasShadow="True">
+                <StackLayout Spacing="15">
+                    <Label Text="📝 Создать напоминание" 
+                           FontSize="22" 
+                           FontAttributes="Bold" 
+                           TextColor="#1F2937"
+                           HorizontalOptions="Center"/>
+
+                    <BoxView HeightRequest="1" 
+                             BackgroundColor="#E5E7EB" 
+                             HorizontalOptions="FillAndExpand"/>
+
+                    <!-- Поле названия -->
+                    <StackLayout Spacing="8">
+                        <Label Text="Название напоминания *" 
+                               FontSize="16" 
+                               FontAttributes="Bold" 
+                               TextColor="#374151"/>
+                        <Entry x:Name="TitleEntry"
+                               Placeholder="Введите название..."
+                               FontSize="16"
+                               BackgroundColor="#F9FAFB"
+                               TextColor="#1F2937"
+                               PlaceholderColor="#9CA3AF"/>
+                    </StackLayout>
+
+                    <!-- Поле описания -->
+                    <StackLayout Spacing="8">
+                        <Label Text="Описание (необязательно)" 
+                               FontSize="16" 
+                               FontAttributes="Bold" 
+                               TextColor="#374151"/>
+                        <Editor x:Name="MessageEditor"
+                                Placeholder="Добавьте описание..."
+                                FontSize="16"
+                                BackgroundColor="#F9FAFB"
+                                TextColor="#1F2937"
+                                PlaceholderColor="#9CA3AF"
+                                HeightRequest="100"/>
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+
+            <!-- Дата и время -->
+            <Frame BackgroundColor="White" 
+                   BorderColor="#E5E7EB" 
+                   CornerRadius="12" 
+                   Padding="20"
+                   HasShadow="True">
+                <StackLayout Spacing="15">
+                    <Label Text="⏰ Когда напомнить" 
+                           FontSize="18" 
+                           FontAttributes="Bold" 
+                           TextColor="#1F2937"/>
+
+                    <!-- Выбор даты -->
+                    <StackLayout Spacing="8">
+                        <Label Text="Дата" 
+                               FontSize="16" 
+                               FontAttributes="Bold" 
+                               TextColor="#374151"/>
+                        <DatePicker x:Name="ReminderDatePicker"
+                                    FontSize="16"
+                                    TextColor="#1F2937"
+                                    BackgroundColor="#F9FAFB"
+                                    Format="dd.MM.yyyy"/>
+                    </StackLayout>
+
+                    <!-- Выбор времени -->
+                    <StackLayout Spacing="8">
+                        <Label Text="Время" 
+                               FontSize="16" 
+                               FontAttributes="Bold" 
+                               TextColor="#374151"/>
+                        <TimePicker x:Name="ReminderTimePicker"
+                                    FontSize="16"
+                                    TextColor="#1F2937"
+                                    BackgroundColor="#F9FAFB"
+                                    Format="HH:mm"/>
+                    </StackLayout>
+
+                    <!-- Предустановленные варианты -->
+                    <StackLayout Spacing="8">
+                        <Label Text="Быстрый выбор:" 
+                               FontSize="14" 
+                               TextColor="#6B7280"/>
+                        <StackLayout Orientation="Horizontal" 
+                                     Spacing="10" 
+                                     HorizontalOptions="Center">
+                            <Button Text="Через 5 мин" 
+                                    FontSize="12"
+                                    BackgroundColor="#EBF4FF"
+                                    TextColor="#1D4ED8"
+                                    Padding="10,5"
+                                    CornerRadius="15"
+                                    Clicked="OnQuickTime5MinClicked"/>
+                            <Button Text="Через 1 час" 
+                                    FontSize="12"
+                                    BackgroundColor="#EBF4FF"
+                                    TextColor="#1D4ED8"
+                                    Padding="10,5"
+                                    CornerRadius="15"
+                                    Clicked="OnQuickTime1HourClicked"/>
+                            <Button Text="Завтра" 
+                                    FontSize="12"
+                                    BackgroundColor="#EBF4FF"
+                                    TextColor="#1D4ED8"
+                                    Padding="10,5"
+                                    CornerRadius="15"
+                                    Clicked="OnQuickTimeTomorrowClicked"/>
+                        </StackLayout>
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+
+            <!-- Дополнительные настройки - УБИРАЕМ -->
+            <!-- <Frame BackgroundColor="White" 
+                   BorderColor="#E5E7EB" 
+                   CornerRadius="12" 
+                   Padding="20"
+                   HasShadow="True">
+                <StackLayout Spacing="15">
+                    <Label Text="⚙️ Дополнительные настройки" 
+                           FontSize="18" 
+                           FontAttributes="Bold" 
+                           TextColor="#1F2937"/>
+                    
+                    <StackLayout Spacing="8">
+                        <Label Text="Приоритет" 
+                               FontSize="16" 
+                               FontAttributes="Bold" 
+                               TextColor="#374151"/>
+                        <Picker x:Name="PriorityPicker"
+                                FontSize="16"
+                                TextColor="#1F2937"
+                                BackgroundColor="#F9FAFB">
+                            <Picker.Items>
+                                <x:String>🔴 Высокий</x:String>
+                                <x:String>🟡 Средний</x:String>
+                                <x:String>🔵 Низкий</x:String>
+                            </Picker.Items>
+                        </Picker>
+                    </StackLayout>
+                    
+                    <StackLayout Spacing="8">
+                        <Label Text="Категория" 
+                               FontSize="16" 
+                               FontAttributes="Bold" 
+                               TextColor="#374151"/>
+                        <Picker x:Name="CategoryPicker"
+                                FontSize="16"
+                                TextColor="#1F2937"
+                                BackgroundColor="#F9FAFB">
+                            <Picker.Items>
+                                <x:String>📚 Учеба</x:String>
+                                <x:String>💼 Работа</x:String>
+                                <x:String>🏠 Дом</x:String>
+                                <x:String>🏥 Здоровье</x:String>
+                                <x:String>🎯 Личное</x:String>
+                                <x:String>📞 Звонки</x:String>
+                                <x:String>🛒 Покупки</x:String>
+                                <x:String>⚡ Прочее</x:String>
+                            </Picker.Items>
+                        </Picker>
+                    </StackLayout>
+                </StackLayout>
+            </Frame> -->
+
+            <!-- Предпросмотр -->
+            <Frame BackgroundColor="#F0F9FF" 
+                   BorderColor="#0EA5E9" 
+                   CornerRadius="12" 
+                   Padding="15"
+                   HasShadow="False">
+                <StackLayout Spacing="5">
+                    <Label Text="📋 Предпросмотр" 
+                           FontSize="16" 
+                           FontAttributes="Bold" 
+                           TextColor="#0369A1"/>
+                    <Label x:Name="PreviewLabel"
+                           Text="Заполните поля выше"
+                           FontSize="14"
+                           TextColor="#0369A1"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- Кнопки действий -->
+            <StackLayout Spacing="10" Margin="0,10,0,20">
+                <Button x:Name="CreateButton"
+                        Text="✅ Создать напоминание"
+                        FontSize="18"
+                        FontAttributes="Bold"
+                        BackgroundColor="#10B981"
+                        TextColor="White"
+                        Padding="15"
+                        CornerRadius="12"
+                        HeightRequest="60"
+                        Clicked="OnCreateReminderClicked"/>
+
+                <Button Text="❌ Отмена"
+                        FontSize="16"
+                        BackgroundColor="#EF4444"
+                        TextColor="White"
+                        Padding="12"
+                        CornerRadius="12"
+                        HeightRequest="50"
+                        Clicked="OnCancelClicked"/>
+            </StackLayout>
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

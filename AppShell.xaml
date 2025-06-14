@@ -7,12 +7,21 @@
     Shell.FlyoutBehavior="Disabled">
 
     <TabBar>
+        <!-- Напоминания -->
+        <ShellContent
+            Title="Напоминания"
+            ContentTemplate="{DataTemplate local:ReminderPage}"
+            Route="ReminderPage"
+            Icon="bell.png" />
+
+        <!-- Редактор заметок -->
         <ShellContent
             Title="Редактор заметок"
             ContentTemplate="{DataTemplate local:CombinedEditorPage}"
             Route="CombinedEditorPage"
             Icon="edit.png" />
 
+        <!-- Графический редактор -->
         <ShellContent
             Title="Графический редактор"
             ContentTemplate="{DataTemplate local:DrawingPage}"
