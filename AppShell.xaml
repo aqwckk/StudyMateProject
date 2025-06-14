@@ -1,31 +1,80 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Shell
-    x:Class="StudyMateTest.AppShell"
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:StudyMateTest.Views"
-    Shell.FlyoutBehavior="Disabled">
+<Shell x:Class="StudyMateTest.AppShell"
+       xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:local="clr-namespace:StudyMateTest"
+       xmlns:views="clr-namespace:StudyMateTest.Views"
+       Title="StudyMate"
+       FlyoutBackgroundColor="#9BB8D3">
 
-    <TabBar>
-        <!-- Напоминания -->
-        <ShellContent
-            Title="Напоминания"
-            ContentTemplate="{DataTemplate local:ReminderPage}"
-            Route="ReminderPage"
-            Icon="bell.png" />
+    <!-- Кастомный заголовок с градиентом -->
+    <Shell.FlyoutHeader>
+        <Grid HeightRequest="200">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#85C1D9" Offset="0.0" />
+                    <GradientStop Color="#9BB8D3" Offset="0.3" />
+                    <GradientStop Color="#C4D9ED" Offset="0.6" />
+                    <GradientStop Color="#D4C2D8" Offset="0.8" />
+                    <GradientStop Color="#D19999" Offset="1.0" />
+                </LinearGradientBrush>
+            </Grid.Background>
 
-        <!-- Редактор заметок -->
-        <ShellContent
-            Title="Редактор заметок"
-            ContentTemplate="{DataTemplate local:CombinedEditorPage}"
-            Route="CombinedEditorPage"
-            Icon="edit.png" />
+            <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="15">
+                <Label Text="—" 
+                       FontSize="{OnPlatform iOS=50, Android=45, WinUI=55}" 
+                       FontFamily="Georgia"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       HorizontalOptions="Center" />
+                <Label Text="StudyMate" 
+                       FontSize="{OnPlatform iOS=28, Android=26, WinUI=30}" 
+                       FontFamily="Georgia"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       HorizontalOptions="Center" />
+                <Label Text="SM — ПОВОД СХОДИТЬ НА ПАРЫ!" 
+                       FontSize="{OnPlatform iOS=14, Android=13, WinUI=15}" 
+                       FontFamily="Arial"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       Opacity="0.9"
+                       HorizontalOptions="Center" />
+            </StackLayout>
+        </Grid>
+    </Shell.FlyoutHeader>
 
-        <!-- Графический редактор -->
-        <ShellContent
-            Title="Графический редактор"
-            ContentTemplate="{DataTemplate local:DrawingPage}"
-            Route="DrawingPage"
-            Icon="draw.png" />
-    </TabBar>
+    <!-- Стили для меню -->
+    <Shell.Resources>
+        <Style x:Key="BaseStyle" TargetType="Element">
+            <Setter Property="Shell.BackgroundColor" Value="#9BB8D3" />
+            <Setter Property="Shell.ForegroundColor" Value="#2E86AB" />
+            <Setter Property="Shell.TitleColor" Value="#2E86AB" />
+            <Setter Property="Shell.DisabledColor" Value="#6B9DC2" />
+            <Setter Property="Shell.UnselectedColor" Value="#4A6B78" />
+        </Style>
+    </Shell.Resources>
+
+    <!-- ВСЕ СТРАНИЦЫ ПРИЛОЖЕНИЯ -->
+
+    <!-- Главная страница -->
+    <FlyoutItem Title="🏠 Главная" Route="MainPage">
+        <ShellContent ContentTemplate="{DataTemplate local:MainPage}" />
+    </FlyoutItem>
+
+    <!-- Заметки и редактор -->
+    <FlyoutItem Title="📚 Мои тетради" Route="CombinedEditorPage">
+        <ShellContent ContentTemplate="{DataTemplate views:CombinedEditorPage}" />
+    </FlyoutItem>
+
+    <!-- Напоминания -->
+    <FlyoutItem Title="⏰ Напоминания" Route="ReminderPage">
+        <ShellContent ContentTemplate="{DataTemplate views:ReminderPage}" />
+    </FlyoutItem>
+
+    <!-- Калькулятор -->
+    <FlyoutItem Title="🔢 Калькулятор" Route="CalculatorPage">
+        <ShellContent ContentTemplate="{DataTemplate views:CalculatorPage}" />
+    </FlyoutItem>
+
 </Shell>

@@ -28,7 +28,7 @@ namespace StudyMateTest
 
                 System.Diagnostics.Debug.WriteLine("MauiProgram: Basic configuration completed");
 
-                // Сервисы для уведомлений
+                // ===== СЕРВИСЫ ЗАМЕТОК И НАПОМИНАНИЙ =====
                 builder.Services.AddSingleton<ILocalStorageService, LocalStorageService>();
 
                 // Платформо-специфичные уведомления
@@ -50,15 +50,28 @@ namespace StudyMateTest
                 builder.Services.AddSingleton<IDrawingService, DrawingService>();
                 builder.Services.AddSingleton<ITextEditorService, TextEditorService>();
 
+                // ===== СЕРВИСЫ КАЛЬКУЛЯТОРА =====
+                // Добавляем сервисы калькулятора
+                // builder.Services.AddSingleton<ICalculatorService, CalculatorService>();
+
                 System.Diagnostics.Debug.WriteLine("Services registered successfully");
 
-                // Регистрируем все страницы как Transient
+                // ===== РЕГИСТРАЦИЯ ВСЕХ СТРАНИЦ =====
+
+                // Основные страницы
+                builder.Services.AddTransient<MainPage>();
+
+                // Страницы напоминаний
                 builder.Services.AddTransient<ReminderPage>();
                 builder.Services.AddTransient<AddReminderPage>();
                 builder.Services.AddTransient<EditReminderPage>();
-                builder.Services.AddTransient<MainPage>();
-                builder.Services.AddTransient<DrawingPage>();
+
+                // Страницы заметок/редактора
                 builder.Services.AddTransient<CombinedEditorPage>();
+                builder.Services.AddTransient<DrawingPage>();
+
+                // Страница калькулятора
+                builder.Services.AddTransient<CalculatorPage>();
 
 #if DEBUG
                 builder.Logging.AddDebug();

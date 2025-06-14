@@ -1,0 +1,741 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="StudyMateTest.Views.CalculatorPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="Калькулятор"
+             BackgroundColor="Black">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="10*" />
+        </Grid.RowDefinitions>
+
+        <!-- Дисплей -->
+        <StackLayout Grid.Row="0" 
+             BackgroundColor="Black"
+             Padding="20"
+             VerticalOptions="End"
+             Spacing="5">
+
+            <!-- Верхняя строка -->
+            <ScrollView x:Name="ExpressionScrollView"
+                Orientation="Horizontal" 
+                HorizontalScrollBarVisibility="Never"
+                HorizontalOptions="FillAndExpand">
+                <Grid WidthRequest="2000" HorizontalOptions="End">
+                    <Label x:Name="ExpressionLabel"
+                   Text="Введите выражение"
+                   FontSize="16"
+                   TextColor="Gray"
+                   HorizontalOptions="End"
+                   HorizontalTextAlignment="End"
+                   VerticalOptions="Center" />
+                </Grid>
+            </ScrollView>
+
+            <!-- Основной дисплей -->
+            <ScrollView x:Name="DisplayScrollView"
+                Orientation="Horizontal" 
+                HorizontalScrollBarVisibility="Never"
+                HorizontalOptions="FillAndExpand">
+                <Grid WidthRequest="2000" HorizontalOptions="End">
+                    <Label x:Name="DisplayLabel"
+                   Text="0"
+                   FontSize="42"
+                   FontAttributes="Bold"
+                   TextColor="White"
+                   HorizontalOptions="End"
+                   HorizontalTextAlignment="End"
+                   VerticalOptions="Center" />
+                </Grid>
+            </ScrollView>
+        </StackLayout>
+
+        <!-- Кнопки -->
+        <!-- ОБЫЧНЫЙ КАЛЬКУЛЯТОР - Панель кнопок -->
+        <Grid x:Name="BasicCalculatorPanel"
+              Grid.Row="1" 
+              BackgroundColor="Black"
+              Padding="15"
+              RowSpacing="12"
+              ColumnSpacing="12"
+              IsVisible="True">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Первая строка: C, CE, ⌫, ÷ -->
+            <Button Text="C" 
+                    Grid.Row="0" Grid.Column="0"
+                    BackgroundColor="#A6A6A6"
+                    TextColor="Black"
+                    FontSize="24"
+                    FontAttributes="Bold"
+                    Clicked="OnClearClicked" />
+
+            <Button Text="CE" 
+                    Grid.Row="0" Grid.Column="1"
+                    BackgroundColor="#A6A6A6"
+                    TextColor="Black"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    Clicked="OnClearEntryClicked" />
+
+            <Button Text="%" 
+                    Grid.Row="0" Grid.Column="2"
+                    BackgroundColor="#A6A6A6"
+                    TextColor="Black"
+                    FontSize="24"
+                    FontAttributes="Bold"
+                    Clicked="OnPercentClicked" />
+
+            <Button Text="⌫" 
+                    Grid.Row="0" Grid.Column="3"
+                    BackgroundColor="#A6A6A6"
+                    TextColor="Black"
+                    FontSize="24"
+                    FontAttributes="Bold"
+                    Clicked="OnBackspaceClicked" />
+
+            <!-- Вторая строка: √, (, ), × -->
+            <Button Text="√" 
+                    Grid.Row="1" Grid.Column="0"
+                    BackgroundColor="#A6A6A6"
+                    TextColor="Black"
+                    FontSize="24"
+                    FontAttributes="Bold"
+                    Clicked="OnSquareRootClicked" />
+
+            <Button Text="(" 
+                    Grid.Row="1" Grid.Column="1"
+                    BackgroundColor="#A6A6A6"
+                    TextColor="Black"
+                    FontSize="24"
+                    FontAttributes="Bold"
+                    Clicked="OnOpenParenthesisClicked" />
+
+            <Button Text=")" 
+                    Grid.Row="1" Grid.Column="2"
+                    BackgroundColor="#A6A6A6"
+                    TextColor="Black"
+                    FontSize="24"
+                    FontAttributes="Bold"
+                    Clicked="OnCloseParenthesisClicked" />
+            <Button Text="÷" 
+                    Grid.Row="1" Grid.Column="3"
+                    BackgroundColor="#FF9500"
+                    TextColor="White"
+                    FontSize="28"
+                    FontAttributes="Bold"
+                    Clicked="OnOperatorClicked" />
+
+            <!-- Третья строка: 7, 8, 9, − -->
+            <Button Text="7" 
+                    Grid.Row="2" Grid.Column="0"
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="32"
+                    FontAttributes="Bold"
+                    Clicked="OnNumberClicked" />
+
+            <Button Text="8" 
+                    Grid.Row="2" Grid.Column="1"
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="32"
+                    FontAttributes="Bold"
+                    Clicked="OnNumberClicked" />
+
+            <Button Text="9" 
+                    Grid.Row="2" Grid.Column="2"
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="32"
+                    FontAttributes="Bold"
+                    Clicked="OnNumberClicked" />
+
+            <Button Text="×" 
+                    Grid.Row="2" Grid.Column="3"
+                    BackgroundColor="#FF9500"
+                    TextColor="White"
+                    FontSize="28"
+                    FontAttributes="Bold"
+                    Clicked="OnOperatorClicked" />
+
+            <!-- Четвертая строка: 4, 5, 6, + -->
+            <Button Text="4" 
+                    Grid.Row="3" Grid.Column="0"
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="32"
+                    FontAttributes="Bold"
+                    Clicked="OnNumberClicked" />
+
+            <Button Text="5" 
+                    Grid.Row="3" Grid.Column="1"
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="32"
+                    FontAttributes="Bold"
+                    Clicked="OnNumberClicked" />
+
+            <Button Text="6" 
+                    Grid.Row="3" Grid.Column="2"
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="32"
+                    FontAttributes="Bold"
+                    Clicked="OnNumberClicked" />
+
+            <Button Text="−" 
+                    Grid.Row="3" Grid.Column="3"
+                    BackgroundColor="#FF9500"
+                    TextColor="White"
+                    FontSize="32"
+                    FontAttributes="Bold"
+                    Clicked="OnOperatorClicked" />
+
+            <!-- Пятая строка: 1, 2, 3, = -->
+            <Button Text="1" 
+                    Grid.Row="4" Grid.Column="0"
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="32"
+                    FontAttributes="Bold"
+                    Clicked="OnNumberClicked" />
+
+            <Button Text="2" 
+                    Grid.Row="4" Grid.Column="1"
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="32"
+                    FontAttributes="Bold"
+                    Clicked="OnNumberClicked" />
+
+            <Button Text="3" 
+                    Grid.Row="4" Grid.Column="2"
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="32"
+                    FontAttributes="Bold"
+                    Clicked="OnNumberClicked" />
+
+            <Button Text="+" 
+                    Grid.Row="4" Grid.Column="3"
+                    BackgroundColor="#FF9500"
+                    TextColor="White"
+                    FontSize="32"
+                    FontAttributes="Bold"
+                    Clicked="OnOperatorClicked" />
+
+            <!-- Шестая строка: 📊, 0, ., % -->
+            <Button x:Name="CalculatorModeButton"
+                    Grid.Row="5" Grid.Column="0"
+                    BackgroundColor="#333333"
+                    Padding="1"
+                    Clicked="OnToggleCalculatorModeClicked">
+                <Button.ImageSource>
+                    <FileImageSource File="calc4.png" />
+                </Button.ImageSource>
+            </Button>
+
+            <Button Text="0" 
+                    Grid.Row="5" Grid.Column="1" 
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="32"
+                    FontAttributes="Bold"
+                    Clicked="OnNumberClicked" />
+
+            <Button Text="." 
+                    Grid.Row="5" Grid.Column="2"
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="32"
+                    FontAttributes="Bold"
+                    Clicked="OnDecimalClicked" />
+            <Button Text="=" 
+                    Grid.Row="5" Grid.Column="3"
+                    BackgroundColor="#FF9500"
+                    TextColor="White"
+                    FontSize="32"
+                    FontAttributes="Bold"
+                    Clicked="OnEqualsClicked" />
+        </Grid>
+
+        <!-- НАУЧНЫЙ КАЛЬКУЛЯТОР - Расширенная панель кнопок -->
+        <Grid x:Name="ScientificCalculatorPanel"
+              Grid.Row="1" 
+              BackgroundColor="Black"
+              Padding="15"
+              RowSpacing="10"
+              ColumnSpacing="15"
+              IsVisible="False">
+
+            <Grid.RowDefinitions>
+                <!-- Научные функции - 3 строки-->
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <!-- Обычные кнопки калькулятора - 6 строк  -->
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- ПЕРВАЯ СТРОКА:sin cos tan cot -->
+            <Button Text="sin" 
+                    Grid.Row="0" Grid.Column="0"
+                    BackgroundColor="#002238"
+                    TextColor="White"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    Clicked="OnScientificFunctionClicked"/>
+
+            <Button Text="cos" 
+                    Grid.Row="0" Grid.Column="1"
+                    BackgroundColor="#002238"
+                    TextColor="White"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    Clicked="OnScientificFunctionClicked" />
+
+            <Button Text="tan" 
+                    Grid.Row="0" Grid.Column="2"
+                    BackgroundColor="#002238"
+                    TextColor="White"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    Clicked="OnScientificFunctionClicked" />
+
+            <Button Text="cot" 
+                    Grid.Row="0" Grid.Column="3"
+                    BackgroundColor="#002238"
+                    TextColor="White"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    Clicked="OnScientificFunctionClicked" />
+
+            <!-- ВТОРАЯ СТРОКА: 2^x, x², x³, x^y, 10^x, x! -->
+            <Button Text="x²" 
+                    Grid.Row="1" Grid.Column="0"
+                    BackgroundColor="#002238"
+                    TextColor="White"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    Clicked="OnSquareClicked" />
+
+            <Button Text="x³" 
+                    Grid.Row="1" Grid.Column="1"
+                    BackgroundColor="#002238"
+                    TextColor="White"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    Clicked="OnCubeClicked" />
+
+            <Button Text="xʸ" 
+                    Grid.Row="1" Grid.Column="2"
+                    BackgroundColor="#002238"
+                    TextColor="White"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    Clicked="OnPowerYClicked" />
+
+            <Button Text="x!" 
+                    Grid.Row="1" Grid.Column="3"
+                    BackgroundColor="#002238"
+                    TextColor="White"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    CornerRadius="6"
+            Clicked="OnFactorialClicked" />
+
+            <!-- ТРЕТЬЯ СТРОКА: √x, ∛x, ⁿ√x, ln, log, log_a -->
+            <Button Text="√" 
+                    Grid.Row="2" Grid.Column="0"
+                    BackgroundColor="#002238"
+                    TextColor="White"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    Clicked="OnSquareRootClicked" />
+
+            <Button Text="∛" 
+                    Grid.Row="2" Grid.Column="1"
+                    BackgroundColor="#002238"
+                    TextColor="White"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    Clicked="OnCubeRootClicked" />
+
+            <Button Text="ln" 
+                    Grid.Row="2" Grid.Column="2"
+                    BackgroundColor="#002238"
+                    TextColor="White"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    Clicked="OnScientificFunctionClicked" />
+
+            <Button Text="log" 
+                    Grid.Row="2" Grid.Column="3"
+                    BackgroundColor="#002238"
+                    TextColor="White"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    Clicked="OnScientificFunctionClicked" />
+
+            <!-- ПЯТАЯ СТРОКА: все кнопки по 1.5 столбца -->
+            <Button Text="C" 
+                    Grid.Row="3" Grid.Column="0" 
+                    BackgroundColor="#A6A6A6"
+                    TextColor="Black"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Clicked="OnClearClicked" />
+
+            <Button Text="(" 
+                    Grid.Row="3" Grid.Column="1"
+                    BackgroundColor="#A6A6A6"
+                    TextColor="Black"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Clicked="OnOpenParenthesisClicked" />
+
+            <Button Text=")" 
+                    Grid.Row="3" Grid.Column="2"
+                    BackgroundColor="#A6A6A6"
+                    TextColor="Black"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Clicked="OnCloseParenthesisClicked" />
+
+            <Button Text="⌫" 
+                    Grid.Row="3" Grid.Column="3" 
+                    BackgroundColor="#A6A6A6"
+                    TextColor="Black"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Clicked="OnBackspaceClicked" />
+
+            <!-- ЧЕТВЕРТАЯ СТРОКА: все кнопки по 1.5 столбца -->
+            <Button Text="CE" 
+                    Grid.Row="4" Grid.Column="0"
+                    BackgroundColor="#A6A6A6"
+                    TextColor="Black"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Clicked="OnClearEntryClicked" />
+            <Button Text="π" 
+                    Grid.Row="4" Grid.Column="1"
+                    BackgroundColor="#6E6E6E"
+                    TextColor="White"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    CornerRadius="6"
+                    Clicked="OnPiClicked" />
+
+            <Button Text="e" 
+                    Grid.Row="4" Grid.Column="2"
+                    BackgroundColor= "#6E6E6E"
+                    TextColor="White"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    CornerRadius="6"
+                    Clicked="OnEClicked" />
+
+            <Button Text="÷" 
+                    Grid.Row="4" Grid.Column="3" 
+                    BackgroundColor="#FF9500"
+                    TextColor="White"
+                    FontSize="25"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Clicked="OnOperatorClicked" />
+
+            <!-- ПЯТАЯ СТРОКА: все кнопки по 1.5 столбца -->
+            <Button Text="7" 
+                    Grid.Row="5" Grid.Column="0" 
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Clicked="OnNumberClicked" />
+
+            <Button Text="8" 
+                    Grid.Row="5" Grid.Column="1"
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Clicked="OnNumberClicked" />
+
+            <Button Text="9" 
+                    Grid.Row="5" Grid.Column="2"
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Clicked="OnNumberClicked" />
+
+            <Button Text="×" 
+                    Grid.Row="5" Grid.Column="3" 
+                    BackgroundColor="#FF9500"
+                    TextColor="White"
+                    FontSize="25"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Clicked="OnOperatorClicked" />
+
+            <!-- ШЕСТАЯ СТРОКА: все кнопки по 1.5 столбца -->
+            <Button Text="4" 
+                    Grid.Row="6" Grid.Column="0" 
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Clicked="OnNumberClicked" />
+
+            <Button Text="5" 
+                    Grid.Row="6" Grid.Column="1"
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Clicked="OnNumberClicked" />
+
+            <Button Text="6" 
+                    Grid.Row="6" Grid.Column="2"
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Clicked="OnNumberClicked" />
+
+            <Button Text="−" 
+                    Grid.Row="6" Grid.Column="3" 
+                    BackgroundColor="#FF9500"
+                    TextColor="White"
+                    FontSize="25"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Clicked="OnOperatorClicked" />
+
+            <!-- СЕДЬМАЯ СТРОКА: все кнопки по 1.5 столбца -->
+            <Button Text="1" 
+                    Grid.Row="7" Grid.Column="0" 
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Clicked="OnNumberClicked" />
+
+            <Button Text="2" 
+                    Grid.Row="7" Grid.Column="1"
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Clicked="OnNumberClicked" />
+
+            <Button Text="3" 
+                    Grid.Row="7" Grid.Column="2"
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Clicked="OnNumberClicked" />
+
+            <Button Text="+" 
+                    Grid.Row="7" Grid.Column="3" 
+                    BackgroundColor="#FF9500"
+                    TextColor="White"
+                    FontSize="25"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Clicked="OnOperatorClicked" />
+
+            <!-- ВОСЬМАЯ СТРОКА: все кнопки по 1.5 столбца -->
+            <Button x:Name="CalculatorModeButtonScientific"
+                    Grid.Row="8" Grid.Column="0" 
+                    BackgroundColor="#333333"
+                    Padding="1"
+                    Clicked="OnToggleCalculatorModeClicked">
+                <Button.ImageSource>
+                    <FileImageSource File="calc4.png" />
+                </Button.ImageSource>
+            </Button>
+
+            <Button Text="0" 
+                    Grid.Row="8" Grid.Column="1"
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Clicked="OnNumberClicked" />
+
+            <Button Text="." 
+                    Grid.Row="8" Grid.Column="2"
+                    BackgroundColor="#333333"
+                    TextColor="White"
+                    FontSize="32"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Clicked="OnDecimalClicked" />
+
+            <Button Text="=" 
+                    Grid.Row="8" Grid.Column="3" 
+                    BackgroundColor="#FF9500"
+                    TextColor="White"
+                    FontSize="25"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Clicked="OnEqualsClicked" />
+
+        </Grid>
+
+        <!-- Заглушка для матричного калькулятора -->
+        <Grid x:Name="MatrixCalculatorPanel"
+                Grid.Row="1" 
+                BackgroundColor="Black"
+                Padding="20"
+                IsVisible="False">
+
+            <StackLayout VerticalOptions="Center" 
+                         HorizontalOptions="Center"
+                         Spacing="30">
+
+                <Label Text="📐"
+                       FontSize="80"
+                       HorizontalOptions="Center" />
+
+                <Label Text="Калькулятор матриц"
+                       TextColor="White"
+                       FontSize="24"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center" />
+
+                <Label Text="В разработке..."
+                       TextColor="Gray"
+                       FontSize="18"
+                       HorizontalOptions="Center" />
+
+                <Button Text="🔙 Назад к обычному"
+                        BackgroundColor="#FF9500"
+                        TextColor="White"
+                        FontSize="16"
+                        CornerRadius="10"
+                        Clicked="OnBasicCalculatorSelected" />
+            </StackLayout>
+        </Grid>
+
+        <!-- Всплывающее меню выбора калькулятора -->
+        <Grid x:Name="CalculatorSelectorOverlay" 
+              IsVisible="False"
+              BackgroundColor="#80000000"
+              Grid.RowSpan="2">
+
+            <Frame BackgroundColor="Black"
+                     BorderColor="Gray"
+                     CornerRadius="15"
+                     Padding="20"
+                     VerticalOptions="Center"
+                     HorizontalOptions="Center"
+                     WidthRequest="280">
+
+                <StackLayout Spacing="15">
+                    <!-- Заголовок -->
+                    <Label Text="Выберите тип калькулятора"
+                           TextColor="White"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center" />
+
+                    <!-- Кнопки выбора -->
+                    <Button BackgroundColor="#333333"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            CornerRadius="12"
+                            HeightRequest="50"
+                            Clicked="OnBasicCalculatorSelected">
+                        <Button.ImageSource>
+                            <FileImageSource File="base.png" />
+                        </Button.ImageSource>
+                        <Button.Text>Стандартный</Button.Text>
+                    </Button>
+
+                    <Button BackgroundColor="#333333"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            CornerRadius="12"
+                            HeightRequest="50"
+                            Clicked="OnScientificCalculatorSelected">
+                        <Button.ImageSource>
+                            <FileImageSource File="sqrt1.png" />
+                        </Button.ImageSource>
+                        <Button.Text>Научный</Button.Text>
+                    </Button>
+
+                    <Button BackgroundColor="#333333"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            CornerRadius="12"
+                            HeightRequest="50"
+                            Clicked="OnMatrixCalculatorSelected">
+                        <Button.ImageSource>
+                            <FileImageSource File="matrix1.png" />
+                        </Button.ImageSource>
+                        <Button.Text>Матрицы</Button.Text>
+                    </Button>
+
+                    <Button Text="❌ Отмена"
+                            BackgroundColor="#666666"
+                            TextColor="White"
+                            FontSize="14"
+                            CornerRadius="10"
+                            Clicked="OnCancelSelection" />
+                </StackLayout>
+            </Frame>
+        </Grid>
+    </Grid>
+</ContentPage>

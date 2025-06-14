@@ -1,0 +1,88 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Основной градиент -->
+    <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2E86AB"/>
+      <stop offset="50%" stop-color="#A23B72"/>
+      <stop offset="100%" stop-color="#F18F01"/>
+    </linearGradient>
+    
+    <!-- Градиент для книги -->
+    <linearGradient id="bookGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F8F9FA"/>
+    </linearGradient>
+    
+    <!-- Градиент для ручки -->
+    <linearGradient id="penGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF6B6B"/>
+      <stop offset="100%" stop-color="#4ECDC4"/>
+    </linearGradient>
+    
+    <!-- Тень -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Основной фон -->
+  <rect width="512" height="512" rx="115" ry="115" fill="url(#mainGradient)" filter="url(#shadow)"/>
+  
+  <!-- Открытая книга -->
+  <g transform="translate(256, 280)">
+    <!-- Левая страница -->
+    <path d="M -140 -80 Q -140 -100 -120 -100 L -20 -100 Q 0 -100 0 -80 L 0 80 Q 0 100 -20 100 L -120 100 Q -140 100 -140 80 Z" 
+          fill="url(#bookGradient)" 
+          stroke="#E0E0E0" 
+          stroke-width="2"/>
+    
+    <!-- Правая страница -->
+    <path d="M 0 -80 Q 0 -100 20 -100 L 120 -100 Q 140 -100 140 -80 L 140 80 Q 140 100 120 100 L 20 100 Q 0 100 0 80 Z" 
+          fill="url(#bookGradient)" 
+          stroke="#E0E0E0" 
+          stroke-width="2"/>
+    
+    <!-- Корешок книги -->
+    <rect x="-10" y="-100" width="20" height="200" fill="#D0D0D0" rx="2"/>
+    
+    <!-- Линии на левой странице -->
+    <line x1="-120" y1="-60" x2="-30" y2="-60" stroke="#E8F4FD" stroke-width="3"/>
+    <line x1="-120" y1="-30" x2="-30" y2="-30" stroke="#E8F4FD" stroke-width="3"/>
+    <line x1="-120" y1="0" x2="-30" y2="0" stroke="#E8F4FD" stroke-width="3"/>
+    <line x1="-120" y1="30" x2="-30" y2="30" stroke="#E8F4FD" stroke-width="3"/>
+    
+    <!-- Линии на правой странице -->
+    <line x1="30" y1="-60" x2="120" y2="-60" stroke="#E8F4FD" stroke-width="3"/>
+    <line x1="30" y1="-30" x2="120" y2="-30" stroke="#E8F4FD" stroke-width="3"/>
+    <line x1="30" y1="0" x2="120" y2="0" stroke="#E8F4FD" stroke-width="3"/>
+    <line x1="30" y1="30" x2="120" y2="30" stroke="#E8F4FD" stroke-width="3"/>
+  </g>
+  
+  <!-- Ручка -->
+  <g transform="translate(350, 200) rotate(25)">
+    <!-- Корпус ручки -->
+    <rect x="-60" y="-6" width="120" height="12" rx="6" fill="url(#penGradient)"/>
+    
+    <!-- Кончик ручки -->
+    <circle cx="60" cy="0" r="8" fill="#2E86AB"/>
+    <circle cx="60" cy="0" r="4" fill="#FFFFFF"/>
+    
+    <!-- Зажим ручки -->
+    <rect x="-50" y="-8" width="15" height="16" rx="2" fill="#FFFFFF" opacity="0.8"/>
+  </g>
+  
+  <!-- Декоративные элементы -->
+  <circle cx="120" cy="150" r="8" fill="#FFFFFF" opacity="0.3"/>
+  <circle cx="380" cy="350" r="12" fill="#FFFFFF" opacity="0.2"/>
+  <circle cx="150" cy="400" r="6" fill="#FFFFFF" opacity="0.4"/>
+  
+  <!-- Логотип StudyMate (упрощенный) -->
+  <g transform="translate(256, 450)">
+    <text x="0" y="0" text-anchor="middle" 
+          font-family="Arial, sans-serif" 
+          font-size="36" 
+          font-weight="bold" 
+          fill="#FFFFFF" 
+          opacity="0.9">SM</text>
+  </g>
+</svg>

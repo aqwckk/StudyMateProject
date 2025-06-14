@@ -1,17 +1,48 @@
-﻿namespace StudyMateTest
+﻿using StudyMateTest.Views;
+
+namespace StudyMateTest
 {
     public partial class AppShell : Shell
     {
         public AppShell()
         {
             InitializeComponent();
-
             // Регистрируем маршруты для навигации
-            Routing.RegisterRoute(nameof(Views.DrawingPage), typeof(Views.DrawingPage));
-            Routing.RegisterRoute(nameof(Views.CombinedEditorPage), typeof(Views.CombinedEditorPage));
-            Routing.RegisterRoute(nameof(Views.ReminderPage), typeof(Views.ReminderPage));
-            Routing.RegisterRoute(nameof(Views.AddReminderPage), typeof(Views.AddReminderPage));
-            Routing.RegisterRoute(nameof(Views.EditReminderPage), typeof(Views.EditReminderPage));
+            RegisterRoutes();
+        }
+
+        private void RegisterRoutes()
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("AppShell: Registering routes");
+
+                // Основные страницы
+                Routing.RegisterRoute("MainPage", typeof(MainPage));
+
+                // Страницы заметок и редактора
+                Routing.RegisterRoute("CombinedEditorPage", typeof(CombinedEditorPage));
+                Routing.RegisterRoute("DrawingPage", typeof(DrawingPage));
+
+                // Страницы напоминаний
+                Routing.RegisterRoute("ReminderPage", typeof(ReminderPage));
+                Routing.RegisterRoute("AddReminderPage", typeof(AddReminderPage));
+                Routing.RegisterRoute("EditReminderPage", typeof(EditReminderPage));
+
+                // Калькулятор
+                Routing.RegisterRoute("CalculatorPage", typeof(CalculatorPage));
+
+                // Дополнительные маршруты для внутренней навигации напоминаний
+                Routing.RegisterRoute("ReminderPage/AddReminder", typeof(AddReminderPage));
+                Routing.RegisterRoute("ReminderPage/EditReminder", typeof(EditReminderPage));
+
+                System.Diagnostics.Debug.WriteLine("AppShell: All routes registered successfully");
+            }
+            catch (System.Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"AppShell ERROR registering routes: {ex.Message}");
+                throw;
+            }
         }
     }
 }
