@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="StudyMateTest.Views.CreateNoteDialog"
+             Title="Новая заметка"
+             BackgroundColor="#F8FAFC">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="20">
+
+            <!-- Заголовок -->
+            <Frame BackgroundColor="White" 
+                   BorderColor="#E5E7EB" 
+                   CornerRadius="12" 
+                   Padding="20"
+                   HasShadow="True">
+                <StackLayout Spacing="15">
+                    <Label Text="📝 Создать новую заметку" 
+                           FontSize="22" 
+                           FontAttributes="Bold" 
+                           TextColor="#1F2937"
+                           HorizontalOptions="Center"/>
+
+                    <BoxView HeightRequest="1" 
+                             BackgroundColor="#E5E7EB" 
+                             HorizontalOptions="FillAndExpand"/>
+
+                    <!-- Поле названия -->
+                    <StackLayout Spacing="8">
+                        <Label Text="Название заметки *" 
+                               FontSize="16" 
+                               FontAttributes="Bold" 
+                               TextColor="#374151"/>
+                        <Entry x:Name="TitleEntry"
+                               Placeholder="Введите название заметки..."
+                               FontSize="16"
+                               BackgroundColor="#F9FAFB"
+                               TextColor="#1F2937"
+                               PlaceholderColor="#9CA3AF"/>
+                    </StackLayout>
+
+                    <!-- Поле описания -->
+                    <StackLayout Spacing="8">
+                        <Label Text="Описание (необязательно)" 
+                               FontSize="16" 
+                               FontAttributes="Bold" 
+                               TextColor="#374151"/>
+                        <Editor x:Name="DescriptionEditor"
+                                Placeholder="Добавьте описание заметки..."
+                                FontSize="16"
+                                BackgroundColor="#F9FAFB"
+                                TextColor="#1F2937"
+                                PlaceholderColor="#9CA3AF"
+                                HeightRequest="100"/>
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+
+            <!-- Предустановленные шаблоны -->
+            <Frame BackgroundColor="White" 
+                   BorderColor="#E5E7EB" 
+                   CornerRadius="12" 
+                   Padding="20"
+                   HasShadow="True">
+                <StackLayout Spacing="15">
+                    <Label Text="🎯 Быстрые шаблоны" 
+                           FontSize="18" 
+                           FontAttributes="Bold" 
+                           TextColor="#1F2937"/>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Row="0" Grid.Column="0"
+                                Text="📚 Лекция"
+                                FontSize="14"
+                                BackgroundColor="#EBF4FF"
+                                TextColor="#1D4ED8"
+                                Padding="8,4"
+                                CornerRadius="8"
+                                Margin="0,0,5,5"
+                                Clicked="OnTemplateClicked"/>
+
+                        <Button Grid.Row="0" Grid.Column="1"
+                                Text="📋 Заметки"
+                                FontSize="14"
+                                BackgroundColor="#F0FDF4"
+                                TextColor="#166534"
+                                Padding="8,4"
+                                CornerRadius="8"
+                                Margin="5,0,0,5"
+                                Clicked="OnTemplateClicked"/>
+
+                        <Button Grid.Row="1" Grid.Column="0"
+                                Text="🧮 Расчеты"
+                                FontSize="14"
+                                BackgroundColor="#FEF3C7"
+                                TextColor="#92400E"
+                                Padding="8,4"
+                                CornerRadius="8"
+                                Margin="0,5,5,0"
+                                Clicked="OnTemplateClicked"/>
+
+                        <Button Grid.Row="1" Grid.Column="1"
+                                Text="💡 Идеи"
+                                FontSize="14"
+                                BackgroundColor="#FDF2F8"
+                                TextColor="#BE185D"
+                                Padding="8,4"
+                                CornerRadius="8"
+                                Margin="5,5,0,0"
+                                Clicked="OnTemplateClicked"/>
+                    </Grid>
+                </StackLayout>
+            </Frame>
+
+            <!-- Предпросмотр -->
+            <Frame BackgroundColor="#F0F9FF" 
+                   BorderColor="#0EA5E9" 
+                   CornerRadius="12" 
+                   Padding="15"
+                   HasShadow="False">
+                <StackLayout Spacing="5">
+                    <Label Text="👁️ Предпросмотр" 
+                           FontSize="16" 
+                           FontAttributes="Bold" 
+                           TextColor="#0369A1"/>
+                    <Label x:Name="PreviewLabel"
+                           Text="Заполните название заметки"
+                           FontSize="14"
+                           TextColor="#0369A1"
+                           LineBreakMode="WordWrap"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- Кнопки действий -->
+            <StackLayout Spacing="10" Margin="0,10,0,20">
+                <Button x:Name="CreateButton"
+                        Text="✅ Создать заметку"
+                        FontSize="18"
+                        FontAttributes="Bold"
+                        BackgroundColor="#10B981"
+                        TextColor="White"
+                        Padding="15"
+                        CornerRadius="12"
+                        HeightRequest="60"
+                        Clicked="OnCreateNoteClicked"/>
+
+                <Button Text="❌ Отмена"
+                        FontSize="16"
+                        BackgroundColor="#6B7280"
+                        TextColor="White"
+                        Padding="12"
+                        CornerRadius="12"
+                        HeightRequest="50"
+                        Clicked="OnCancelClicked"/>
+            </StackLayout>
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

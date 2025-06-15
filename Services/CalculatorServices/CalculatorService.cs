@@ -3,7 +3,7 @@ using System.Data;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace StudyMateTest.Services
+namespace StudyMateTest.Services.CalculatorServices
 {
     public class CalculatorService : ICalculatorService
     {
@@ -229,7 +229,7 @@ namespace StudyMateTest.Services
                 // TAN - ПРОВЕРЯЕМ НА tan(π/2), tan(3π/2) и т.д.
                 expression = ProcessFunction(expression, "tan", x => {
                     // Нормализуем угол к диапазону [0, 2π]
-                    double normalizedX = ((x % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+                    double normalizedX = (x % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
 
                     // Проверяем проблемные точки: π/2, 3π/2
                     double piHalf = Math.PI / 2;
@@ -256,7 +256,7 @@ namespace StudyMateTest.Services
                 // COT - ПРОВЕРЯЕМ НА cot(0), cot(π), cot(2π) И cot(π/2)
                 expression = ProcessFunction(expression, "cot", x => {
                     // Нормализуем угол к диапазону [0, 2π]
-                    double normalizedX = ((x % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+                    double normalizedX = (x % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
 
                     // Проверяем проблемные точки: 0, π, 2π (где sin=0)
                     if (Math.Abs(normalizedX) < 1e-10 ||

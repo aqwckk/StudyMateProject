@@ -1,4 +1,4 @@
-﻿namespace StudyMateTest.Services
+﻿namespace StudyMateTest.Services.CalculatorServices
 {
     public interface ICalculatorService
     {

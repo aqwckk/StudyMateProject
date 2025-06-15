@@ -36,6 +36,14 @@ namespace StudyMateTest
                 Routing.RegisterRoute("ReminderPage/AddReminder", typeof(AddReminderPage));
                 Routing.RegisterRoute("ReminderPage/EditReminder", typeof(EditReminderPage));
 
+                // Маршруты для управления заметками
+                Routing.RegisterRoute("NotesListPage/CreateNote", typeof(CreateNoteDialog));
+                Routing.RegisterRoute("NotesListPage/EditNote", typeof(CombinedEditorPage));
+
+                // Маршруты для управления заметками
+                Routing.RegisterRoute("NotesListPage", typeof(NotesListPage));
+                Routing.RegisterRoute("CreateNoteDialog", typeof(CreateNoteDialog));
+
                 System.Diagnostics.Debug.WriteLine("AppShell: All routes registered successfully");
             }
             catch (System.Exception ex)

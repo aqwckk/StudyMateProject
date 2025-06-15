@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="StudyMateTest.Views.NotesListPage"
+             Title="Мои заметки"
+             BackgroundColor="#F8FAFC">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок и кнопка создания -->
+        <Grid Grid.Row="0" BackgroundColor="#4A90E2" Padding="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackLayout Grid.Column="0" VerticalOptions="Center">
+                <Label Text="📚 Мои заметки" 
+                       FontSize="24" 
+                       FontAttributes="Bold" 
+                       TextColor="White"/>
+                <Label x:Name="NotesCountLabel" 
+                       Text="0 заметок" 
+                       FontSize="14" 
+                       TextColor="White" 
+                       Opacity="0.8"/>
+            </StackLayout>
+
+            <Button Grid.Column="1" 
+                    Text="+" 
+                    FontSize="24" 
+                    FontAttributes="Bold" 
+                    BackgroundColor="White" 
+                    TextColor="#4A90E2" 
+                    WidthRequest="50" 
+                    HeightRequest="50"
+                    CornerRadius="25"
+                    Clicked="OnCreateNoteClicked"/>
+        </Grid>
+
+        <!-- Контент -->
+        <Grid Grid.Row="1">
+            <!-- Пустое состояние -->
+            <StackLayout x:Name="EmptyStateStack" 
+                         IsVisible="True" 
+                         VerticalOptions="Center" 
+                         HorizontalOptions="Center" 
+                         Padding="40">
+                <Label Text="📝" 
+                       FontSize="80" 
+                       HorizontalOptions="Center" 
+                       Margin="0,0,0,20"/>
+                <Label Text="Нет заметок" 
+                       FontSize="20" 
+                       FontAttributes="Bold" 
+                       HorizontalOptions="Center" 
+                       TextColor="#6B7280"/>
+                <Label Text="Нажмите '+' чтобы создать первую заметку" 
+                       FontSize="16" 
+                       HorizontalOptions="Center" 
+                       TextColor="#9CA3AF" 
+                       HorizontalTextAlignment="Center"
+                       Margin="0,10,0,0"/>
+            </StackLayout>
+
+            <!-- Список заметок -->
+            <CollectionView x:Name="NotesCollectionView" 
+                            BackgroundColor="Transparent" 
+                            Margin="15"
+                            IsVisible="False">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="0,5">
+                            <Frame BackgroundColor="White" 
+                                   BorderColor="#E5E7EB"  
+                                   CornerRadius="12" 
+                                   Padding="16"
+                                   HasShadow="True">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Заголовок и статус -->
+                                    <Label Grid.Row="0" Grid.Column="0" 
+                                           Text="{Binding DisplayTitle}" 
+                                           FontSize="18" 
+                                           FontAttributes="Bold" 
+                                           TextColor="#1F2937" 
+                                           LineBreakMode="WordWrap"/>
+
+                                    <Frame Grid.Row="0" Grid.Column="1" 
+                                           BackgroundColor="{Binding StatusColor}" 
+                                           Padding="8,4" 
+                                           CornerRadius="6"
+                                           HasShadow="False"
+                                           VerticalOptions="Start">
+                                        <Label Text="{Binding StatusText}" 
+                                               FontSize="10" 
+                                               TextColor="White" 
+                                               FontAttributes="Bold"/>
+                                    </Frame>
+
+                                    <!-- Описание -->
+                                    <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" 
+                                           Text="{Binding DisplayDescription}" 
+                                           FontSize="14" 
+                                           TextColor="#6B7280" 
+                                           Margin="0,5,0,0" 
+                                           LineBreakMode="WordWrap"/>
+
+                                    <!-- Предпросмотр содержимого -->
+                                    <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" 
+                                           Text="{Binding TextPreview}" 
+                                           FontSize="13" 
+                                           TextColor="#9CA3AF" 
+                                           Margin="0,8,0,0" 
+                                           LineBreakMode="WordWrap"/>
+
+                                    <!-- Информация о содержимом и времени -->
+                                    <StackLayout Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" 
+                                                 Orientation="Horizontal" 
+                                                 Margin="0,8,0,0" 
+                                                 Spacing="15">
+                                        <Label Text="{Binding ContentSummary}" 
+                                               FontSize="12" 
+                                               TextColor="#4A90E2" 
+                                               FontAttributes="Bold"/>
+                                        <Label Text="{Binding LastModifiedText}" 
+                                               FontSize="12" 
+                                               TextColor="#9CA3AF"/>
+                                    </StackLayout>
+
+                                    <!-- Кнопки действий -->
+                                    <StackLayout Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" 
+                                                 Orientation="Horizontal" 
+                                                 HorizontalOptions="End" 
+                                                 Margin="0,15,0,0" 
+                                                 Spacing="10">
+
+                                        <Button Text="📝 Открыть" 
+                                                FontSize="12" 
+                                                BackgroundColor="#F0F9FF" 
+                                                TextColor="#0369A1" 
+                                                Padding="12,6" 
+                                                CornerRadius="6"
+                                                BindingContext="{Binding .}" 
+                                                Clicked="OnOpenNoteClicked"/>
+
+                                        <Button Text="📤 Экспорт" 
+                                                FontSize="12" 
+                                                BackgroundColor="#F0FDF4" 
+                                                TextColor="#166534" 
+                                                Padding="12,6" 
+                                                CornerRadius="6"
+                                                BindingContext="{Binding .}" 
+                                                Clicked="OnExportNoteClicked"/>
+
+                                        <Button Text="📋 Копия" 
+                                                FontSize="12" 
+                                                BackgroundColor="#FFFBEB" 
+                                                TextColor="#92400E" 
+                                                Padding="12,6" 
+                                                CornerRadius="6"
+                                                BindingContext="{Binding .}" 
+                                                Clicked="OnDuplicateNoteClicked"/>
+
+                                        <Button Text="🗑️ Удалить" 
+                                                FontSize="12" 
+                                                BackgroundColor="#FEF2F2" 
+                                                TextColor="#DC2626" 
+                                                Padding="12,6" 
+                                                CornerRadius="6"
+                                                BindingContext="{Binding .}" 
+                                                Clicked="OnDeleteNoteClicked"/>
+                                    </StackLayout>
+                                </Grid>
+                            </Frame>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+        <!-- Нижняя панель с действиями -->
+        <Grid Grid.Row="2" Padding="20" BackgroundColor="#F9FAFB">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" 
+                    Text="🔄 Обновить" 
+                    FontSize="14" 
+                    BackgroundColor="#4A90E2" 
+                    TextColor="White" 
+                    Padding="12" 
+                    CornerRadius="8"
+                    Margin="0,0,5,0" 
+                    Clicked="OnRefreshClicked"/>
+
+            <Button Grid.Column="1" 
+                    Text="📥 Импорт" 
+                    FontSize="14" 
+                    BackgroundColor="#10B981" 
+                    TextColor="White" 
+                    Padding="12" 
+                    CornerRadius="8"
+                    Margin="2.5,0,2.5,0" 
+                    Clicked="OnImportClicked"/>
+
+            <Button Grid.Column="2" 
+                    Text="🗑️ Очистить" 
+                    FontSize="14" 
+                    BackgroundColor="#EF4444" 
+                    TextColor="White" 
+                    Padding="12" 
+                    CornerRadius="8"
+                    Margin="5,0,0,0" 
+                    Clicked="OnClearAllClicked"/>
+        </Grid>
+    </Grid>
+</ContentPage>

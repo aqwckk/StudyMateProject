@@ -1,7 +1,7 @@
 ﻿using Microsoft.Maui.Controls;
 using System;
-using StudyMateTest.Models;
-using StudyMateTest.Services;
+using StudyMateTest.Models.Calculator;
+using StudyMateTest.Services.CalculatorServices;
 
 namespace StudyMateTest.Views
 {

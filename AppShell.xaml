@@ -63,8 +63,8 @@
     </FlyoutItem>
 
     <!-- Заметки и редактор -->
-    <FlyoutItem Title="📚 Мои тетради" Route="CombinedEditorPage">
-        <ShellContent ContentTemplate="{DataTemplate views:CombinedEditorPage}" />
+    <FlyoutItem Title="📚 Мои тетради" Route="NotesListPage">
+        <ShellContent ContentTemplate="{DataTemplate views:NotesListPage}" />
     </FlyoutItem>
 
     <!-- Напоминания -->

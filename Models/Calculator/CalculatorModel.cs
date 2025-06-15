@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace StudyMateTest.Models
+namespace StudyMateTest.Models.Calculator
 {
     public class CalculatorModel
     {

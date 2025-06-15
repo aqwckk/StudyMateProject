@@ -34,6 +34,10 @@ namespace StudyMateTest.Services.DrawingServices
         void Redo();
         void Clear();
 
+        void LoadFromBytes(byte[] pngData);
+        void LoadFromBitmap(SKBitmap bitmap);
+        bool HasGraphicsContent();
+
         Task<byte[]> SaveAsPngAsync();
 
         event EventHandler CanUndoRedoChanged;

@@ -5,6 +5,8 @@ using StudyMateTest.Services.NotificationServices;
 using StudyMateTest.Services.DrawingServices;
 using StudyMateTest.Services.TextEditorServices;
 using StudyMateTest.Views;
+using CommunityToolkit.Maui;
+using StudyMateTest.Services.CalculatorServices;
 
 namespace StudyMateTest
 {
@@ -19,6 +21,7 @@ namespace StudyMateTest
                 var builder = MauiApp.CreateBuilder();
                 builder
                     .UseMauiApp<App>()
+                    .UseMauiCommunityToolkit()
                     .UseSkiaSharp()  // Для графического редактора
                     .ConfigureFonts(fonts =>
                     {
@@ -28,8 +31,10 @@ namespace StudyMateTest
 
                 System.Diagnostics.Debug.WriteLine("MauiProgram: Basic configuration completed");
 
-                // ===== СЕРВИСЫ ЗАМЕТОК И НАПОМИНАНИЙ =====
                 builder.Services.AddSingleton<ILocalStorageService, LocalStorageService>();
+
+                builder.Services.AddSingleton<INoteService, NoteService>();
+                System.Diagnostics.Debug.WriteLine("Registered NoteService");
 
                 // Платформо-специфичные уведомления
 #if WINDOWS
@@ -52,7 +57,7 @@ namespace StudyMateTest
 
                 // ===== СЕРВИСЫ КАЛЬКУЛЯТОРА =====
                 // Добавляем сервисы калькулятора
-                // builder.Services.AddSingleton<ICalculatorService, CalculatorService>();
+                builder.Services.AddSingleton<ICalculatorService, CalculatorService>();
 
                 System.Diagnostics.Debug.WriteLine("Services registered successfully");
 
@@ -66,6 +71,9 @@ namespace StudyMateTest
                 builder.Services.AddTransient<AddReminderPage>();
                 builder.Services.AddTransient<EditReminderPage>();
 
+                // Страницы для управления заметками
+                builder.Services.AddTransient<NotesListPage>();
+                builder.Services.AddTransient<CreateNoteDialog>();
                 // Страницы заметок/редактора
                 builder.Services.AddTransient<CombinedEditorPage>();
                 builder.Services.AddTransient<DrawingPage>();

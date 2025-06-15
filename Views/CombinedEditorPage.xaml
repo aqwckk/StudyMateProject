@@ -14,10 +14,31 @@
     <Grid RowDefinitions="Auto,*,Auto">
 
         <!-- Компактная панель инструментов -->
-        <Grid Grid.Row="0" BackgroundColor="#3E3E3E" Padding="5" RowDefinitions="Auto,Auto">
+        <Grid Grid.Row="0" BackgroundColor="#3E3E3E" Padding="5" RowDefinitions="Auto,Auto,Auto">
+            <!--- Первая строка: управление заметками-->
+                <ScrollView Grid.Row="0" Orientation="Horizontal">
+                <HorizontalStackLayout Spacing="3">
+                    <Label Text="📝 Заметка:" VerticalOptions="Center" FontSize="12" TextColor="LightGreen" Margin="0,0,10,0" />
 
-            <!-- Первая строка: графические инструменты -->
-            <ScrollView Grid.Row="0" Orientation="Horizontal">
+                    <Button Text="💾 Сохранить"
+                FontSize="10" Padding="6,3" WidthRequest="80" HeightRequest="25"
+                BackgroundColor="#10B981" TextColor="White"
+                Clicked="OnSaveNoteClicked" />
+
+                    <Button Text="📄 Как новая"
+                FontSize="10" Padding="6,3" WidthRequest="80" HeightRequest="25"
+                BackgroundColor="#3B82F6" TextColor="White"
+                Clicked="OnSaveAsNewNoteClicked" />
+
+                    <BoxView Color="Gray" WidthRequest="1" Margin="5,0" />
+
+                    <Label Text="Статус:" VerticalOptions="Center" FontSize="10" TextColor="White" />
+                    <Label x:Name="StatusIndicator" Text="Готов" 
+               VerticalOptions="Center" FontSize="10" TextColor="LightGray" />
+                </HorizontalStackLayout>
+            </ScrollView>
+            <!-- Вторая строка: графические инструменты -->
+            <ScrollView Grid.Row="1" Orientation="Horizontal">
                 <HorizontalStackLayout Spacing="3">
                     <Label Text="🎨 Графика:" VerticalOptions="Center" FontSize="12" TextColor="LightBlue" Margin="0,0,10,0" />
 
@@ -123,8 +144,8 @@
                 </HorizontalStackLayout>
             </ScrollView>
 
-            <!-- Вторая строка: текстовые инструменты -->
-            <ScrollView Grid.Row="1" Orientation="Horizontal" Margin="0,5,0,0">
+            <!-- Третья строка: текстовые инструменты -->
+            <ScrollView Grid.Row="2" Orientation="Horizontal" Margin="0,5,0,0">
                 <HorizontalStackLayout Spacing="3">
                     <Label Text="📝 Текст:" VerticalOptions="Center" FontSize="12" TextColor="LightGreen" Margin="0,0,10,0" />
 
@@ -261,14 +282,16 @@
                        FontSize="10" TextColor="LightGray" VerticalOptions="Center" />
             </StackLayout>
 
-            <!-- Правая часть: Сохранение -->
+            <!-- Правая часть: Быстрое сохранение-->
             <HorizontalStackLayout Grid.Column="1" Spacing="3">
-                <Button Text="💾🎨" ToolTipProperties.Text="Сохранить рисунок"
-                        Command="{Binding DrawingViewModel.SaveCommand}"
-                        FontSize="10" Padding="6,3" WidthRequest="50" HeightRequest="25" />
-                <Button Text="💾📝" ToolTipProperties.Text="Сохранить текст"
-                        Command="{Binding TextViewModel.SaveDocumentCommand}"
-                        FontSize="10" Padding="6,3" WidthRequest="50" HeightRequest="25" />
+                <Button Text="💾 Заметка" ToolTipProperties.Text="Сохранить заметку"
+                        Clicked="OnSaveNoteClicked"
+                        BackgroundColor="#10B981" TextColor="White"
+                        FontSize="10" Padding="6,3" WidthRequest="80" HeightRequest="25" />
+                <Button Text="📤 Экспорт" ToolTipProperties.Text="Экспорт файлов"
+                        FontSize="10" Padding="6,3" WidthRequest="70" HeightRequest="25" 
+                        BackgroundColor="#3B82F6" TextColor="White"
+                        Clicked="OnExportOptionsClicked" />
             </HorizontalStackLayout>
         </Grid>
     </Grid>

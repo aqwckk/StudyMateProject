@@ -25,7 +25,7 @@ namespace StudyMateTest
         {
             try
             {
-                await Shell.Current.GoToAsync("//CombinedEditorPage");
+                await Shell.Current.GoToAsync("//NotesListPage");
             }
             catch (Exception ex)
             {

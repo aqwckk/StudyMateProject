@@ -331,6 +331,144 @@ namespace StudyMateTest.Services.DrawingServices
             }
         }
 
+        public void LoadFromBytes(byte[] pngData)
+        {
+            System.Diagnostics.Debug.WriteLine($"LoadFromBytes called with {pngData?.Length ?? 0} bytes");
+
+            if (pngData == null || pngData.Length == 0)
+            {
+                System.Diagnostics.Debug.WriteLine("No data to load, clearing");
+                Clear();
+                return;
+            }
+
+            try
+            {
+                using (var stream = new System.IO.MemoryStream(pngData))
+                {
+                    var bitmap = SKBitmap.Decode(stream);
+                    if (bitmap != null)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Bitmap decoded: {bitmap.Width}x{bitmap.Height}");
+                        LoadFromBitmap(bitmap);
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("Failed to decode bitmap");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading graphics from bytes: {ex.Message}");
+                Clear();
+            }
+        }
+
+        public void LoadFromBitmap(SKBitmap bitmap)
+        {
+            System.Diagnostics.Debug.WriteLine($"LoadFromBitmap called with bitmap: {bitmap?.Width}x{bitmap?.Height}");
+
+            if (bitmap == null)
+            {
+                System.Diagnostics.Debug.WriteLine("Bitmap is null, clearing");
+                Clear();
+                return;
+            }
+
+            try
+            {
+                BeginBatchOperation();
+
+                if (_elements.Count > 0)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Saving {_elements.Count} elements for undo");
+                    _undoStack.Push(new DrawingAction
+                    {
+                        Type = DrawingAction.ActionType.Clear,
+                        ClearedElements = new List<IDrawingElement>(_elements)
+                    });
+                }
+
+                _elements.Clear();
+                _redoStack.Clear();
+
+                _canvasWidth = bitmap.Width;
+                _canvasHeight = bitmap.Height;
+                System.Diagnostics.Debug.WriteLine($"Canvas size set to: {_canvasWidth}x{_canvasHeight}");
+
+                var imageElement = new StudyMateTest.Models.Drawing.DrawingElements.BitmapElement(
+                    bitmap.Copy(),
+                    new SKRect(0, 0, bitmap.Width, bitmap.Height)
+                );
+
+                _elements.Add(imageElement);
+                System.Diagnostics.Debug.WriteLine($"Added bitmap element, total elements: {_elements.Count}");
+
+                EndBatchOperation();
+                OnCanvasSizeChanged();
+                OnCanUndoRedoChanged();
+                OnDrawingChanged();
+
+                System.Diagnostics.Debug.WriteLine($"Graphics loaded successfully, HasContent: {HasGraphicsContent()}");
+            }
+            catch (Exception ex)
+            {
+                EndBatchOperation();
+                System.Diagnostics.Debug.WriteLine($"Error loading graphics from bitmap: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+                Clear();
+            }
+        }
+
+        public bool HasGraphicsContent()
+        {
+            bool hasContent = _elements.Count > 0;
+            System.Diagnostics.Debug.WriteLine($"HasGraphicsContent: {hasContent} (elements: {_elements.Count})");
+            return hasContent;
+        }
+
+        public async Task<byte[]> SaveAsPngAsync()
+        {
+            System.Diagnostics.Debug.WriteLine($"SaveAsPngAsync called, elements: {_elements.Count}");
+
+            if (_elements.Count == 0)
+            {
+                System.Diagnostics.Debug.WriteLine("No elements to save, returning null");
+                return null;
+            }
+
+            try
+            {
+                SKImageInfo info = new SKImageInfo((int)_canvasWidth, (int)_canvasHeight);
+                using (SKSurface surface = SKSurface.Create(info))
+                {
+                    SKCanvas canvas = surface.Canvas;
+                    canvas.Clear(SKColors.White);
+
+                    System.Diagnostics.Debug.WriteLine($"Drawing {_elements.Count} elements to surface");
+
+                    int count = _elements.Count;
+                    for (int i = 0; i < count; i++)
+                    {
+                        _elements[i].Draw(canvas);
+                    }
+
+                    using (SKImage image = surface.Snapshot())
+                    using (SKData data = image.Encode(SKEncodedImageFormat.Png, 100))
+                    {
+                        byte[] result = data.ToArray();
+                        System.Diagnostics.Debug.WriteLine($"PNG saved: {result.Length} bytes");
+                        return result;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error saving PNG: {ex.Message}");
+                return null;
+            }
+        }
         private void DrawHandle(SKCanvas canvas, SKPoint center, float size, SKPaint paint)
         {
             canvas.DrawRect(center.X - size / 2, center.Y - size / 2, size, size, paint);
@@ -717,28 +855,6 @@ namespace StudyMateTest.Services.DrawingServices
                 EndBatchOperation();
                 OnCanUndoRedoChanged();
                 OnDrawingChanged();
-            }
-        }
-
-        public async Task<byte[]> SaveAsPngAsync()
-        {
-            SKImageInfo info = new SKImageInfo((int)_canvasWidth, (int)_canvasHeight);
-            using (SKSurface surface = SKSurface.Create(info))
-            {
-                SKCanvas canvas = surface.Canvas;
-                canvas.Clear(SKColors.White);
-
-                int count = _elements.Count;
-                for (int i = 0; i < count; i++)
-                {
-                    _elements[i].Draw(canvas);
-                }
-
-                using (SKImage image = surface.Snapshot())
-                using (SKData data = image.Encode(SKEncodedImageFormat.Png, 100))
-                {
-                    return data.ToArray();
-                }
             }
         }
 
