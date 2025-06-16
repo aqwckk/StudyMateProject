@@ -65,6 +65,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\StudyMateTest.Core\StudyMateTest.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Compile Update="Views\NotesListPage.xaml.cs">
 	    <DependentUpon>NotesListPage.xaml</DependentUpon>
 	  </Compile>
