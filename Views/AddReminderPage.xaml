@@ -128,59 +128,6 @@
                 </StackLayout>
             </Frame>
 
-            <!-- Дополнительные настройки - УБИРАЕМ -->
-            <!-- <Frame BackgroundColor="White" 
-                   BorderColor="#E5E7EB" 
-                   CornerRadius="12" 
-                   Padding="20"
-                   HasShadow="True">
-                <StackLayout Spacing="15">
-                    <Label Text="⚙️ Дополнительные настройки" 
-                           FontSize="18" 
-                           FontAttributes="Bold" 
-                           TextColor="#1F2937"/>
-                    
-                    <StackLayout Spacing="8">
-                        <Label Text="Приоритет" 
-                               FontSize="16" 
-                               FontAttributes="Bold" 
-                               TextColor="#374151"/>
-                        <Picker x:Name="PriorityPicker"
-                                FontSize="16"
-                                TextColor="#1F2937"
-                                BackgroundColor="#F9FAFB">
-                            <Picker.Items>
-                                <x:String>🔴 Высокий</x:String>
-                                <x:String>🟡 Средний</x:String>
-                                <x:String>🔵 Низкий</x:String>
-                            </Picker.Items>
-                        </Picker>
-                    </StackLayout>
-                    
-                    <StackLayout Spacing="8">
-                        <Label Text="Категория" 
-                               FontSize="16" 
-                               FontAttributes="Bold" 
-                               TextColor="#374151"/>
-                        <Picker x:Name="CategoryPicker"
-                                FontSize="16"
-                                TextColor="#1F2937"
-                                BackgroundColor="#F9FAFB">
-                            <Picker.Items>
-                                <x:String>📚 Учеба</x:String>
-                                <x:String>💼 Работа</x:String>
-                                <x:String>🏠 Дом</x:String>
-                                <x:String>🏥 Здоровье</x:String>
-                                <x:String>🎯 Личное</x:String>
-                                <x:String>📞 Звонки</x:String>
-                                <x:String>🛒 Покупки</x:String>
-                                <x:String>⚡ Прочее</x:String>
-                            </Picker.Items>
-                        </Picker>
-                    </StackLayout>
-                </StackLayout>
-            </Frame> -->
-
             <!-- Предпросмотр -->
             <Frame BackgroundColor="#F0F9FF" 
                    BorderColor="#0EA5E9" 

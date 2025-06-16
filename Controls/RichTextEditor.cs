@@ -197,9 +197,6 @@ namespace StudyMateTest.Controls
                 if (IsBold) attributes |= FontAttributes.Bold;
                 if (IsItalic) attributes |= FontAttributes.Italic;
                 _editor.FontAttributes = attributes;
-
-                // Подчеркивание в MAUI Editor не поддерживается напрямую
-                // Можно использовать TextDecorations, если доступно
             }
         }
 

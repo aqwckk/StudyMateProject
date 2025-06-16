@@ -321,7 +321,6 @@ namespace StudyMateTest.Views
 
                 double result = _calculatorService.Calculate(expression);
 
-                // НОВАЯ ПРОВЕРКА НА ОШИБКИ
                 if (double.IsNaN(result) || double.IsInfinity(result))
                 {
                     ShowError();
