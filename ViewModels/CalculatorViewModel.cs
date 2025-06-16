@@ -105,9 +105,9 @@ namespace StudyMateTest.ViewModels
             }
         }
 
-        /// <summary>
+        
         /// Обработка ввода оператора
-        /// </summary>
+
         /// <param name="operatorSymbol">Символ оператора</param>
         public void InputOperator(string operatorSymbol)
         {
@@ -130,9 +130,9 @@ namespace StudyMateTest.ViewModels
             }
         }
 
-        /// <summary>
+        
         /// Обработка ввода десятичной точки
-        /// </summary>
+
         public void InputDecimal()
         {
             if (HasDecimalPoint)
@@ -153,9 +153,9 @@ namespace StudyMateTest.ViewModels
             HasDecimalPoint = true;
         }
 
-        /// <summary>
+        
         /// Выполнение вычисления
-        /// </summary>
+
         /// <returns>Результат вычисления или сообщение об ошибке</returns>
         public CalculationResult Calculate()
         {
@@ -198,9 +198,9 @@ namespace StudyMateTest.ViewModels
             }
         }
 
-        /// <summary>
+        
         /// Вычисление квадратного корня
-        /// </summary>
+
         /// <returns>Результат вычисления или сообщение об ошибке</returns>
         public CalculationResult CalculateSquareRoot()
         {
@@ -240,9 +240,9 @@ namespace StudyMateTest.ViewModels
             }
         }
 
-        /// <summary>
+        
         /// Полная очистка калькулятора
-        /// </summary>
+
         public void Clear()
         {
             _calculatorModel.Reset();
@@ -253,9 +253,9 @@ namespace StudyMateTest.ViewModels
             OnPropertyChanged(nameof(HasDecimalPoint));
         }
 
-        /// <summary>
+        
         /// Очистка последнего ввода
-        /// </summary>
+
         public void ClearEntry()
         {
             DisplayValue = "0";
@@ -278,18 +278,18 @@ namespace StudyMateTest.ViewModels
             }
         }
 
-        /// <summary>
+        
         /// Получить историю вычислений
-        /// </summary>
+
         /// <returns>Список строк с историей</returns>
         public List<string> GetHistory()
         {
             return new List<string>(History);
         }
 
-        /// <summary>
+        
         /// Очистить историю вычислений
-        /// </summary>
+
         public void ClearHistory()
         {
             History.Clear();
