@@ -48,6 +48,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <AndroidResource Remove="StudyMateTest.Core\**" />
+	  <Compile Remove="StudyMateTest.Core\**" />
+	  <EmbeddedResource Remove="StudyMateTest.Core\**" />
+	  <MauiCss Remove="StudyMateTest.Core\**" />
+	  <MauiXaml Remove="StudyMateTest.Core\**" />
+	  <None Remove="StudyMateTest.Core\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<!-- Основные пакеты MAUI -->
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
