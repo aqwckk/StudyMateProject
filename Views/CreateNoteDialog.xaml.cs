@@ -12,6 +12,20 @@ namespace StudyMateTest.Views
             UpdatePreview();
         }
 
+        protected override bool OnBackButtonPressed()
+        {
+            try
+            {
+                MainThread.BeginInvokeOnMainThread(() => OnCancelClicked(null, null));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in OnBackButtonPressed: {ex.Message}");
+                return false;
+            }
+        }
+
         private void SetupPreviewUpdates()
         {
             try
@@ -124,8 +138,8 @@ namespace StudyMateTest.Views
                     Id = Guid.NewGuid().ToString(),
                     Title = TitleEntry.Text.Trim(),
                     Description = DescriptionEditor.Text?.Trim() ?? "",
-                    TextContent = "", 
-                    GraphicsData = null, 
+                    TextContent = "",
+                    GraphicsData = null,
                     CreatedAt = DateTime.Now,
                     LastModified = DateTime.Now,
                     IsModified = true
@@ -142,7 +156,7 @@ namespace StudyMateTest.Views
                 await Task.Delay(100);
 
                 System.Diagnostics.Debug.WriteLine("Closing modal...");
-                await Navigation.PopModalAsync();
+                await Navigation.PopAsync();
 
                 System.Diagnostics.Debug.WriteLine("=== OnCreateNoteClicked END ===");
             }
@@ -173,12 +187,12 @@ namespace StudyMateTest.Views
                         return;
                 }
 
-                await Navigation.PopModalAsync();
+                await Navigation.PopAsync();
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error canceling: {ex.Message}");
-                await Navigation.PopModalAsync();
+                await Navigation.PopAsync();
             }
         }
     }

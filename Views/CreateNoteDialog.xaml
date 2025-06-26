@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="StudyMateTest.Views.CreateNoteDialog"
              Title="Новая заметка"
-             BackgroundColor="#F8FAFC">
+             BackgroundColor="#F8FAFC"
+             NavigationPage.HasBackButton="True">
 
     <ScrollView>
         <StackLayout Padding="20" Spacing="20">

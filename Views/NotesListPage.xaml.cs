@@ -76,16 +76,31 @@ namespace StudyMateTest.Views
                 System.Diagnostics.Debug.WriteLine($"=== OnNoteCreated RECEIVED ===");
                 System.Diagnostics.Debug.WriteLine($"Received new note: {note.Title}");
                 System.Diagnostics.Debug.WriteLine($"Note ID: {note.Id}");
-                System.Diagnostics.Debug.WriteLine($"Current notes count before add: {_notes.Count}");
+                System.Diagnostics.Debug.WriteLine($"Current notes count before add: {_notes?.Count ?? 0}");
 
                 await _noteService.SaveNoteAsync(note);
                 System.Diagnostics.Debug.WriteLine($"Note saved to storage");
 
                 await MainThread.InvokeOnMainThreadAsync(() =>
                 {
-                    _notes.Insert(0, note); // Добавляем в начало списка
-                    System.Diagnostics.Debug.WriteLine($"Added note to collection. New count: {_notes.Count}");
-                    UpdateNotesCount();
+                    try
+                    {
+                        if (_notes != null)
+                        {
+                            _notes.Add(note);
+                            System.Diagnostics.Debug.WriteLine($"Added note to collection. New count: {_notes.Count}");
+                            UpdateNotesCount();
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine("ERROR: _notes collection is null!");
+                        }
+                    }
+                    catch (Exception innerEx)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"ERROR adding note to collection: {innerEx.Message}");
+                        System.Diagnostics.Debug.WriteLine($"Stack trace: {innerEx.StackTrace}");
+                    }
                 });
 
                 await MainThread.InvokeOnMainThreadAsync(async () =>
@@ -141,12 +156,10 @@ namespace StudyMateTest.Views
             try
             {
                 System.Diagnostics.Debug.WriteLine("=== Create note button clicked ===");
-                System.Diagnostics.Debug.WriteLine($"Current notes count before create: {_notes.Count}");
 
                 var createDialog = new CreateNoteDialog();
 
-                System.Diagnostics.Debug.WriteLine("About to push CreateNoteDialog");
-                await Navigation.PushModalAsync(createDialog);
+                await Navigation.PushAsync(createDialog);
                 System.Diagnostics.Debug.WriteLine("CreateNoteDialog pushed successfully");
             }
             catch (Exception ex)
