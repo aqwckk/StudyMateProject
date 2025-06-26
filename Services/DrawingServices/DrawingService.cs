@@ -832,6 +832,11 @@ namespace StudyMateTest.Services.DrawingServices
             }
         }
 
+        public void InvalidateCanvas()
+        {
+            OnDrawingChanged();
+        }
+
         public void Clear()
         {
             if (_elements.Count == 0)

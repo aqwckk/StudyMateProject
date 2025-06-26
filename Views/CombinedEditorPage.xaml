@@ -138,7 +138,11 @@
                     <Button Text="🔍-" Command="{Binding DrawingViewModel.ZoomOutCommand}" 
                             FontSize="10" Padding="4,2" WidthRequest="35" HeightRequest="25" />
                     <Label Text="{Binding DrawingViewModel.ZoomPercentage}" 
-                           VerticalOptions="Center" FontSize="10" TextColor="White" WidthRequest="40" HorizontalTextAlignment="Center" />
+                            VerticalOptions="Center" FontSize="10" TextColor="White" WidthRequest="40" HorizontalTextAlignment="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnZoomLabelTapped" />
+                        </Label.GestureRecognizers>
+                    </Label>
                     <Button Text="🔍+" Command="{Binding DrawingViewModel.ZoomInCommand}" 
                             FontSize="10" Padding="4,2" WidthRequest="35" HeightRequest="25" />
                 </HorizontalStackLayout>

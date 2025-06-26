@@ -151,6 +151,8 @@ namespace StudyMateTest.ViewModels
                     _drawingService.Zoom = value;
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(ZoomPercentage));
+
+                    _drawingService.InvalidateCanvas();
                 }
             }
         }

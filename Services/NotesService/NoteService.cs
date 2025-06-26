@@ -216,13 +216,48 @@ namespace StudyMateTest.Services
                     return false;
                 }
 
-                fileName = fileName ?? $"{SanitizeFileName(note.Title)}_{DateTime.Now:yyyyMMdd_HHmmss}.png";
-                string filePath = Path.Combine(FileSystem.AppDataDirectory, fileName);
+                string defaultFileName = SanitizeFileName(note.Title);
+                string userFileName = await Application.Current.MainPage.DisplayPromptAsync(
+                    "Экспорт рисунка",
+                    "Введите имя файла:",
+                    initialValue: defaultFileName,
+                    placeholder: "Имя файла без расширения");
+
+                if (string.IsNullOrWhiteSpace(userFileName))
+                    return false;
+
+                fileName = $"{SanitizeFileName(userFileName)}_{DateTime.Now:yyyyMMdd_HHmmss}.png";
+
+                string filePath;
+
+#if WINDOWS
+        try
+        {
+            var picker = new Windows.Storage.Pickers.FileSavePicker();
+            picker.SuggestedFileName = fileName;
+            picker.FileTypeChoices.Add("PNG Image", new[] { ".png" });
+            picker.DefaultFileExtension = ".png";
+            
+            var hwnd = ((MauiWinUIWindow)Application.Current.Windows[0].Handler.PlatformView).WindowHandle;
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+            
+            var file = await picker.PickSaveFileAsync();
+            if (file == null) return false;
+            
+            filePath = file.Path;
+        }
+        catch
+        {
+            filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), fileName);
+        }
+#else
+                filePath = Path.Combine(FileSystem.AppDataDirectory, fileName);
+#endif
 
                 await File.WriteAllBytesAsync(filePath, note.GraphicsData);
 
-                await Application.Current.MainPage.DisplayAlert("Успешно", $"Рисунок экспортирован: {fileName}", "OK");
-                System.Diagnostics.Debug.WriteLine($"Note graphics exported to: {fileName}");
+                await Application.Current.MainPage.DisplayAlert("Успешно", $"Рисунок экспортирован:\n{filePath}", "OK");
+                System.Diagnostics.Debug.WriteLine($"Note graphics exported to: {filePath}");
                 return true;
             }
             catch (Exception ex)
@@ -243,8 +278,43 @@ namespace StudyMateTest.Services
                     return false;
                 }
 
-                fileName = fileName ?? $"{SanitizeFileName(note.Title)}_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
-                string filePath = Path.Combine(FileSystem.AppDataDirectory, fileName);
+                string defaultFileName = SanitizeFileName(note.Title);
+                string userFileName = await Application.Current.MainPage.DisplayPromptAsync(
+                    "Экспорт текста",
+                    "Введите имя файла:",
+                    initialValue: defaultFileName,
+                    placeholder: "Имя файла без расширения");
+
+                if (string.IsNullOrWhiteSpace(userFileName))
+                    return false;
+
+                fileName = $"{SanitizeFileName(userFileName)}_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
+
+                string filePath;
+
+#if WINDOWS
+        try
+        {
+            var picker = new Windows.Storage.Pickers.FileSavePicker();
+            picker.SuggestedFileName = fileName;
+            picker.FileTypeChoices.Add("Text Document", new[] { ".txt" });
+            picker.DefaultFileExtension = ".txt";
+            
+            var hwnd = ((MauiWinUIWindow)Application.Current.Windows[0].Handler.PlatformView).WindowHandle;
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+            
+            var file = await picker.PickSaveFileAsync();
+            if (file == null) return false;
+            
+            filePath = file.Path;
+        }
+        catch
+        {
+            filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), fileName);
+        }
+#else
+                filePath = Path.Combine(FileSystem.AppDataDirectory, fileName);
+#endif
 
                 var plainText = System.Text.RegularExpressions.Regex.Replace(
                     note.TextContent, "<[^>]+>", "")
@@ -264,8 +334,8 @@ namespace StudyMateTest.Services
 
                 await File.WriteAllTextAsync(filePath, content.ToString(), Encoding.UTF8);
 
-                await Application.Current.MainPage.DisplayAlert("Успешно", $"Текст экспортирован: {fileName}", "OK");
-                System.Diagnostics.Debug.WriteLine($"Note text exported to: {fileName}");
+                await Application.Current.MainPage.DisplayAlert("Успешно", $"Текст экспортирован:\n{filePath}", "OK");
+                System.Diagnostics.Debug.WriteLine($"Note text exported to: {filePath}");
                 return true;
             }
             catch (Exception ex)
@@ -280,14 +350,49 @@ namespace StudyMateTest.Services
         {
             try
             {
-                fileName = fileName ?? $"{SanitizeFileName(note.Title)}_{DateTime.Now:yyyyMMdd_HHmmss}.json";
-                string filePath = Path.Combine(FileSystem.AppDataDirectory, fileName);
+                string defaultFileName = SanitizeFileName(note.Title);
+                string userFileName = await Application.Current.MainPage.DisplayPromptAsync(
+                    "Экспорт заметки",
+                    "Введите имя файла:",
+                    initialValue: defaultFileName,
+                    placeholder: "Имя файла без расширения");
+
+                if (string.IsNullOrWhiteSpace(userFileName))
+                    return false;
+
+                fileName = $"{SanitizeFileName(userFileName)}_{DateTime.Now:yyyyMMdd_HHmmss}.json";
+
+                string filePath;
+
+#if WINDOWS
+        try
+        {
+            var picker = new Windows.Storage.Pickers.FileSavePicker();
+            picker.SuggestedFileName = fileName;
+            picker.FileTypeChoices.Add("JSON Document", new[] { ".json" });
+            picker.DefaultFileExtension = ".json";
+            
+            var hwnd = ((MauiWinUIWindow)Application.Current.Windows[0].Handler.PlatformView).WindowHandle;
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+            
+            var file = await picker.PickSaveFileAsync();
+            if (file == null) return false;
+            
+            filePath = file.Path;
+        }
+        catch
+        {
+            filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), fileName);
+        }
+#else
+                filePath = Path.Combine(FileSystem.AppDataDirectory, fileName);
+#endif
 
                 var json = JsonSerializer.Serialize(note, _jsonOptions);
                 await File.WriteAllTextAsync(filePath, json, Encoding.UTF8);
 
-                await Application.Current.MainPage.DisplayAlert("Успешно", $"Заметка экспортирована: {fileName}", "OK");
-                System.Diagnostics.Debug.WriteLine($"Note exported to JSON: {fileName}");
+                await Application.Current.MainPage.DisplayAlert("Успешно", $"Заметка экспортирована:\n{filePath}", "OK");
+                System.Diagnostics.Debug.WriteLine($"Note exported to JSON: {filePath}");
                 return true;
             }
             catch (Exception ex)

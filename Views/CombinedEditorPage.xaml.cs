@@ -28,6 +28,8 @@ public partial class CombinedEditorPage : ContentPage
     private bool _hasUnsavedChanges = false;
     private readonly object _autoSaveLock = new object();
 
+    private double _initialSplitterPosition;
+
     public CombinedEditorPage(IDrawingService drawingService, ITextEditorService textEditorService)
     {
         InitializeComponent();
@@ -89,6 +91,31 @@ public partial class CombinedEditorPage : ContentPage
         }
     }
 
+    private void OnZoomLabelTapped(object sender, EventArgs e)
+    {
+        try
+        {
+            _viewModel.DrawingViewModel.Zoom = 1.0f;
+
+            canvasView?.InvalidateSurface();
+
+            StatusLabel.Text = "Масштаб сброшен к 100%";
+
+            _ = Task.Delay(2000).ContinueWith(_ =>
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    if (StatusLabel.Text == "Масштаб сброшен к 100%")
+                        StatusLabel.Text = "Готов";
+                });
+            });
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error resetting zoom: {ex.Message}");
+            StatusLabel.Text = "Ошибка сброса масштаба";
+        }
+    }
     private void InitializeAutoSave()
     {
         _autoSaveTimer = new System.Timers.Timer(180000);
@@ -182,6 +209,7 @@ public partial class CombinedEditorPage : ContentPage
             case GestureStatus.Started:
                 _isDraggingSplitter = true;
                 _totalWidth = SplitMode.Width;
+                _initialSplitterPosition = _splitterPosition;
                 Splitter.BackgroundColor = Colors.Blue;
                 StatusLabel.Text = "Перетаскивание разделителя...";
                 break;
@@ -189,9 +217,10 @@ public partial class CombinedEditorPage : ContentPage
             case GestureStatus.Running:
                 if (_isDraggingSplitter && _totalWidth > 0)
                 {
-                    double currentX = e.TotalX;
-                    double deltaRatio = currentX / _totalWidth;
-                    double newPosition = Math.Max(0.1, Math.Min(0.9, 0.5 + deltaRatio));
+                    double deltaRatio = e.TotalX / _totalWidth;
+                    double newPosition = _initialSplitterPosition + deltaRatio;
+
+                    newPosition = Math.Max(0.1, Math.Min(0.9, newPosition));
 
                     _splitterPosition = newPosition;
                     UpdateSplitterLayout();

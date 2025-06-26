@@ -43,5 +43,7 @@ namespace StudyMateTest.Services.DrawingServices
         event EventHandler CanUndoRedoChanged;
         event EventHandler DrawingChanged;
         event EventHandler<CanvasSizeChangedEventArgs> CanvasSizeChanged;
+
+        void InvalidateCanvas();
     }
 }
