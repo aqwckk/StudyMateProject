@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="StudyMateTest.Views.ReminderPage"
-             Title="Напоминания">
+             Title=""
+             Shell.NavBarIsVisible="False">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -12,7 +13,7 @@
         </Grid.RowDefinitions>
 
         <!-- Заголовок -->
-        <Grid Grid.Row="0" BackgroundColor="#6366F1" Padding="20">
+        <Grid Grid.Row="0" BackgroundColor="#4A90E2" Padding="20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -23,11 +24,11 @@
                 <Label x:Name="ReminderCountLabel" Text="0 активных напоминаний" FontSize="14" TextColor="White" Opacity="0.8"/>
             </StackLayout>
 
-            <Button Grid.Column="1" Text="+" FontSize="24" FontAttributes="Bold" BackgroundColor="White" TextColor="#6366F1" WidthRequest="50" HeightRequest="50" Clicked="OnAddReminderClicked"/>
+            <Button Grid.Column="1" Text="+" FontSize="24" FontAttributes="Bold" BackgroundColor="White" TextColor="#4A90E2" WidthRequest="50" HeightRequest="50" Clicked="OnAddReminderClicked"/>
         </Grid>
 
-        <!-- Контент -->
-        <Grid Grid.Row="1">
+        <!-- Контент с белым фоном -->
+        <Grid Grid.Row="1" BackgroundColor="White">
             <!-- Пустое состояние -->
             <StackLayout x:Name="EmptyStateLabel" IsVisible="True" VerticalOptions="Center" HorizontalOptions="Center" Padding="40">
                 <Label Text="📅" FontSize="60" HorizontalOptions="Center" Margin="0,0,0,20"/>
@@ -36,7 +37,7 @@
             </StackLayout>
 
             <!-- Список напоминаний -->
-            <CollectionView x:Name="RemindersCollectionView" BackgroundColor="Transparent" Margin="15">
+            <CollectionView x:Name="RemindersCollectionView" BackgroundColor="White" Margin="15">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Grid Padding="0,5">
@@ -76,7 +77,7 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Text="🔄 Обновить" FontSize="14" BackgroundColor="#6366F1" TextColor="White" Padding="12" Margin="0,0,5,0" Clicked="OnRefreshClicked"/>
+            <Button Grid.Column="0" Text="🔄 Обновить" FontSize="14" BackgroundColor="#4A90E2" TextColor="White" Padding="12" Margin="0,0,5,0" Clicked="OnRefreshClicked"/>
             <Button Grid.Column="1" Text="🗑️ Очистить все" FontSize="14" BackgroundColor="#EF4444" TextColor="White" Padding="12" Margin="5,0,0,0" Clicked="OnClearAllClicked"/>
         </Grid>
     </Grid>

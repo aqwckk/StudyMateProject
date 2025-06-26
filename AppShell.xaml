@@ -5,75 +5,90 @@
        xmlns:local="clr-namespace:StudyMateTest"
        xmlns:views="clr-namespace:StudyMateTest.Views"
        Title="StudyMate"
-       FlyoutBackgroundColor="#9BB8D3">
+       FlyoutBackgroundColor="White"
+       FlyoutBehavior="Flyout">
 
-    <!-- Кастомный заголовок с градиентом -->
+    <!-- Простой белый заголовок -->
     <Shell.FlyoutHeader>
-        <Grid HeightRequest="200">
-            <Grid.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Color="#85C1D9" Offset="0.0" />
-                    <GradientStop Color="#9BB8D3" Offset="0.3" />
-                    <GradientStop Color="#C4D9ED" Offset="0.6" />
-                    <GradientStop Color="#D4C2D8" Offset="0.8" />
-                    <GradientStop Color="#D19999" Offset="1.0" />
-                </LinearGradientBrush>
-            </Grid.Background>
+        <Border BackgroundColor="White" 
+                Padding="20"
+                StrokeThickness="0">
+            <StackLayout Spacing="10" 
+                         VerticalOptions="Center" 
+                         HorizontalOptions="Center"
+                         Padding="0,30,0,20">
 
-            <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="15">
-                <Label Text="—" 
-                       FontSize="{OnPlatform iOS=50, Android=45, WinUI=55}" 
-                       FontFamily="Georgia"
-                       FontAttributes="Bold"
-                       TextColor="White"
+                <Label Text="📚" 
+                       FontSize="50"
                        HorizontalOptions="Center" />
+
                 <Label Text="StudyMate" 
-                       FontSize="{OnPlatform iOS=28, Android=26, WinUI=30}" 
-                       FontFamily="Georgia"
+                       FontSize="32" 
+                       FontFamily="Comic Sans MS"
                        FontAttributes="Bold"
-                       TextColor="White"
+                       TextColor="#4A90E2"
                        HorizontalOptions="Center" />
-                <Label Text="SM — ПОВОД СХОДИТЬ НА ПАРЫ!" 
-                       FontSize="{OnPlatform iOS=14, Android=13, WinUI=15}" 
-                       FontFamily="Arial"
-                       FontAttributes="Bold"
-                       TextColor="White"
-                       Opacity="0.9"
-                       HorizontalOptions="Center" />
+
+                <BoxView Color="#E2E8F0" 
+                         HeightRequest="2" 
+                         HorizontalOptions="FillAndExpand"
+                         Margin="20,15,20,0" />
+
             </StackLayout>
-        </Grid>
+        </Border>
     </Shell.FlyoutHeader>
 
-    <!-- Стили для меню -->
+    <!-- Глобальные стили для чистого белого Shell -->
     <Shell.Resources>
-        <Style x:Key="BaseStyle" TargetType="Element">
-            <Setter Property="Shell.BackgroundColor" Value="#9BB8D3" />
-            <Setter Property="Shell.ForegroundColor" Value="#2E86AB" />
-            <Setter Property="Shell.TitleColor" Value="#2E86AB" />
-            <Setter Property="Shell.DisabledColor" Value="#6B9DC2" />
-            <Setter Property="Shell.UnselectedColor" Value="#4A6B78" />
-        </Style>
+        <ResourceDictionary>
+
+            <!-- Стиль для всего Shell -->
+            <Style TargetType="Shell" ApplyToDerivedTypes="True">
+                <Setter Property="Shell.BackgroundColor" Value="White" />
+                <Setter Property="Shell.ForegroundColor" Value="#4A90E2" />
+                <Setter Property="Shell.TitleColor" Value="#4A90E2" />
+                <Setter Property="Shell.DisabledColor" Value="#CBD5E1" />
+                <Setter Property="Shell.UnselectedColor" Value="#64748B" />
+                <Setter Property="Shell.TabBarBackgroundColor" Value="White" />
+                <Setter Property="Shell.TabBarForegroundColor" Value="#4A90E2" />
+                <Setter Property="Shell.TabBarTitleColor" Value="#4A90E2" />
+                <Setter Property="Shell.TabBarUnselectedColor" Value="#64748B" />
+            </Style>
+
+
+            <!-- Стиль для контента Shell -->
+            <Style TargetType="ShellContent">
+                <Setter Property="Shell.BackgroundColor" Value="White" />
+                <Setter Property="Shell.ForegroundColor" Value="#4A90E2" />
+                <Setter Property="Shell.TitleColor" Value="#4A90E2" />
+            </Style>
+
+        </ResourceDictionary>
     </Shell.Resources>
 
-    <!-- ВСЕ СТРАНИЦЫ ПРИЛОЖЕНИЯ -->
+    <!-- НАВИГАЦИЯ ПО ПРИЛОЖЕНИЮ -->
 
     <!-- Главная страница -->
-    <FlyoutItem Title="🏠 Главная" Route="MainPage">
+    <FlyoutItem Title="🏠  Главная" 
+                Route="MainPage">
         <ShellContent ContentTemplate="{DataTemplate local:MainPage}" />
     </FlyoutItem>
 
-    <!-- Заметки и редактор -->
-    <FlyoutItem Title="📚 Мои тетради" Route="NotesListPage">
+    <!-- Мои тетради -->
+    <FlyoutItem Title="📚  Мои тетради" 
+                Route="NotesListPage">
         <ShellContent ContentTemplate="{DataTemplate views:NotesListPage}" />
     </FlyoutItem>
 
     <!-- Напоминания -->
-    <FlyoutItem Title="⏰ Напоминания" Route="ReminderPage">
+    <FlyoutItem Title="⏰  Напоминания" 
+                Route="ReminderPage">
         <ShellContent ContentTemplate="{DataTemplate views:ReminderPage}" />
     </FlyoutItem>
 
     <!-- Калькулятор -->
-    <FlyoutItem Title="🔢 Калькулятор" Route="CalculatorPage">
+    <FlyoutItem Title="🔢  Калькулятор" 
+                Route="CalculatorPage">
         <ShellContent ContentTemplate="{DataTemplate views:CalculatorPage}" />
     </FlyoutItem>
 

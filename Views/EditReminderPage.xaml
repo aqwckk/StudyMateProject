@@ -2,18 +2,20 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="StudyMateTest.Views.EditReminderPage"
-             Title="Редактирование напоминания">
+             Title=""
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="White">
 
-    <ScrollView>
-        <StackLayout Padding="20" Spacing="15">
+    <ScrollView BackgroundColor="White">
+        <StackLayout Padding="20" Spacing="15" BackgroundColor="White">
 
             <!-- Заголовок -->
-            <Frame BackgroundColor="#6366F1" Padding="20" CornerRadius="12" HasShadow="True">
+            <Frame BackgroundColor="#4A90E2" Padding="20" CornerRadius="12" HasShadow="False">
                 <Label Text="✏️ Редактирование напоминания" FontSize="20" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center"/>
             </Frame>
 
             <!-- Название -->
-            <Frame BackgroundColor="White" Padding="15" CornerRadius="8" HasShadow="True">
+            <Frame BackgroundColor="White" Padding="15" CornerRadius="8" HasShadow="False">
                 <StackLayout>
                     <Label Text="📝 Название" FontSize="16" FontAttributes="Bold" TextColor="#374151"/>
                     <Entry x:Name="TitleEntry" Placeholder="Введите название напоминания" FontSize="16" TextColor="#1F2937"/>
@@ -21,7 +23,7 @@
             </Frame>
 
             <!-- Описание -->
-            <Frame BackgroundColor="White" Padding="15" CornerRadius="8" HasShadow="True">
+            <Frame BackgroundColor="White" Padding="15" CornerRadius="8" HasShadow="False">
                 <StackLayout>
                     <Label Text="📋 Описание" FontSize="16" FontAttributes="Bold" TextColor="#374151"/>
                     <Editor x:Name="MessageEditor" Placeholder="Добавьте подробности..." HeightRequest="80" FontSize="14" TextColor="#1F2937"/>
@@ -29,7 +31,7 @@
             </Frame>
 
             <!-- Дата и время -->
-            <Frame BackgroundColor="White" Padding="15" CornerRadius="8" HasShadow="True">
+            <Frame BackgroundColor="White" Padding="15" CornerRadius="8" HasShadow="False">
                 <StackLayout>
                     <Label Text="⏰ Дата и время" FontSize="16" FontAttributes="Bold" TextColor="#374151" Margin="0,0,0,10"/>
 
@@ -59,16 +61,52 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Button Grid.Column="0" Text="09:00" FontSize="12" BackgroundColor="#F3F4F6" TextColor="#374151" Clicked="OnQuickTimeClicked" Margin="0,0,2,0"/>
-                        <Button Grid.Column="1" Text="12:00" FontSize="12" BackgroundColor="#F3F4F6" TextColor="#374151" Clicked="OnQuickTimeClicked" Margin="2,0,2,0"/>
-                        <Button Grid.Column="2" Text="15:00" FontSize="12" BackgroundColor="#F3F4F6" TextColor="#374151" Clicked="OnQuickTimeClicked" Margin="2,0,2,0"/>
-                        <Button Grid.Column="3" Text="18:00" FontSize="12" BackgroundColor="#F3F4F6" TextColor="#374151" Clicked="OnQuickTimeClicked" Margin="2,0,0,0"/>
+                        <Button Grid.Column="0" 
+                                Text="09:00" 
+                                FontSize="12" 
+                                BackgroundColor="#F3F4F6" 
+                                TextColor="#374151" 
+                                Clicked="OnQuickTimeClicked" 
+                                Margin="0,0,2,0"
+                                BorderColor="Transparent"
+                                BorderWidth="0"
+                                CornerRadius="6"/>
+                        <Button Grid.Column="1" 
+                                Text="12:00" 
+                                FontSize="12" 
+                                BackgroundColor="#F3F4F6" 
+                                TextColor="#374151" 
+                                Clicked="OnQuickTimeClicked" 
+                                Margin="2,0,2,0"
+                                BorderColor="Transparent"
+                                BorderWidth="0"
+                                CornerRadius="6"/>
+                        <Button Grid.Column="2" 
+                                Text="15:00" 
+                                FontSize="12" 
+                                BackgroundColor="#F3F4F6" 
+                                TextColor="#374151" 
+                                Clicked="OnQuickTimeClicked" 
+                                Margin="2,0,2,0"
+                                BorderColor="Transparent"
+                                BorderWidth="0"
+                                CornerRadius="6"/>
+                        <Button Grid.Column="3" 
+                                Text="18:00" 
+                                FontSize="12" 
+                                BackgroundColor="#F3F4F6" 
+                                TextColor="#374151" 
+                                Clicked="OnQuickTimeClicked" 
+                                Margin="2,0,0,0"
+                                BorderColor="Transparent"
+                                BorderWidth="0"
+                                CornerRadius="6"/>
                     </Grid>
                 </StackLayout>
             </Frame>
 
             <!-- Предпросмотр -->
-            <Frame BackgroundColor="#F8FAFC" Padding="15" CornerRadius="8" HasShadow="True">
+            <Frame BackgroundColor="#F8FAFC" Padding="15" CornerRadius="8" HasShadow="False">
                 <StackLayout>
                     <Label Text="👁️ Предпросмотр" FontSize="16" FontAttributes="Bold" TextColor="#374151" Margin="0,0,0,10"/>
                     <Label x:Name="PreviewLabel" Text="Напоминание появится здесь..." FontSize="14" TextColor="#6B7280" LineBreakMode="WordWrap"/>
@@ -82,8 +120,29 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" Text="❌ Отмена" FontSize="16" BackgroundColor="#6B7280" TextColor="White" Padding="15" Margin="0,0,5,0" Clicked="OnCancelClicked"/>
-                <Button Grid.Column="1" Text="💾 Сохранить" FontSize="16" BackgroundColor="#10B981" TextColor="White" Padding="15" Margin="5,0,0,0" Clicked="OnSaveClicked"/>
+                <Button Grid.Column="0" 
+                        Text="❌ Отмена" 
+                        FontSize="16" 
+                        BackgroundColor="#6B7280" 
+                        TextColor="White" 
+                        Padding="15" 
+                        Margin="0,0,5,0" 
+                        Clicked="OnCancelClicked"
+                        BorderColor="Transparent"
+                        BorderWidth="0"
+                        CornerRadius="8"/>
+
+                <Button Grid.Column="1" 
+                        Text="💾 Сохранить" 
+                        FontSize="16" 
+                        BackgroundColor="#10B981" 
+                        TextColor="White" 
+                        Padding="15" 
+                        Margin="5,0,0,0" 
+                        Clicked="OnSaveClicked"
+                        BorderColor="Transparent"
+                        BorderWidth="0"
+                        CornerRadius="8"/>
             </Grid>
 
         </StackLayout>

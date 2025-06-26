@@ -6,90 +6,75 @@
              Shell.TabBarIsVisible="False"
              NavigationPage.HasNavigationBar="False">
 
-    <Grid>
-        <Grid.Background>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                <GradientStop Color="#A8D8EA" Offset="0.0" />
-                <GradientStop Color="#B8E6FF" Offset="0.3" />
-                <GradientStop Color="#E6F3FF" Offset="0.6" />
-                <GradientStop Color="#FFE6F0" Offset="0.8" />
-                <GradientStop Color="#F4C2C2" Offset="1.0" />
-            </LinearGradientBrush>
-        </Grid.Background>
+    <Grid BackgroundColor="White" Padding="30">
 
-        <ScrollView VerticalOptions="FillAndExpand">
+        <ScrollView VerticalOptions="FillAndExpand" 
+                    HorizontalOptions="FillAndExpand">
+
             <StackLayout 
-                Padding="40,30,40,30"
-                Spacing="25"
-                VerticalOptions="Center"
-                HorizontalOptions="Center"
-                MaximumWidthRequest="500">
+                Padding="25"
+                Spacing="30"
+                VerticalOptions="CenterAndExpand"
+                HorizontalOptions="CenterAndExpand"
+                WidthRequest="450"
+                MaximumWidthRequest="450"
+                MinimumWidthRequest="450">
 
                 <!-- Заголовок -->
                 <Label Text="StudyMate" 
-                       FontSize="{OnPlatform iOS=52, Android=48, WinUI=56}" 
-                       FontFamily="Georgia"
+                       FontSize="68" 
+                       FontFamily="Segoe UI Black"
                        FontAttributes="Bold"
                        TextColor="#2E86AB"
                        HorizontalOptions="Center"
-                       Margin="0,20,0,10" />
-
-                <!-- Слоган -->
-                <Label Text="📚 Твой умный помощник для учёбы! ✨" 
-                       FontSize="{OnPlatform iOS=26, Android=24, WinUI=28}" 
-                       FontFamily="Arial"
-                       FontAttributes="Bold"
-                       TextColor="#1B4A5C"
-                       HorizontalOptions="Center"
-                       HorizontalTextAlignment="Center"
-                       Margin="0,0,0,30" />
+                       Margin="0,30,0,40">
+                    <Label.Shadow>
+                        <Shadow Brush="Black"
+                                Offset="2,2"
+                                Radius="1"
+                                Opacity="0.3" />
+                    </Label.Shadow>
+                </Label>
 
                 <!-- Кнопки основных функций -->
-                <Button Text="📚 Мои тетради"
+                <Button Text="Мои тетради"
                         FontSize="{OnPlatform iOS=28, Android=26, WinUI=30}"
-                        FontFamily="Arial"
+                        FontFamily="Segoe UI Black"
                         FontAttributes="Bold"
                         TextColor="White"
                         BackgroundColor="#4A90E2"
-                        HeightRequest="{OnPlatform iOS=85, Android=80, WinUI=90}"
-                        MinimumWidthRequest="350"
+                        HeightRequest="90"
+                        WidthRequest="400"
                         CornerRadius="20"
                         Clicked="OnNotebooksClicked"
-                        HorizontalOptions="Center" />
+                        HorizontalOptions="Center"
+                        Margin="0,8" />
 
-                <Button Text="⏰ Мои напоминания"
+                <Button Text="Мои напоминания"
                         FontSize="{OnPlatform iOS=28, Android=26, WinUI=30}"
-                        FontFamily="Arial"
+                        FontFamily="Segoe UI Black"
                         FontAttributes="Bold"
                         TextColor="White"
-                        BackgroundColor="#7B68EE"
-                        HeightRequest="{OnPlatform iOS=85, Android=80, WinUI=90}"
-                        MinimumWidthRequest="350"
+                        BackgroundColor="#4A90E2"
+                        HeightRequest="90"
+                        WidthRequest="400"
                         CornerRadius="20"
                         Clicked="OnRemindersClicked"
-                        HorizontalOptions="Center" />
+                        HorizontalOptions="Center"
+                        Margin="0,8" />
 
-                <Button Text="🔢 Калькулятор"
+                <Button Text="Калькулятор"
                         FontSize="{OnPlatform iOS=28, Android=26, WinUI=30}"
-                        FontFamily="Arial"
+                        FontFamily="Segoe UI Black"
                         FontAttributes="Bold"
                         TextColor="White"
-                        BackgroundColor="#FF6B6B"
-                        HeightRequest="{OnPlatform iOS=85, Android=80, WinUI=90}"
-                        MinimumWidthRequest="350"
+                        BackgroundColor="#4A90E2"
+                        HeightRequest="90"
+                        WidthRequest="400"
                         CornerRadius="20"
                         Clicked="OnCalculatorClicked"
-                        HorizontalOptions="Center" />
-
-                <!-- Мотивационный текст -->
-                <Label Text="💪 Учись эффективно, достигай большего!" 
-                       FontSize="{OnPlatform iOS=20, Android=18, WinUI=22}" 
-                       FontFamily="Arial"
-                       FontAttributes="Bold"
-                       TextColor="#2E86AB"
-                       HorizontalOptions="Center"
-                       HorizontalTextAlignment="Center"
-                       Margin="0,30,0,20" />
+                        HorizontalOptions="Center"
+                        Margin="0,8" />
 
             </StackLayout>
         </ScrollView>
