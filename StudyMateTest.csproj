@@ -48,15 +48,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <AndroidResource Remove="StudyMateTest.Core\**" />
-	  <Compile Remove="StudyMateTest.Core\**" />
-	  <EmbeddedResource Remove="StudyMateTest.Core\**" />
-	  <MauiCss Remove="StudyMateTest.Core\**" />
-	  <MauiXaml Remove="StudyMateTest.Core\**" />
-	  <None Remove="StudyMateTest.Core\**" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<!-- Основные пакеты MAUI -->
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
@@ -73,9 +64,6 @@
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\StudyMateTest.Core\StudyMateTest.Core.csproj" />
-	</ItemGroup>
 
 	<ItemGroup>
 	  <Compile Update="Views\NotesListPage.xaml.cs">
