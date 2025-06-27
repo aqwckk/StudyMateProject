@@ -54,6 +54,10 @@ namespace StudyMateTest.Services.CalculatorServices
 
             try
             {
+                // Проверяем на множественные минусы подряд
+                if (HasMultipleMinuses(expression))
+                    return false;
+
                 string prepared = PrepareExpression(expression);
 
                 // Проверяем балансировку скобок
@@ -84,6 +88,25 @@ namespace StudyMateTest.Services.CalculatorServices
             {
                 return false;
             }
+        }
+
+        private bool HasMultipleMinuses(string expression)
+        {
+            // Проверяем на два или более минуса подряд
+            // Разрешаем только отрицательные числа в скобках: (-5)
+
+            // Временно заменяем корректные отрицательные числа в скобках
+            string temp = Regex.Replace(expression, @"\(\s*−\s*\d+(?:\.\d+)?\s*\)", "NEGATIVE_NUMBER");
+
+            // Теперь ищем множественные минусы
+            if (Regex.IsMatch(temp, @"−\s*−"))
+                return true;
+
+            // Проверяем на другие множественные операторы
+            if (Regex.IsMatch(temp, @"[+×÷]\s*[+×÷]"))
+                return true;
+
+            return false;
         }
 
         public string FormatResult(double result)

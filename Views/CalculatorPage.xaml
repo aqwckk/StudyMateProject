@@ -41,7 +41,7 @@
                 HorizontalOptions="FillAndExpand">
                 <Grid WidthRequest="2000" HorizontalOptions="End">
                     <Label x:Name="DisplayLabel"
-                   Text="0"
+                   Text=""
                    FontSize="42"
                    FontAttributes="Bold"
                    TextColor="Black"
@@ -51,6 +51,29 @@
                 </Grid>
             </ScrollView>
         </StackLayout>
+        <StackLayout Orientation="Horizontal" 
+             HorizontalOptions="Start" 
+             Margin="10,5,10,0">
+
+            <Button x:Name="CopyExpressionButton"
+            Text="Скопировать выражение"
+            BackgroundColor="Transparent"
+            TextColor="#666666"
+            FontSize="14"
+            Padding="8,4"
+            Clicked="OnCopyExpressionClicked" />
+
+            <Button x:Name="CopyResultButton"
+            Text="Скопировать результат"
+            BackgroundColor="Transparent"
+            TextColor="#666666"
+            FontSize="14"
+            Padding="8,4"
+            Margin="5,0,0,0"
+            Clicked="OnCopyResultClicked" />
+
+        </StackLayout>
+
 
         <!-- Кнопки -->
         <!-- ОБЫЧНЫЙ КАЛЬКУЛЯТОР - Панель кнопок -->
@@ -647,7 +670,7 @@
                        HorizontalOptions="Center" />
 
                 <Label Text="Калькулятор матриц"
-                       TextColor="White"
+                       TextColor="Black"
                        FontSize="24"
                        FontAttributes="Bold"
                        HorizontalOptions="Center" />

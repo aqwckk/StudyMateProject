@@ -24,7 +24,108 @@ namespace StudyMateTest.Views
             DisplayLabel.SizeChanged += OnDisplayLabelSizeChanged;
 
             UpdateDisplay();
+
+            // Добавляем поддержку клавиатуры для Windows
+            this.Loaded += OnPageLoaded;
         }
+
+        private void OnPageLoaded(object sender, EventArgs e)
+        {
+            try
+            {
+#if WINDOWS
+        // Более простая настройка клавиатуры для Windows
+        var platformView = this.Handler?.PlatformView as Microsoft.UI.Xaml.FrameworkElement;
+        if (platformView != null)
+        {
+            platformView.KeyDown += OnWindowsKeyDown;
+            platformView.IsTabStop = true;
+            platformView.Focus(Microsoft.UI.Xaml.FocusState.Programmatic);
+        }
+#endif
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Keyboard setup error: {ex.Message}");
+            }
+        }
+
+#if WINDOWS
+private void OnWindowsKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+{
+    try
+    {
+        var key = e.Key;
+        
+        // Цифры 0-9
+        if (key >= Windows.System.VirtualKey.Number0 && key <= Windows.System.VirtualKey.Number9)
+        {
+            int digit = (int)(key - Windows.System.VirtualKey.Number0);
+            var tempButton = new Button { Text = digit.ToString() };
+            OnNumberClicked(tempButton, EventArgs.Empty);
+            e.Handled = true;
+            return;
+        }
+        
+        // NumPad цифры
+        if (key >= Windows.System.VirtualKey.NumberPad0 && key <= Windows.System.VirtualKey.NumberPad9)
+        {
+            int digit = (int)(key - Windows.System.VirtualKey.NumberPad0);
+            var tempButton = new Button { Text = digit.ToString() };
+            OnNumberClicked(tempButton, EventArgs.Empty);
+            e.Handled = true;
+            return;
+        }
+
+        // Операторы и специальные клавиши
+        if (key == Windows.System.VirtualKey.Add)
+        {
+            OnOperatorClicked(new Button { Text = "+" }, EventArgs.Empty);
+            e.Handled = true;
+        }
+        else if (key == Windows.System.VirtualKey.Subtract)
+        {
+            OnOperatorClicked(new Button { Text = "−" }, EventArgs.Empty);
+            e.Handled = true;
+        }
+        else if (key == Windows.System.VirtualKey.Multiply)
+        {
+            OnOperatorClicked(new Button { Text = "×" }, EventArgs.Empty);
+            e.Handled = true;
+        }
+        else if (key == Windows.System.VirtualKey.Divide)
+        {
+            OnOperatorClicked(new Button { Text = "÷" }, EventArgs.Empty);
+            e.Handled = true;
+        }
+        else if (key == Windows.System.VirtualKey.Decimal)
+        {
+            OnDecimalClicked(this, EventArgs.Empty);
+            e.Handled = true;
+        }
+        else if (key == Windows.System.VirtualKey.Back)
+        {
+            OnBackspaceClicked(this, EventArgs.Empty);
+            e.Handled = true;
+        }
+        else if (key == Windows.System.VirtualKey.Escape)
+        {
+            OnClearClicked(this, EventArgs.Empty);
+            e.Handled = true;
+        }
+        else if (key == Windows.System.VirtualKey.Delete)
+        {
+            OnClearEntryClicked(this, EventArgs.Empty);
+            e.Handled = true;
+        }
+       
+    }
+    catch (Exception ex)
+    {
+        System.Diagnostics.Debug.WriteLine($"Key handling error: {ex.Message}");
+    }
+}
+#endif
 
         private void OnDisplayLabelSizeChanged(object sender, EventArgs e)
         {
@@ -811,6 +912,10 @@ namespace StudyMateTest.Views
                 {
                     ExpressionLabel.Text = string.IsNullOrEmpty(_currentExpression) ? "Введите выражение" : "Ввод...";
                 }
+
+                bool hasContent = !string.IsNullOrEmpty(_currentExpression);
+                CopyExpressionButton.IsVisible = hasContent;
+                CopyResultButton.IsVisible = hasContent;
             }
             catch
             {
@@ -830,6 +935,113 @@ namespace StudyMateTest.Views
             }
             catch { /* Даже обработка ошибок может упасть */ }
         }
+        #endregion
+
+        #region Copy Functions
+
+        private async void OnCopyExpressionClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(_currentExpression))
+                {
+                    await Clipboard.SetTextAsync(_currentExpression);
+                    await ShowCopyConfirmation("Выражение скопировано!");
+                }
+                else
+                {
+                    await ShowCopyConfirmation("Нет выражения для копирования");
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowCopyConfirmation("Ошибка копирования");
+                System.Diagnostics.Debug.WriteLine($"Copy expression error: {ex.Message}");
+            }
+        }
+
+        private async void OnCopyResultClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_justCalculated && !string.IsNullOrEmpty(_currentExpression))
+                {
+                    // Копируем результат вычислений
+                    await Clipboard.SetTextAsync(_currentExpression);
+                    await ShowCopyConfirmation("Результат скопирован!");
+                }
+                else if (!string.IsNullOrEmpty(_currentExpression))
+                {
+                    // Если не вычислено, но есть выражение - вычисляем и копируем
+                    string expression = _currentExpression.Trim();
+
+                    // Убираем оператор в конце, если есть
+                    while (expression.EndsWith(" + ") || expression.EndsWith(" − ") ||
+                           expression.EndsWith(" × ") || expression.EndsWith(" ÷ "))
+                    {
+                        var lastSpaceIndex = expression.TrimEnd().LastIndexOf(' ');
+                        if (lastSpaceIndex > 0)
+                        {
+                            expression = expression.Substring(0, lastSpaceIndex);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    if (_calculatorService.IsValidExpression(expression))
+                    {
+                        double result = _calculatorService.Calculate(expression);
+
+                        if (!double.IsNaN(result) && !double.IsInfinity(result))
+                        {
+                            string formattedResult = _calculatorService.FormatResult(result);
+                            await Clipboard.SetTextAsync(formattedResult);
+                            await ShowCopyConfirmation("Результат скопирован!");
+                        }
+                        else
+                        {
+                            await ShowCopyConfirmation("Невозможно вычислить результат");
+                        }
+                    }
+                    else
+                    {
+                        await ShowCopyConfirmation("Некорректное выражение");
+                    }
+                }
+                else
+                {
+                    await ShowCopyConfirmation("Нет результата для копирования");
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowCopyConfirmation("Ошибка копирования");
+                System.Diagnostics.Debug.WriteLine($"Copy result error: {ex.Message}");
+            }
+        }
+
+        private async Task ShowCopyConfirmation(string message)
+        {
+            try
+            {
+                // Показываем уведомление на 1.5 секунды
+                var originalText = ExpressionLabel.Text;
+                ExpressionLabel.Text = message;
+                ExpressionLabel.TextColor = Color.FromArgb("#4CAF50"); // Зеленый цвет
+
+                await Task.Delay(1500);
+
+                ExpressionLabel.Text = originalText;
+                ExpressionLabel.TextColor = Color.FromArgb("#666666"); // Возвращаем серый цвет
+            }
+            catch
+            {
+                // Игнорируем ошибки анимации
+            }
+        }
+
         #endregion
     }
 }
