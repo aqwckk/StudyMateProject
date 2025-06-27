@@ -34,7 +34,6 @@ namespace StudyMateTest.Views
             try
             {
 #if WINDOWS
-        // Более простая настройка клавиатуры для Windows
         var platformView = this.Handler?.PlatformView as Microsoft.UI.Xaml.FrameworkElement;
         if (platformView != null)
         {
@@ -56,7 +55,7 @@ private void OnWindowsKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEv
     try
     {
         var key = e.Key;
-        
+       
         // Цифры 0-9
         if (key >= Windows.System.VirtualKey.Number0 && key <= Windows.System.VirtualKey.Number9)
         {
@@ -118,7 +117,11 @@ private void OnWindowsKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEv
             OnClearEntryClicked(this, EventArgs.Empty);
             e.Handled = true;
         }
-       
+        else
+        {
+            // Для всех остальных клавиш - просто блокируем
+            e.Handled = true;
+        }      
     }
     catch (Exception ex)
     {
