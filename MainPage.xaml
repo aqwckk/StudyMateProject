@@ -23,9 +23,9 @@
                 <!-- Заголовок -->
                 <Label Text="StudyMate" 
                        FontSize="68" 
-                       FontFamily="Segoe UI Black"
+                       FontFamily="Comic Sans MS"
                        FontAttributes="Bold"
-                       TextColor="#2E86AB"
+                       TextColor="#4A90E2"
                        HorizontalOptions="Center"
                        Margin="0,30,0,40">
                     <Label.Shadow>
