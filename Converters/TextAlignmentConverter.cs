@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace StudyMateTest.Converters
 {
+    // конвертер для конвертирования кастомного (нашего) выравнивания в стандартное выравнивание MAUI
     class TextAlignmentConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

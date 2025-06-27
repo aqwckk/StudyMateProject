@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace StudyMateTest.Models.Drawing.DrawingElements
 {
-    public interface IDrawingElement
+    public interface IDrawingElement // интерфейс для все графических элементов
     {
-        void Draw(SKCanvas canvas);
-        SKRect Bounds { get; }
+        void Draw(SKCanvas canvas); // метод для рисования на холсте
+        SKRect Bounds { get; } // границы объекта
     }
 }

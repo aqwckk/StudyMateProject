@@ -7,34 +7,34 @@ using System.Threading.Tasks;
 
 namespace StudyMateTest.Models.Drawing.DrawingElements
 {
-    public class LineElement : DrawingElement
+    // класс для описания линии
+    public class LineElement : DrawingElement // наследуемся от DrawingElement
     {
-        public SKPoint Start { get; }
-        public SKPoint End { get; }
+        public SKPoint Start { get; } // свойство только для чтения для начальной точки линии
+        public SKPoint End { get; } // свойство только для чтения для конечной точки линии
 
-        public LineElement(SKPoint start, SKPoint end, SKPaint paint) : base(paint)
+        public LineElement(SKPoint start, SKPoint end, SKPaint paint) : base(paint) // конструктор для создания линии с заданными начальной и конечной точкой и краской
         {
-            Start = start;
-            End = end;
+            Start = start; // начальная точка - переданная start
+            End = end; // конечная точка - переданная end
         }
 
-        public override void Draw(SKCanvas canvas)
+        public override void Draw(SKCanvas canvas) // переопределяем метод рисования на холсте
         {
-            canvas.DrawLine(Start, End, Paint);
+            canvas.DrawLine(Start, End, Paint); // рисуем линию от начальной до конечной точки заданной краской
         }
 
-        public override SKRect Bounds
+        public override SKRect Bounds // переопределяем свойство для границ элемента
         {
-            get 
+            get
             {
-                return new SKRect(
-                    Math.Min(Start.X, End.X),
-                    Math.Min(Start.Y, End.Y),
-                    Math.Max(Start.X, End.X),
-                    Math.Max(Start.Y, End.Y)
+                return new SKRect( // создаем прямоугольник, описывающий линию
+                    Math.Min(Start.X, End.X), // левая граница - минимальная X координата
+                    Math.Min(Start.Y, End.Y), // верхняя граница - минимальная Y координата
+                    Math.Max(Start.X, End.X), // правая граница - максимальная X координата
+                    Math.Max(Start.Y, End.Y)  // нижняя граница - максимальная Y координата
                     );
             }
         }
-
     }
 }

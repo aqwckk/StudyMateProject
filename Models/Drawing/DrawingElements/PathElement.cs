@@ -7,63 +7,65 @@ using System.Threading.Tasks;
 
 namespace StudyMateTest.Models.Drawing.DrawingElements
 {
-    public class PathElement : DrawingElement 
+    // класс для описания произвольного пути (кривой линии)
+    public class PathElement : DrawingElement // наследуемся от DrawingElement
     {
-        public SKPath Path { get; }
+        public SKPath Path { get; } // свойство только для чтения для хранения пути
 
-        public PathElement(SKPath path, SKPaint paint) : base(paint)
+        public PathElement(SKPath path, SKPaint paint) : base(paint) // конструктор для создания элемента пути с заданным путем и краской
         {
-            Path = SimplifyPath(path);
+            Path = SimplifyPath(path); // упрощаем переданный путь для оптимизации производительности
         }
 
-        private SKPath SimplifyPath(SKPath originalPath, float tolerance = 2f) 
+        // метод для упрощения пути путем уменьшения количества точек
+        private SKPath SimplifyPath(SKPath originalPath, float tolerance = 2f)
         {
-            SKPath simplifiedPath = new SKPath();
+            SKPath simplifiedPath = new SKPath(); // создаем новый упрощенный путь
 
-            if (originalPath.PointCount <= 10) 
+            if (originalPath.PointCount <= 10) // если точек мало (10 или меньше)
             {
-                simplifiedPath.AddPath(originalPath);
+                simplifiedPath.AddPath(originalPath); // просто копируем оригинальный путь
                 return simplifiedPath;
             }
 
-            using (SKPathMeasure measure = new SKPathMeasure(originalPath)) 
+            using (SKPathMeasure measure = new SKPathMeasure(originalPath)) // создаем измеритель пути для работы с длиной и позициями
             {
-                float length = measure.Length;
-                int numPoints = Math.Max(2, (int)(length / (tolerance * 5)));
+                float length = measure.Length; // получаем общую длину пути
+                int numPoints = Math.Max(2, (int)(length / (tolerance * 5))); // вычисляем оптимальное количество точек на основе длины и допуска
 
-                if (numPoints > originalPath.PointCount) 
+                if (numPoints > originalPath.PointCount) // если вычисленное количество больше исходного
                 {
-                    simplifiedPath.AddPath(originalPath);
+                    simplifiedPath.AddPath(originalPath); // используем оригинальный путь
                     return simplifiedPath;
                 }
 
-                bool isFirst = true;
-                for (int i = 0; i < numPoints; i++) 
+                bool isFirst = true; // флаг для отслеживания первой точки
+                for (int i = 0; i < numPoints; i++) // проходим по оптимальному количеству точек
                 {
-                    float distance = i * length / (numPoints - 1);
-                    if (measure.GetPosition(distance, out SKPoint point)) 
+                    float distance = i * length / (numPoints - 1); // вычисляем расстояние вдоль пути для текущей точки
+                    if (measure.GetPosition(distance, out SKPoint point)) // получаем координаты точки на заданном расстоянии
                     {
-                        if (isFirst)
+                        if (isFirst) // если это первая точка
                         {
-                            simplifiedPath.MoveTo(point);
+                            simplifiedPath.MoveTo(point); // перемещаемся к точке (начало пути)
                             isFirst = false;
                         }
-                        else 
+                        else
                         {
-                            simplifiedPath.LineTo(point);
+                            simplifiedPath.LineTo(point); // рисуем линию к точке
                         }
                     }
                 }
             }
 
-            return simplifiedPath;
+            return simplifiedPath; // возвращаем упрощенный путь
         }
 
-        public override void Draw(SKCanvas canvas)
+        public override void Draw(SKCanvas canvas) // переопределяем метод рисования на холсте
         {
-            canvas.DrawPath(Path, Paint);
+            canvas.DrawPath(Path, Paint); // рисуем путь на холсте заданной краской
         }
 
-        public override SKRect Bounds => Path.Bounds;
+        public override SKRect Bounds => Path.Bounds; // переопределяем свойство границ - используем встроенное свойство Bounds пути
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StudyMateTest.Models.TextEditor
 {
-    public enum TextAlignment
+    public enum TextAlignment // перечисление выравнивания текста
     {
         Left,
         Center,
