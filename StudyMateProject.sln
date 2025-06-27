@@ -5,6 +5,10 @@ VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudyMateTest", "StudyMateTest.csproj", "{779B1FD9-98CA-8FE0-96D9-80136AF093D8}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudyMateTest.Tests", "..\StudyMateTest.Tests\StudyMateTest.Tests.csproj", "{CA0CA4FA-6C2A-4A18-81D1-775546A92E7D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudyMateTest.Core", "..\StudyMateTest.Core\StudyMateTest.Core.csproj", "{AB5D9112-158A-4747-9F5B-FF764C57CB2A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,6 +21,14 @@ Global
 		{779B1FD9-98CA-8FE0-96D9-80136AF093D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{779B1FD9-98CA-8FE0-96D9-80136AF093D8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{779B1FD9-98CA-8FE0-96D9-80136AF093D8}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{CA0CA4FA-6C2A-4A18-81D1-775546A92E7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA0CA4FA-6C2A-4A18-81D1-775546A92E7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA0CA4FA-6C2A-4A18-81D1-775546A92E7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA0CA4FA-6C2A-4A18-81D1-775546A92E7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB5D9112-158A-4747-9F5B-FF764C57CB2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB5D9112-158A-4747-9F5B-FF764C57CB2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB5D9112-158A-4747-9F5B-FF764C57CB2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB5D9112-158A-4747-9F5B-FF764C57CB2A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
