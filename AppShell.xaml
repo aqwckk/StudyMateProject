@@ -13,35 +13,87 @@
        FlyoutBackgroundColor="White"
        FlyoutBehavior="Flyout">
 
-    <!-- Простой белый заголовок -->
-    <Shell.FlyoutHeader>
-        <Border BackgroundColor="White" 
-                Padding="20"
-                StrokeThickness="0">
-            <StackLayout Spacing="10" 
-                         VerticalOptions="Center" 
-                         HorizontalOptions="Center"
-                         Padding="0,30,0,20">
+    <!-- Кастомный шаблон для Flyout -->
+    <Shell.FlyoutContent>
+        <Grid BackgroundColor="White">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-                <Label Text="📚" 
-                       FontSize="50"
-                       HorizontalOptions="Center" />
+            <!-- Заголовок -->
+            <Border Grid.Row="0" 
+                    BackgroundColor="White" 
+                    Padding="20"
+                    StrokeThickness="0">
+                <StackLayout Spacing="10" 
+                             VerticalOptions="Center" 
+                             HorizontalOptions="Center"
+                             Padding="0,30,0,20">
 
-                <Label Text="StudyMate" 
-                       FontSize="32" 
-                       FontFamily="Comic Sans MS"
-                       FontAttributes="Bold"
-                       TextColor="#4A90E2"
-                       HorizontalOptions="Center" />
+                    <Label Text="📚" 
+                           FontSize="50"
+                           HorizontalOptions="Center" />
 
-                <BoxView Color="#E2E8F0" 
-                         HeightRequest="2" 
-                         HorizontalOptions="FillAndExpand"
-                         Margin="20,15,20,0" />
+                    <Label Text="StudyMate" 
+                           FontSize="32" 
+                           FontFamily="Comic Sans MS"
+                           FontAttributes="Bold"
+                           TextColor="#4A90E2"
+                           HorizontalOptions="Center" />
 
-            </StackLayout>
-        </Border>
-    </Shell.FlyoutHeader>
+                    <BoxView Color="#E2E8F0" 
+                             HeightRequest="2" 
+                             HorizontalOptions="FillAndExpand"
+                             Margin="20,15,20,0" />
+
+                </StackLayout>
+            </Border>
+
+            <!-- Меню навигации -->
+            <ScrollView Grid.Row="1" BackgroundColor="White">
+                <StackLayout Spacing="0" BackgroundColor="White">
+
+                    <Button Text="🏠  Главная"
+                            BackgroundColor="Transparent"
+                            TextColor="Black"
+                            FontSize="16"
+                            HorizontalOptions="FillAndExpand"
+                            HeightRequest="50"
+                            Padding="20,0"
+                            Clicked="OnHomeClicked" />
+
+                    <Button Text="📚  Мои тетради"
+                            BackgroundColor="Transparent"
+                            TextColor="Black"
+                            FontSize="16"
+                            HorizontalOptions="FillAndExpand"
+                            HeightRequest="50"
+                            Padding="20,0"
+                            Clicked="OnNotesClicked" />
+
+                    <Button Text="⏰  Напоминания"
+                            BackgroundColor="Transparent"
+                            TextColor="Black"
+                            FontSize="16"
+                            HorizontalOptions="FillAndExpand"
+                            HeightRequest="50"
+                            Padding="20,0"
+                            Clicked="OnReminderClicked" />
+
+                    <Button Text="🔢  Калькулятор"
+                            BackgroundColor="Transparent"
+                            TextColor="Black"
+                            FontSize="16"
+                            HorizontalOptions="FillAndExpand"
+                            HeightRequest="50"
+                            Padding="20,0"
+                            Clicked="OnCalculatorClicked" />
+
+                </StackLayout>
+            </ScrollView>
+        </Grid>
+    </Shell.FlyoutContent>
 
     <!-- Глобальные стили для чистого белого Shell -->
     <Shell.Resources>
@@ -69,31 +121,22 @@
 
         </ResourceDictionary>
     </Shell.Resources>
+    
+    <!-- Основные страницы как ShellContent -->
+    <ShellContent Title="Главная" 
+                  Route="MainPage"
+                  ContentTemplate="{DataTemplate local:MainPage}" />
 
-    <!-- НАВИГАЦИЯ ПО ПРИЛОЖЕНИЮ -->
+    <ShellContent Title="Мои тетради" 
+                  Route="NotesListPage"
+                  ContentTemplate="{DataTemplate views:NotesListPage}" />
 
-    <!-- Главная страница -->
-    <FlyoutItem Title="🏠  Главная" 
-                Route="MainPage">
-        <ShellContent ContentTemplate="{DataTemplate local:MainPage}" />
-    </FlyoutItem>
+    <ShellContent Title="Напоминания" 
+                  Route="ReminderPage"
+                  ContentTemplate="{DataTemplate views:ReminderPage}" />
 
-    <!-- Мои тетради -->
-    <FlyoutItem Title="📚  Мои тетради" 
-                Route="NotesListPage">
-        <ShellContent ContentTemplate="{DataTemplate views:NotesListPage}" />
-    </FlyoutItem>
-
-    <!-- Напоминания -->
-    <FlyoutItem Title="⏰  Напоминания" 
-                Route="ReminderPage">
-        <ShellContent ContentTemplate="{DataTemplate views:ReminderPage}" />
-    </FlyoutItem>
-
-    <!-- Калькулятор -->
-    <FlyoutItem Title="🔢  Калькулятор" 
-                Route="CalculatorPage">
-        <ShellContent ContentTemplate="{DataTemplate views:CalculatorPage}" />
-    </FlyoutItem>
+    <ShellContent Title="Калькулятор" 
+                  Route="CalculatorPage"
+                  ContentTemplate="{DataTemplate views:CalculatorPage}" />
 
 </Shell>

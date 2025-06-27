@@ -52,5 +52,30 @@ namespace StudyMateTest
                 throw;
             }
         }
+
+        // Обработчики нажатий для кастомного Flyout меню
+        private async void OnHomeClicked(object sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync("//MainPage");
+            Shell.Current.FlyoutIsPresented = false;
+        }
+
+        private async void OnNotesClicked(object sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync("//NotesListPage");
+            Shell.Current.FlyoutIsPresented = false;
+        }
+
+        private async void OnReminderClicked(object sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync("//ReminderPage");
+            Shell.Current.FlyoutIsPresented = false;
+        }
+
+        private async void OnCalculatorClicked(object sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync("//CalculatorPage");
+            Shell.Current.FlyoutIsPresented = false;
+        }
     }
 }
